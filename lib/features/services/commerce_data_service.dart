@@ -4,11 +4,11 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:logger/logger.dart';
 import '../../helpers/auth_helper.dart';
-import '../../config/app_config.dart';
+import 'package:zonix/helpers/env_helper.dart';
 
 class CommerceDataService {
   static const FlutterSecureStorage _storage = FlutterSecureStorage();
-  static String get baseUrl => AppConfig.apiUrl;
+  static String get baseUrl => EnvHelper.apiUrl;
   static final Logger _logger = Logger();
 
   // Datos mock para cuando el backend no esté disponible

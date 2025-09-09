@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../helpers/auth_helper.dart';
-import '../../config/app_config.dart';
+import 'package:zonix/helpers/env_helper.dart';
 
 class PrivacyService {
-  static String get baseUrl => AppConfig.apiUrl;
+  static String get baseUrl => EnvHelper.apiUrl;
 
   // Obtener configuración actual de privacidad
   static Future<Map<String, dynamic>> getPrivacySettings() async {

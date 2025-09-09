@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:logger/logger.dart';
 import 'websocket_service.dart';
-import '../../config/app_config.dart';
+import 'package:zonix/helpers/env_helper.dart';
 import '../../helpers/auth_helper.dart';
 
 class CommerceNotificationService {
@@ -13,7 +13,7 @@ class CommerceNotificationService {
   CommerceNotificationService._internal();
 
   static const FlutterSecureStorage _storage = FlutterSecureStorage();
-  static String get baseUrl => AppConfig.apiUrl;
+  static String get baseUrl => EnvHelper.apiUrl;
   final Logger _logger = Logger();
 
   StreamSubscription? _wsSubscription;

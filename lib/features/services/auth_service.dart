@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import '../config/app_config.dart';
+import 'package:zonix/helpers/env_helper.dart';
 
 class AuthService {
   static const storage = FlutterSecureStorage();
@@ -22,7 +22,7 @@ class AuthService {
     
     try {
       final response = await http.post(
-        Uri.parse('${AppConfig.apiUrl}/api/auth/login'),
+        Uri.parse('${EnvHelper.apiUrl}/api/auth/login'),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -31,7 +31,7 @@ class AuthService {
           'email': email,
           'password': password,
         }),
-      ).timeout(Duration(milliseconds: AppConfig.requestTimeout));
+      ).timeout(Duration(milliseconds: EnvHelper.requestTimeout));
 
       logger.i('Login Response Status: ${response.statusCode}');
 
@@ -83,12 +83,12 @@ class AuthService {
       if (token == null) return null;
 
       final response = await http.get(
-        Uri.parse('${AppConfig.apiUrl}/api/auth/user'),
+        Uri.parse('${EnvHelper.apiUrl}/api/auth/user'),
         headers: {
           'Authorization': 'Bearer $token',
           'Accept': 'application/json',
         },
-      ).timeout(Duration(milliseconds: AppConfig.requestTimeout));
+      ).timeout(Duration(milliseconds: EnvHelper.requestTimeout));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -110,12 +110,12 @@ class AuthService {
       if (token == null) return true;
 
       final response = await http.post(
-        Uri.parse('${AppConfig.apiUrl}/api/auth/logout'),
+        Uri.parse('${EnvHelper.apiUrl}/api/auth/logout'),
         headers: {
           'Authorization': 'Bearer $token',
           'Accept': 'application/json',
         },
-      ).timeout(Duration(milliseconds: AppConfig.requestTimeout));
+      ).timeout(Duration(milliseconds: EnvHelper.requestTimeout));
 
       // Limpiar almacenamiento local
       await storage.delete(key: 'token');

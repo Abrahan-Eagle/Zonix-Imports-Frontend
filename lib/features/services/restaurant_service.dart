@@ -5,10 +5,10 @@ import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 import '../../models/restaurant.dart';
 import '../../helpers/auth_helper.dart';
-import '../../config/app_config.dart';
+import 'package:zonix/helpers/env_helper.dart';
 
 class RestaurantService {
-  final String apiUrl = '${AppConfig.apiUrl}/api/buyer/restaurants';
+  final String apiUrl = '${EnvHelper.apiUrl}/api/buyer/restaurants';
   final Logger logger = Logger(
     printer: PrettyPrinter(
       methodCount: 0,
@@ -30,7 +30,7 @@ class RestaurantService {
       final response = await http.get(
         Uri.parse(apiUrl),
         headers: headers,
-      ).timeout(Duration(milliseconds: AppConfig.requestTimeout));
+      ).timeout(Duration(milliseconds: EnvHelper.requestTimeout));
 
       logger.i('API Response Status: ${response.statusCode}');
 
@@ -78,7 +78,7 @@ class RestaurantService {
       final response = await http.get(
         Uri.parse(url),
         headers: headers,
-      ).timeout(Duration(milliseconds: AppConfig.requestTimeout));
+      ).timeout(Duration(milliseconds: EnvHelper.requestTimeout));
 
       logger.i('API Details Response Status: ${response.statusCode}');
 

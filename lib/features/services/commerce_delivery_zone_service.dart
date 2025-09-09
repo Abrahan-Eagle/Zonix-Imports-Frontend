@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import '../../config/app_config.dart';
+import 'package:zonix/helpers/env_helper.dart';
 import '../auth/auth_helper.dart';
 
 class CommerceDeliveryZoneService {
   static const FlutterSecureStorage _storage = FlutterSecureStorage();
-  static String get baseUrl => AppConfig.apiUrl;
+  static String get baseUrl => EnvHelper.apiUrl;
 
   // Obtener todas las zonas de delivery del comercio
   static Future<List<Map<String, dynamic>>> getDeliveryZones({

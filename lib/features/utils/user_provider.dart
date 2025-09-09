@@ -5,7 +5,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:zonix/features/utils/auth_utils.dart';
 import 'package:logger/logger.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import '../../config/app_config.dart';
+import 'package:zonix/helpers/env_helper.dart';
 import 'package:http/http.dart' as http;
 
 final logger = Logger();
@@ -137,7 +137,7 @@ class UserProvider with ChangeNotifier {
 
       logger.i('Retrieved token: $token');
       final response = await http.get(
-        // Uri.parse('${AppConfig.apiUrl}/api/auth/user'),
+        // Uri.parse('${EnvHelper.apiUrl}/api/auth/user'),
         Uri.parse('$baseUrl/api/auth/user'),
         headers: {
           'Authorization': 'Bearer $token',

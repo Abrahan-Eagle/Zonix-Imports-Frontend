@@ -2,14 +2,14 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../../helpers/auth_helper.dart';
-import '../../config/app_config.dart';
+import 'package:zonix/helpers/env_helper.dart';
 
 class FavoritesService {
   // GET /api/buyer/favorites - Obtener favoritos del usuario
   Future<List<Map<String, dynamic>>> getFavorites() async {
     try {
       final headers = await AuthHelper.getAuthHeaders();
-      final url = Uri.parse('${AppConfig.apiUrl}/api/buyer/favorites');
+      final url = Uri.parse('${EnvHelper.apiUrl}/api/buyer/favorites');
       
       final response = await http.get(
         url,
@@ -37,7 +37,7 @@ class FavoritesService {
   Future<Map<String, dynamic>> toggleFavorite(int postId) async {
     try {
       final headers = await AuthHelper.getAuthHeaders();
-      final url = Uri.parse('${AppConfig.apiUrl}/api/buyer/posts/$postId/favorite');
+      final url = Uri.parse('${EnvHelper.apiUrl}/api/buyer/posts/$postId/favorite');
       
       final response = await http.post(
         url,

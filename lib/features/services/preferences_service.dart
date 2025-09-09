@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../../config/app_config.dart';
+import 'package:zonix/helpers/env_helper.dart';
 import '../../helpers/auth_helper.dart';
 
 class PreferencesService {
-  static String get baseUrl => AppConfig.apiUrl;
-  static int get requestTimeout => AppConfig.requestTimeout;
+  static String get baseUrl => EnvHelper.apiUrl;
+  static int get requestTimeout => EnvHelper.requestTimeout;
 
   /// Obtener preferencias del usuario
   static Future<Map<String, dynamic>> getUserPreferences() async {

@@ -4,15 +4,15 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:logger/logger.dart';
 import '../../models/product.dart';
 import '../../helpers/auth_helper.dart';
-import '../../config/app_config.dart';
+import 'package:zonix/helpers/env_helper.dart';
 
 final String baseUrl = const bool.fromEnvironment('dart.vm.product')
-      ? dotenv.env['API_URL_PROD']!
-      : dotenv.env['API_URL_LOCAL']!;
+    ? dotenv.env['API_URL_PROD']!
+    : dotenv.env['API_URL_LOCAL']!;
 final Logger _logger = Logger();
 
 class ProductService {
-  final String apiUrl = '${AppConfig.apiUrl}/api/buyer/products';
+  final String apiUrl = '${EnvHelper.apiUrl}/api/buyer/products';
 
   // GET /api/buyer/products - Listar productos (con filtro opcional por category_id)
   Future<List<Product>> fetchProducts({int? categoryId}) async {
@@ -54,23 +54,23 @@ class ProductService {
     final headers = await AuthHelper.getAuthHeaders();
     final url = '$apiUrl/$productId';
     _logger.i('Llamando a $url');
-    
+
     final response = await http.get(
       Uri.parse(url),
       headers: headers,
     );
-    
+
     _logger.i('Status code: ${response.statusCode}');
     _logger.i('Response body: ${response.body}');
-    
+
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       _logger.i('Decoded data type: ${data.runtimeType}');
       _logger.i('Decoded data: $data');
-      
+
       // Handle different response structures
       Map<String, dynamic> productData;
-      
+
       if (data is Map<String, dynamic>) {
         // Check if it's wrapped in success/data structure
         if (data['success'] == true && data['data'] != null) {
@@ -81,12 +81,13 @@ class ProductService {
         }
       } else if (data is List && data.isNotEmpty) {
         // If backend returns an array, take the first item
-        _logger.w('Backend returned array instead of object, taking first item');
+        _logger
+            .w('Backend returned array instead of object, taking first item');
         productData = data[0];
       } else {
         throw Exception('Invalid response format from backend');
       }
-      
+
       _logger.i('Final product data: $productData');
       return Product.fromJson(productData);
     } else {

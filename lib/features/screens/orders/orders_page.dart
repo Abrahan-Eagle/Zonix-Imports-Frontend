@@ -4,7 +4,7 @@ import 'package:zonix/models/order.dart';
 import 'package:zonix/features/services/order_service.dart';
 import 'package:zonix/features/services/websocket_service.dart';
 import 'package:zonix/features/utils/user_provider.dart';
-import 'package:zonix/config/app_config.dart';
+import 'package:zonix/helpers/env_helper.dart';
 import 'package:zonix/helpers/auth_helper.dart';
 import 'dart:async'; // Added for StreamSubscription
 import 'package:zonix/features/utils/app_colors.dart';
@@ -66,7 +66,7 @@ class _OrdersPageState extends State<OrdersPage> {
   }
 
   Future<void> _initializeWebSocket() async {
-    if (!AppConfig.enableWebsockets) return;
+    if (!EnvHelper.enableWebsockets) return;
 
     try {
       _webSocketService = WebSocketService();

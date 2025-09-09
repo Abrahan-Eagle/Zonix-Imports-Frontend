@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
-import '../../config/app_config.dart';
+import 'package:zonix/helpers/env_helper.dart';
 import '../../helpers/auth_helper.dart';
 
 class PromotionService {
@@ -17,17 +17,18 @@ class PromotionService {
     try {
       final headers = await AuthHelper.getAuthHeaders();
       final queryParams = <String, String>{};
-      
-      if (commerceId != null) queryParams['commerce_id'] = commerceId.toString();
+
+      if (commerceId != null)
+        queryParams['commerce_id'] = commerceId.toString();
       if (type != null) queryParams['type'] = type;
       if (minAmount != null) queryParams['min_amount'] = minAmount.toString();
       if (maxAmount != null) queryParams['max_amount'] = maxAmount.toString();
 
-      final url = Uri.parse('${AppConfig.apiUrl}/api/buyer/promotions/active')
+      final url = Uri.parse('${EnvHelper.apiUrl}/api/buyer/promotions/active')
           .replace(queryParameters: queryParams);
-      
+
       final response = await http.get(url, headers: headers);
-      
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         if (data['success'] == true && data['data'] != null) {
@@ -35,7 +36,8 @@ class PromotionService {
         }
         return [];
       } else {
-        throw Exception('Error al obtener promociones activas: ${response.statusCode}');
+        throw Exception(
+            'Error al obtener promociones activas: ${response.statusCode}');
       }
     } catch (e) {
       _logger.e('Error en getActivePromotions: $e');
@@ -52,16 +54,17 @@ class PromotionService {
     try {
       final headers = await AuthHelper.getAuthHeaders();
       final queryParams = <String, String>{};
-      
-      if (commerceId != null) queryParams['commerce_id'] = commerceId.toString();
+
+      if (commerceId != null)
+        queryParams['commerce_id'] = commerceId.toString();
       if (minAmount != null) queryParams['min_amount'] = minAmount.toString();
       if (category != null) queryParams['category'] = category;
 
-      final url = Uri.parse('${AppConfig.apiUrl}/api/buyer/promotions/coupons')
+      final url = Uri.parse('${EnvHelper.apiUrl}/api/buyer/promotions/coupons')
           .replace(queryParameters: queryParams);
-      
+
       final response = await http.get(url, headers: headers);
-      
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         if (data['success'] == true && data['data'] != null) {
@@ -85,20 +88,21 @@ class PromotionService {
   }) async {
     try {
       final headers = await AuthHelper.getAuthHeaders();
-      final url = Uri.parse('${AppConfig.apiUrl}/api/buyer/promotions/validate-coupon');
-      
+      final url =
+          Uri.parse('${EnvHelper.apiUrl}/api/buyer/promotions/validate-coupon');
+
       final body = {
         'coupon_code': couponCode,
         if (orderAmount != null) 'order_amount': orderAmount,
         if (commerceId != null) 'commerce_id': commerceId,
       };
-      
+
       final response = await http.post(
         url,
         headers: headers,
         body: jsonEncode(body),
       );
-      
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         if (data['success'] == true) {
@@ -122,19 +126,20 @@ class PromotionService {
   }) async {
     try {
       final headers = await AuthHelper.getAuthHeaders();
-      final url = Uri.parse('${AppConfig.apiUrl}/api/buyer/promotions/apply-coupon');
-      
+      final url =
+          Uri.parse('${EnvHelper.apiUrl}/api/buyer/promotions/apply-coupon');
+
       final body = {
         'coupon_code': couponCode,
         'order_id': orderId,
       };
-      
+
       final response = await http.post(
         url,
         headers: headers,
         body: jsonEncode(body),
       );
-      
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         if (data['success'] == true) {
@@ -160,16 +165,17 @@ class PromotionService {
     try {
       final headers = await AuthHelper.getAuthHeaders();
       final queryParams = <String, String>{};
-      
+
       if (status != null) queryParams['status'] = status;
       if (page != null) queryParams['page'] = page.toString();
       if (limit != null) queryParams['limit'] = limit.toString();
 
-      final url = Uri.parse('${AppConfig.apiUrl}/api/buyer/promotions/coupon-history')
-          .replace(queryParameters: queryParams);
-      
+      final url =
+          Uri.parse('${EnvHelper.apiUrl}/api/buyer/promotions/coupon-history')
+              .replace(queryParameters: queryParams);
+
       final response = await http.get(url, headers: headers);
-      
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         if (data['success'] == true && data['data'] != null) {
@@ -177,11 +183,12 @@ class PromotionService {
         }
         return [];
       } else {
-        throw Exception('Error al obtener historial de cupones: ${response.statusCode}');
+        throw Exception(
+            'Error al obtener historial de cupones: ${response.statusCode}');
       }
     } catch (e) {
       _logger.e('Error en getCouponHistory: $e');
       throw Exception('Error al obtener historial de cupones: $e');
     }
   }
-} 
+}

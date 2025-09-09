@@ -7,13 +7,13 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import '../../config/app_config.dart';
+import 'package:zonix/helpers/env_helper.dart';
 import '../../helpers/auth_helper.dart';
 
 class CommerceService extends ChangeNotifier {
   final ApiService _apiService = ApiService();
   final _storage = const FlutterSecureStorage();
-  static String get baseUrl => AppConfig.apiUrl;
+  static String get baseUrl => EnvHelper.apiUrl;
   
   // Mock data for development (will be replaced with real API calls)
   static final List<Commerce> _mockCommerces = [

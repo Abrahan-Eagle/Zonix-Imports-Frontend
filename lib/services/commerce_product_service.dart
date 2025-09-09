@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/commerce_product.dart';
-import '../config/app_config.dart';
+import 'package:zonix/helpers/env_helper.dart';
 import '../helpers/auth_helper.dart';
 
 class CommerceProductService {
-  final String apiUrl = '${AppConfig.apiUrl}/api/commerce/products';
+  final String apiUrl = '${EnvHelper.apiUrl}/api/commerce/products';
 
   Future<List<CommerceProduct>> fetchProducts() async {
     final headers = await AuthHelper.getAuthHeaders();
@@ -59,7 +59,7 @@ class CommerceProductService {
 
   Future<Map<String, dynamic>> getStats() async {
     final headers = await AuthHelper.getAuthHeaders();
-    final response = await http.get(Uri.parse('${AppConfig.apiUrl}/api/commerce/products-stats'), headers: headers);
+    final response = await http.get(Uri.parse('${EnvHelper.apiUrl}/api/commerce/products-stats'), headers: headers);
     if (response.statusCode == 200) {
       return json.decode(response.body)['data'] ?? {};
     } else {

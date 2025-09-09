@@ -324,15 +324,6 @@
 //   return const AssetImage('assets/default_avatar.png'); // Imagen predeterminada
 // }
 
-
-
-
-
-
-
-
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:logger/logger.dart';
@@ -352,15 +343,12 @@ import 'package:zonix/features/screens/profile/profile_page.dart';
 import 'package:zonix/features/screens/settings/settings_page_2.dart';
 import 'package:zonix/features/screens/auth/sign_in_screen.dart';
 
-
 import 'package:zonix/features/DomainProfiles/Profiles/api/profile_service.dart';
-
 
 import 'package:zonix/features/screens/products/products_page.dart';
 import 'package:zonix/features/screens/cart/cart_page.dart';
 import 'package:zonix/features/screens/orders/orders_page.dart';
 import 'package:zonix/features/screens/restaurants/restaurants_page.dart';
-
 
 import 'package:zonix/features/services/cart_service.dart';
 import 'package:zonix/features/services/order_service.dart';
@@ -399,7 +387,7 @@ import 'package:zonix/features/services/websocket_service.dart';
 import 'package:zonix/features/utils/app_colors.dart';
 import 'package:zonix/features/screens/commerce/commerce_notifications_page.dart';
 import 'package:zonix/features/screens/commerce/commerce_profile_page.dart';
-import 'package:zonix/config/app_config.dart';
+import 'package:zonix/helpers/env_helper.dart';
 
 /*
  * ZONIX EATS - Aplicación Multi-Rol
@@ -416,10 +404,9 @@ import 'package:zonix/config/app_config.dart';
 const FlutterSecureStorage _storage = FlutterSecureStorage();
 final ApiService apiService = ApiService();
 
-final String baseUrl =
-    const bool.fromEnvironment('dart.vm.product')
-        ? dotenv.env['API_URL_PROD']!
-        : dotenv.env['API_URL_LOCAL']!;
+final String baseUrl = const bool.fromEnvironment('dart.vm.product')
+    ? dotenv.env['API_URL_PROD']!
+    : dotenv.env['API_URL_LOCAL']!;
 
 // Configuración del logger
 final logger = Logger();
@@ -444,10 +431,12 @@ Future<void> main() async {
   ]);
 
   // Inicializar configuración desde .env
-  await AppConfig.initialize();
+  await dotenv.load(fileName: ".env");
 
   // Bypass de login para tests de integración
-  final bool isIntegrationTest = const String.fromEnvironment('INTEGRATION_TEST', defaultValue: 'false') == 'true';
+  final bool isIntegrationTest =
+      const String.fromEnvironment('INTEGRATION_TEST', defaultValue: 'false') ==
+          'true';
 
   runApp(
     MultiProvider(
@@ -569,7 +558,8 @@ class MyApp extends StatelessWidget {
         '/commerce/inventory': (context) => const CommerceInventoryPage(),
         '/commerce/orders': (context) => const CommerceOrdersPage(),
         '/commerce/profile': (context) => CommerceProfilePage(),
-        '/commerce/notifications': (context) => const CommerceNotificationsPage(),
+        '/commerce/notifications': (context) =>
+            const CommerceNotificationsPage(),
       },
     );
   }
@@ -594,28 +584,26 @@ class MainRouterState extends State<MainRouter> {
     _loadLastPosition();
   }
 
+  Future<void> _loadProfile() async {
+    try {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
 
-   Future<void> _loadProfile() async {
-      try {
-        final userProvider = Provider.of<UserProvider>(context, listen: false);
+      // Obtén los detalles del usuario y verifica su contenido
+      final userDetails = await userProvider.getUserDetails();
 
-        // Obtén los detalles del usuario y verifica su contenido
-        final userDetails = await userProvider.getUserDetails();
-       
-
-        // Extrae y valida el ID del usuario
-        final id = userDetails['userId'];
-        if (id == null || id is! int) {
-          throw Exception('El ID del usuario es inválido: $id');
-        }
-        // Obtén el perfil usando el ID del usuario
-        _profile = await ProfileService().getProfileById(id);
-       
-        setState(() {});
-      } catch (e) {
-        logger.e('Error obteniendo el ID del usuario: $e');
+      // Extrae y valida el ID del usuario
+      final id = userDetails['userId'];
+      if (id == null || id is! int) {
+        throw Exception('El ID del usuario es inválido: $id');
       }
+      // Obtén el perfil usando el ID del usuario
+      _profile = await ProfileService().getProfileById(id);
+
+      setState(() {});
+    } catch (e) {
+      logger.e('Error obteniendo el ID del usuario: $e');
     }
+  }
 
   Future<void> _loadLastPosition() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -785,9 +773,9 @@ class MainRouterState extends State<MainRouter> {
 
     // // Agregar elementos específicos según el rol si el nivel es 0
     // if (level == 0) {
-    //   if (role == 'sales_admin') { 
+    //   if (role == 'sales_admin') {
     //     items.insert( 2, const BottomNavigationBarItem( icon: Icon(Icons.qr_code), label: 'Verificar', ),);
-       
+
     //     items.insert( 3, const BottomNavigationBarItem( icon: Icon(Icons.check_circle), label: 'Aprobar', ),);
     //   }
 
@@ -838,10 +826,9 @@ class MainRouterState extends State<MainRouter> {
   Widget _createLevelButton(int level, IconData icon, String tooltip) {
     return FloatingActionButton.small(
       heroTag: 'level$level',
-      backgroundColor:
-          _selectedLevel == level
-              ? Colors.blueAccent[700]
-              : Colors.blueAccent[50],
+      backgroundColor: _selectedLevel == level
+          ? Colors.blueAccent[700]
+          : Colors.blueAccent[50],
       child: Icon(
         icon,
         color: _selectedLevel == level ? Colors.white : Colors.black,
@@ -867,10 +854,9 @@ class MainRouterState extends State<MainRouter> {
                   fontFamily: 'system-ui',
                   fontSize: 26,
                   fontWeight: FontWeight.bold,
-                  color:
-                      Theme.of(context).brightness == Brightness.dark
-                          ? Colors.white
-                          : Colors.black,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black,
                   letterSpacing: 1.2,
                 ),
               ),
@@ -880,10 +866,9 @@ class MainRouterState extends State<MainRouter> {
                   fontFamily: 'system-ui',
                   fontSize: 26,
                   fontWeight: FontWeight.bold,
-                  color:
-                      Theme.of(context).brightness == Brightness.dark
-                          ? Colors.blueAccent[700]
-                          : Colors.orange,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.blueAccent[700]
+                      : Colors.orange,
                   letterSpacing: 1.2,
                 ),
               ),
@@ -902,23 +887,21 @@ class MainRouterState extends State<MainRouter> {
                     items: [
                       PopupMenuItem(
                         child: const Text('Mi QR'),
-                        onTap:
-                            () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const ProfilePage1(),
-                              ),
-                            ),
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ProfilePage1(),
+                          ),
+                        ),
                       ),
                       PopupMenuItem(
                         child: const Text('Configuración'),
-                        onTap:
-                            () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const SettingsPage2(),
-                              ),
-                            ),
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const SettingsPage2(),
+                          ),
+                        ),
                       ),
                       PopupMenuItem(
                         child: const Text('Cerrar sesión'),
@@ -926,18 +909,19 @@ class MainRouterState extends State<MainRouter> {
                           await userProvider.logout();
                           // await _storage.deleteAll();
                           if (!mounted) return;
-                        
-                          Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(builder: (context) => const SignInScreen()), // Redirige al login
-                            (Route<dynamic> route) => false, // Elimina todas las rutas previas
-                          );
 
-                       },
+                          Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    const SignInScreen()), // Redirige al login
+                            (Route<dynamic> route) =>
+                                false, // Elimina todas las rutas previas
+                          );
+                        },
                       ),
                     ],
                   );
                 },
-
                 child: FutureBuilder<String?>(
                   future: _storage.read(key: 'userPhotoUrl'),
                   builder: (
@@ -966,17 +950,21 @@ class MainRouterState extends State<MainRouter> {
                         //   ),
                         // ),
                         child: CircleAvatar(
-                            radius: 20,
-                            backgroundImage: _getProfileImage(
-                                    _profile?.photo, // Foto del perfil del usuario (desde el backend)
-                                     snapshot.data!, // Foto de Google (si está disponible)
-                                  ),
-                            child: (_profile?.photo == null &&  snapshot.data == null)
-                                ? const Icon(Icons.person, color: Colors.white) // Ícono predeterminado si no hay foto
-                                : null,
+                          radius: 20,
+                          backgroundImage: _getProfileImage(
+                            _profile
+                                ?.photo, // Foto del perfil del usuario (desde el backend)
+                            snapshot
+                                .data!, // Foto de Google (si está disponible)
                           ),
-
-                     );
+                          child: (_profile?.photo == null &&
+                                  snapshot.data == null)
+                              ? const Icon(Icons.person,
+                                  color: Colors
+                                      .white) // Ícono predeterminado si no hay foto
+                              : null,
+                        ),
+                      );
                     }
                   },
                 ),
@@ -1126,7 +1114,6 @@ class MainRouterState extends State<MainRouter> {
           _createLevelButton(5, Icons.admin_panel_settings, 'Administrador'),
         ],
       ),
-
       bottomNavigationBar: BottomNavigationBar(
         items: _getBottomNavItems(_selectedLevel, userProvider.userRole),
         currentIndex: _bottomNavIndex,
@@ -1148,16 +1135,18 @@ class MainRouterState extends State<MainRouter> {
   }
 }
 
-ImageProvider<Object> _getProfileImage(String? profilePhoto, String? googlePhotoUrl) {
+ImageProvider<Object> _getProfileImage(
+    String? profilePhoto, String? googlePhotoUrl) {
   if (profilePhoto != null && profilePhoto.isNotEmpty) {
     // Detectar URLs de placeholder y evitarlas
-    if (profilePhoto.contains('via.placeholder.com') || 
+    if (profilePhoto.contains('via.placeholder.com') ||
         profilePhoto.contains('placeholder.com') ||
         profilePhoto.contains('placehold.it')) {
-      logger.w('Detectada URL de placeholder en perfil, usando imagen local: $profilePhoto');
+      logger.w(
+          'Detectada URL de placeholder en perfil, usando imagen local: $profilePhoto');
       return const AssetImage('assets/default_avatar.png');
     }
-    
+
     logger.i('Usando foto del perfil: $profilePhoto');
     return NetworkImage(profilePhoto); // Imagen del perfil del usuario
   }

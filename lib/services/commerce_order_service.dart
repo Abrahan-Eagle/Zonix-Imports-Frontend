@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/commerce_order.dart';
-import '../config/app_config.dart';
+import 'package:zonix/helpers/env_helper.dart';
 import '../helpers/auth_helper.dart';
 
 class CommerceOrderService {
-  final String apiUrl = '${AppConfig.apiUrl}/api/commerce/orders';
+  final String apiUrl = '${EnvHelper.apiUrl}/api/commerce/orders';
 
   Future<List<CommerceOrder>> fetchOrders() async {
     final headers = await AuthHelper.getAuthHeaders();

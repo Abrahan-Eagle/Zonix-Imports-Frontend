@@ -1,14 +1,14 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../helpers/auth_helper.dart';
-import '../../config/app_config.dart';
+import 'package:zonix/helpers/env_helper.dart';
 
 class TestAuthService {
   // GET /api/test/auth - Probar autenticación
   static Future<Map<String, dynamic>> testAuth() async {
     try {
       final headers = await AuthHelper.getAuthHeaders();
-      final url = Uri.parse('${AppConfig.apiUrl}/api/test/auth');
+      final url = Uri.parse('${EnvHelper.apiUrl}/api/test/auth');
       
       print('🔍 Probando autenticación en: $url');
       print('🔍 Headers: $headers');

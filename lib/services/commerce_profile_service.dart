@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/commerce_profile.dart';
-import '../config/app_config.dart';
+import 'package:zonix/helpers/env_helper.dart';
 import '../helpers/auth_helper.dart';
 
 class CommerceProfileService {
-  final String apiUrl = '${AppConfig.apiUrl}/api/profile';
+  final String apiUrl = '${EnvHelper.apiUrl}/api/profile';
 
   Future<CommerceProfile> fetchProfile() async {
     final headers = await AuthHelper.getAuthHeaders();

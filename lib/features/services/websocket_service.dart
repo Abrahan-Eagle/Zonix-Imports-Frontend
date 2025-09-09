@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:logger/logger.dart';
-import '../../config/app_config.dart';
+import 'package:zonix/helpers/env_helper.dart';
 import 'dart:math' as math;
 
 class WebSocketService {
@@ -116,7 +116,7 @@ class WebSocketService {
 
   // Build WebSocket URL for Laravel Echo Server
   String _buildWebSocketUrl() {
-    return AppConfig.wsUrl;
+    return EnvHelper.wsUrl;
   }
 
   // Send authentication message

@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
-import '../../config/app_config.dart';
+import 'package:zonix/helpers/env_helper.dart';
 import '../../helpers/auth_helper.dart';
 
 class BuyerReviewService {
@@ -16,7 +16,7 @@ class BuyerReviewService {
   }) async {
     try {
       final headers = await AuthHelper.getAuthHeaders();
-      final url = Uri.parse('${AppConfig.apiUrl}/api/buyer/reviews/restaurant');
+      final url = Uri.parse('${EnvHelper.apiUrl}/api/buyer/reviews/restaurant');
       
       final body = {
         'commerce_id': commerceId,
@@ -56,7 +56,7 @@ class BuyerReviewService {
   }) async {
     try {
       final headers = await AuthHelper.getAuthHeaders();
-      final url = Uri.parse('${AppConfig.apiUrl}/api/buyer/reviews/delivery-agent');
+      final url = Uri.parse('${EnvHelper.apiUrl}/api/buyer/reviews/delivery-agent');
       
       final body = {
         'agent_id': agentId,
@@ -104,7 +104,7 @@ class BuyerReviewService {
       if (sortBy != null) queryParams['sort_by'] = sortBy;
       if (order != null) queryParams['order'] = order;
 
-      final url = Uri.parse('${AppConfig.apiUrl}/api/buyer/reviews/restaurant/$commerceId')
+      final url = Uri.parse('${EnvHelper.apiUrl}/api/buyer/reviews/restaurant/$commerceId')
           .replace(queryParameters: queryParams);
       
       final response = await http.get(url, headers: headers);
@@ -157,7 +157,7 @@ class BuyerReviewService {
       if (sortBy != null) queryParams['sort_by'] = sortBy;
       if (order != null) queryParams['order'] = order;
 
-      final url = Uri.parse('${AppConfig.apiUrl}/api/buyer/reviews/delivery-agent/$agentId')
+      final url = Uri.parse('${EnvHelper.apiUrl}/api/buyer/reviews/delivery-agent/$agentId')
           .replace(queryParameters: queryParams);
       
       final response = await http.get(url, headers: headers);

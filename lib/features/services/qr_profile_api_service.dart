@@ -4,7 +4,7 @@ import 'package:logger/logger.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../../helpers/auth_helper.dart';
-import '../../config/app_config.dart';
+import 'package:zonix/helpers/env_helper.dart';
 
 final logger = Logger();
 const FlutterSecureStorage _storage = FlutterSecureStorage(); // Inicializa _storage
@@ -52,7 +52,7 @@ Future<String?> sendUserIdToBackend(int userId) async {
   Future<Map<String, dynamic>> fetchProfileByQr(String qrCode) async {
     final headers = await AuthHelper.getAuthHeaders();
     final response = await http.get(
-      Uri.parse('${AppConfig.apiUrl}/api/buyer/profiles/$qrCode'),
+      Uri.parse('${EnvHelper.apiUrl}/api/buyer/profiles/$qrCode'),
       headers: headers,
     );
     if (response.statusCode == 200) {
