@@ -1,278 +1,155 @@
-# ZONIX Project Rules for Cursor AI
+# .cursorrules
 
-## 🏭 Business Model Context
+rules:
+  - type: project
+    value: |
+      Proyecto: MVP de e-commerce multi-modal para Venezuela.
+      Visión: Plataforma que permite a empresas y personas vender productos con distintas modalidades:
+      - Venta al detal
+      - Venta al mayor
+      - Pre-order (contado o abonos)
+      - Referidos (links con comisión)
+      - Dropshipping interno (vender con stock de otro)
+      
+      Roles principales:
+      - Comprador (por defecto al registrarse)
+      - Vendedor (puede publicar productos, gestionar inventario, usar referidos y dropshipping)
+      - Administrador (gestiona usuarios, pedidos, disputas y productos)
 
-### 🎯 **Core Business: Gas Distribution Management System**
-ZONIX es un sistema integral de gestión de distribución de gas doméstico que maneja:
+      Pagos: descentralizados → cada vendedor define qué métodos acepta.
+      Métodos disponibles en MVP: Stripe, PayPal, Pago Móvil, Zelle, Binance Pay/USDT.
+      Flujo API: Stripe/PayPal/Binance (webhooks).
+      Flujo manual: Pago Móvil/Zelle (comprobante).
+      La plataforma no custodia fondos, solo registra pedidos y comisiones.
 
-#### **🏪 Estaciones de Gas (Stations)**
-- **Ubicaciones físicas** donde se distribuye gas
-- **Horarios específicos** por día de la semana
-- **Límite diario**: 200 citas por estación
-- **Códigos únicos** para identificación
-- **Estado activo/inactivo**
+      Alcance MVP:
+      - App móvil en Flutter (APK en Android)
+      - Backend en Laravel 10 + MySQL 8
+      - Autenticación con Google OAuth2
+      - Publicación de productos con todas las modalidades (detal, mayor, pre-order, referidos, dropshipping)
+      - Carrito y checkout con validaciones
+      - Gestión de pedidos y estados (pendiente → pagado → enviado → entregado)
+      - Inventario con movimientos y alertas
+      - Panel mínimo de administración (usuarios, productos, pedidos, disputas)
+      - Notificaciones internas y por correo
+      - KPIs: API ≤2s (data pequeña), ≤4s (data grande), uptime 99.9%, 98% operatividad pagos.
 
-#### **🎫 Tickets de Gas (Gas Tickets)**
-- **Sistema de citas** para compra de bombonas
-- **Cola virtual** con posiciones (1-200)
-- **Estados del ticket**:
-  - `pending` - Pendiente de verificación
-  - `verifying` - En proceso de verificación
-  - `waiting` - Esperando en cola
-  - `dispatched` - Entregado/Comprado
-  - `canceled` - Cancelado
-  - `expired` - Expirado
-- **Reglas de negocio**:
-  - **21 días mínimo** entre compras (para usuarios internos)
-  - **Citas solo en domingo** para usuarios externos
-  - **Expiración**: 2 días después de la cita
-  - **QR Code** único por ticket
+      Fuera de alcance MVP (fase 2):
+      - Web Angular
+      - IA de recomendaciones
+      - Marketplace internacional (multi-país)
+      - Programas avanzados de fidelización
+      - Integraciones múltiples de logística y pagos
 
-#### **🛢️ Bombonas de Gas (Gas Cylinders)**
-- **Tipos**: small, wide
-- **Pesos**: 10kg, 18kg, 45kg
-- **Códigos únicos** de fabricación
-- **Aprobación** requerida antes de uso
-- **Proveedores** asociados
+  - type: coding
+    value: |
+      Estándares y convenciones:
+      - General:
+        - Commits convencionales: tipo(scope): resumen (feat, fix, refactor, docs, chore)
+        - Revisiones pequeñas con checklist y pruebas locales
+        - Mantener tiempos API (pequeñas ≤2s, grandes ≤4s) y paginación por defecto
+      - PHP (Laravel 10):
+        - PSR-12 coding style
+        - Eloquent ORM para DB (evitar SQL crudo)
+        - Validación con FormRequest
+        - Controllers delgados, Services para lógica de negocio
+        - Policies/Middleware para roles y permisos
+        - Migraciones versionadas
+        - Variables sensibles en .env
+        - Laravel Sanctum para autenticación en APIs
+        - Rutas API bajo prefijo /api y recursos con paginación
+        - Webhooks idempotentes (clave secreta del proveedor + firma)
+        - Manejo de errores: usar códigos HTTP correctos y mensajes consistentes
+      - Flutter (Dart 3.x):
+        - Arquitectura MVVM
+        - Provider para manejo de estado (o Riverpod si se adopta)
+        - Separación en /models, /screens, /widgets, /services
+        - Servicios de API centralizados en /services
+        - Validaciones de formularios en UI y manejo de errores visible
+        - Timeouts HTTP y reintentos básicos en servicios
+        - Navegación declarativa y rutas tipeadas cuando sea posible
+        - Estándar de errores desde API: { message, errors?, code }
+        - En `services`: mapear errores por campo para formularios
+      - DB (MySQL 8):
+        - Índices en campos de búsqueda
+        - Relaciones con claves foráneas
+        - Campos created_at, updated_at en todas las tablas
+        - Paginación obligatoria en listados grandes
+        - Constraints e integridad referencial; soft deletes cuando aplique
+      - Seguridad:
+        - HTTPS (TLS 1.2 o superior)
+        - OAuth2 (Google)
+        - Sanitización de inputs
+        - Protección contra SQLi/XSS/CSRF
+        - Autenticación 2FA → fase 2
+        - Secrets en .env y no en repositorio
+        - Logs sin datos sensibles
+      - Rendimiento:
+        - Respuesta API ≤2s en consultas pequeñas
+        - ≤4s en listados grandes (con paginación)
+        - Cache básico para datos estáticos (categorías)
+        - Lazy loading en imágenes y productos
+        - N+1 queries: usar eager loading (with) cuando aplique
 
-#### **👥 Roles de Usuario**
-1. **Usuario Regular**: Crear tickets, ver historial
-2. **Sales Admin**: Verificar datos, escanear QR, aprobar tickets
-3. **Dispatcher**: Gestionar colas, despachar tickets
+  - type: data_model
+    value: |
+      Tablas principales:
+      - usuarios (id, nombre, email, rol, rif?, banco?, direccion?, created_at…)
+      - productos (id, vendedor_id, nombre, descripcion, modalidad, precio_base, stock, min_mayor?, precio_mayor?, preorden_entrega?, video_url?)
+      - imagenes_producto (id, producto_id, url)
+      - pedidos (id, comprador_id, vendedor_id, total, modalidad, estado, created_at…)
+      - items_pedido (id, pedido_id, producto_id, cantidad, precio_unitario, subtotal)
+      - pagos (id, pedido_id, metodo, monto, estado, referencia, comprobante_url?, created_at)
+      - inventario_movimientos (id, producto_id, tipo, cantidad, motivo, created_at)
+      - referidos (id, producto_id, referidor_id, porcentaje, link, activo)
+      - notificaciones (id, usuario_id, tipo, mensaje, leido, created_at)
 
-### 🔄 **Flujo de Negocio Principal**
-1. **Usuario crea ticket** → Selecciona bombona → Asigna estación
-2. **Sistema valida** → Reglas de negocio → Asigna posición en cola
-3. **Sales Admin verifica** → Escanea QR → Valida datos
-4. **Dispatcher gestiona** → Cola física → Entrega bombona
-5. **Ticket marcado** → `dispatched` → Registro completo
+  - type: api_endpoints
+    value: |
+      Endpoints mínimos:
+      - POST /auth/google → login con OAuth2
+      - GET /me → perfil actual
+      - PUT /me/rol → cambio a vendedor
+      - CRUD /productos → publicación y gestión
+      - GET /productos?filtros… → catálogo
+      - POST /carrito → agregar producto
+      - DELETE /carrito/{item} → eliminar del carrito
+      - POST /checkout → crear pedido
+      - POST /pagos/stripe|paypal|binance → intentos de pago
+      - POST /webhooks/{proveedor} → confirmación de pago
+      - POST /pagos/comprobante → pago manual (Pago Móvil/Zelle)
+      - GET /pedidos (del comprador)
+      - GET /vendedor/pedidos
+      - PUT /vendedor/pedidos/{id}/estado
+      - GET /notificaciones
 
-## Project Context
-- This is a Flutter + Laravel project for gas ticket management
-- Frontend: Flutter 3.35.2 (Dart 3.9.0) - Mobile app
-- Backend: Laravel 10 (PHP 8.1+) - REST API
-- Database: MySQL with tables for users, profiles, tickets, stations
-- Authentication: Google Sign-In + Laravel Sanctum (JWT)
+  - type: contribution
+    value: |
+      Guía de contribución (Cursor):
+      - Mantener consistencia con este archivo y con README
+      - Antes de editar, revisar lints y pruebas: `flutter test` en móvil; `php artisan test` en backend
+      - PRs deben incluir: objetivo, cambios, screenshots (UI), pruebas manuales realizadas
+      - Convención de ramas: `feat/*`, `fix/*`, `chore/*`, `docs/*`
+      - No introducir dependencias sin justificar tamaño/seguridad
 
-## File Structure
-- Frontend: `/var/www/html/proyectos/AIPP/PRODUCCION/ZONIX/zonix/`
-- Backend: `/var/www/html/proyectos/AIPP/PRODUCCION/ZONIX/zonix-backend/`
-- Key files: `lib/main.dart`, `routes/api.php`, `app/Http/Controllers/`
-
-## Coding Standards
-
-### Flutter/Dart
-- Always use Spanish comments and variable names when possible
-- Follow Flutter conventions: camelCase for variables, PascalCase for classes
-- Use Provider for state management
-- Handle errors with try-catch and proper logging
-- Use flutter_secure_storage for sensitive data
-- Always add proper imports and exports
-
-### Laravel/PHP
-- Use Spanish comments and variable names when possible
-- Follow Laravel conventions: snake_case for database, camelCase for variables
-- Use Eloquent relationships properly
-- Always validate input data
-- Use proper HTTP status codes
-- Handle errors with try-catch and logging
-- Use Laravel Sanctum for authentication
-
-### API Design
-- Use RESTful conventions
-- Always return JSON responses
-- Include proper HTTP headers
-- Use Bearer token authentication
-- Handle CORS properly
-- Validate all inputs
-
-## Project-Specific Rules
-
-### Authentication Flow
-- Google Sign-In → Laravel Sanctum token → Role-based access
-- Store tokens in flutter_secure_storage
-- Check authentication status on app start
-- Handle token expiration gracefully
-
-### Database Relationships
-- User 1:1 Profile
-- Profile has many: Phones, Emails, Documents, Addresses
-- GasTicket belongs to: Profile, GasCylinder, Station
-- Use proper foreign keys and constraints
-
-### Business Logic Rules
-- **Ticket Creation**:
-  - Validate 21-day rule for internal users
-  - Sunday-only appointments for external users
-  - Check daily limit (200 tickets per station)
-  - Assign queue position automatically
-  - Generate unique QR code
-- **Ticket States**:
-  - `pending` → `verifying` → `waiting` → `dispatched`
-  - Only Sales Admin can change to `verifying`
-  - Only Dispatcher can change to `dispatched`
-  - Auto-expire after 2 days
-- **Station Management**:
-  - Validate days available per station
-  - Check opening/closing times
-  - Handle external vs internal appointments
-- **Gas Cylinder Validation**:
-  - Must be approved before use
-  - Validate manufacturing date
-  - Check supplier association
-
-### Error Handling
-- Always log errors with proper context
-- Return user-friendly error messages
-- Handle network errors gracefully
-- Validate data types (especially int/string conversions)
-
-### Security
-- Never expose sensitive data in logs
-- Always validate user permissions
-- Use proper CORS configuration
-- Sanitize all user inputs
-
-## Common Patterns
-
-### Frontend State Management
-```dart
-// Use Provider pattern
-class UserProvider with ChangeNotifier {
-  bool _isAuthenticated = false;
-  String _userRole = '';
-  
-  bool get isAuthenticated => _isAuthenticated;
-  String get userRole => _userRole;
-  
-  Future<void> checkAuthentication() async {
-    // Implementation
-  }
-}
-```
-
-### Business Logic Implementation
-```dart
-// Gas Ticket Business Rules
-class GasTicketBusinessRules {
-  static bool canCreateTicket(DateTime lastPurchase) {
-    final daysSince = DateTime.now().difference(lastPurchase).inDays;
-    return daysSince >= 21; // Regla de 21 días
-  }
-  
-  static bool isExternalAppointmentAllowed() {
-    return DateTime.now().weekday == DateTime.sunday; // Solo domingos
-  }
-  
-  static int calculateQueuePosition(int stationId, DateTime appointmentDate) {
-    // Lógica para calcular posición en cola
-  }
-}
-```
-
-### Backend API Response
-```php
-// Always return consistent JSON structure
-return response()->json([
-    'success' => true,
-    'data' => $data,
-    'message' => 'Operation completed successfully'
-], 200);
-```
-
-### Error Handling
-```dart
-// Frontend
-try {
-  final response = await apiService.fetchData();
-  // Handle success
-} catch (e) {
-  logger.e('Error fetching data: $e');
-  // Show user-friendly error
-}
-```
-
-```php
-// Backend
-try {
-    $data = $this->service->process($request);
-    return response()->json(['success' => true, 'data' => $data]);
-} catch (Exception $e) {
-    Log::error('Error processing request: ' . $e->getMessage());
-    return response()->json(['success' => false, 'message' => 'Error occurred'], 500);
-}
-```
-
-## Environment Configuration
-- Local: API_URL_LOCAL=http://192.168.27.4:8000
-- Production: API_URL_PROD=https://zonix.aiblockweb.com
-- Database: zionix_BD
-- Device: Always 192.168.27.5:5555 (fixed device)
-- Backend: Native installation (no Docker)
-- Version Control: GitHub with CI/CD for backend
-
-## Testing Guidelines
-- Run tests before commits for safety
-- Test all API endpoints
-- Test authentication flows
-- Test role-based access
-- Test error scenarios
-- Test data validation
-- Use both unit and integration tests when possible
-- Reset database when schema changes are required
-- Use seeders for different testing scenarios
-
-### Flutter Testing
-- Test widget functionality
-- Test state management (Provider)
-- Test API integration
-- Test authentication flows
-- Test error handling
-- Test on actual device (192.168.27.5:5555)
-
-## Performance Considerations
-- Use proper indexing on database
-- Implement caching where appropriate
-- Optimize image uploads
-- Handle large datasets efficiently
-- Use proper pagination
-
-## Documentation
-- Always add comments in Spanish for complex logic
-- Document API endpoints
-- Keep README updated
-- Document environment setup
-- Document deployment process
-- Use Spanish for all user-facing content and comments
-
-## Git Workflow
-- Use meaningful commit messages
-- Create feature branches
-- Test before merging
-- Keep commits atomic
-- Document breaking changes
-- Use GitHub for version control
-- Backend has CI/CD - push triggers production deployment
-- Frontend: manual deployment process
-
-## Deployment
-- Test in local environment first
-- Use proper environment variables
-- Backup database before updates
-- Monitor logs after deployment
-- Test all critical paths
-- Backend: Automatic deployment via CI/CD on GitHub push
-- Frontend: Manual deployment process
-- Database: Reset when schema changes required
-
-## Remember
-- This is a production system handling real user data
-- Security and data integrity are critical
-- Always test changes thoroughly
-- Follow the established patterns
-- Keep code clean and maintainable
-- Use Spanish for user-facing content
-- Handle errors gracefully
-- Log important events
-- Validate all inputs
-- Test all scenarios
+  - type: tasks
+    value: |
+      Roadmap del MVP (4 semanas):
+      - Semana 1:
+        * Infraestructura (VPS, DB, proyecto Laravel, proyecto Flutter)
+        * Migraciones base
+        * Login con Google OAuth2
+      - Semana 2:
+        * API de productos
+        * Catálogo con filtros y paginación
+        * Carrito y Checkout
+        * Flujo de pedidos (comprador)
+      - Semana 3:
+        * Publicación de productos (todas las modalidades)
+        * Inventario del vendedor
+        * Gestión de pedidos por el vendedor
+        * Pre-order con abonos
+      - Semana 4:
+        * Panel de administración mínimo
+        * QA y pruebas de carga
+        * Deploy backend y publicación APK
