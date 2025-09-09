@@ -56,6 +56,7 @@ dependencies:
   pdf: ^3.11.1
   path_provider: ^2.1.5
   qr: ^3.0.2
+  shimmer: ^3.0.0
   
 
 dev_dependencies:
@@ -124,7 +125,13 @@ flutter:
     - assets/onboarding/undraw_add_information_j2wg.svg
     - assets/onboarding/undraw_outer_space_re_u9vd.svg
     - assets/images/1.png
-    - assets/images/2.png 
+    - assets/images/2.png
+    # Assets faltantes agregados
+    - assets/images/logo_login.png
+    - assets/images/logo_login2.png
+    - assets/onboarding/onboarding_eats_familia.png
+    - assets/onboarding/onboarding_eats.png
+    - assets/onboarding/onboarding_eats2.png 
     - assets/images/profile_photos/16a4f66ff40d30c7a8fa1fe44b1e3c3e.jpg
     - assets/images/profile_photos/HD-wallpaper-floating-in-asteroids-astronaut-asteroid-belt-space.jpg
     - .env
