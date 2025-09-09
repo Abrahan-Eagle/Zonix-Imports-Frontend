@@ -339,9 +339,7 @@ import 'package:logger/logger.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zonix/features/services/auth/api_service.dart';
-import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:zonix/features/utils/user_provider.dart';
 import 'package:flutter/services.dart';
@@ -353,7 +351,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:zonix/features/screens/profile/profile_page.dart';
 import 'package:zonix/features/screens/settings/settings_page_2.dart';
 import 'package:zonix/features/screens/auth/sign_in_screen.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 
 import 'package:zonix/features/DomainProfiles/Profiles/api/profile_service.dart';
@@ -364,7 +361,6 @@ import 'package:zonix/features/screens/cart/cart_page.dart';
 import 'package:zonix/features/screens/orders/orders_page.dart';
 import 'package:zonix/features/screens/restaurants/restaurants_page.dart';
 
-import 'package:zonix/features/screens/cart/checkout_page.dart';
 
 import 'package:zonix/features/services/cart_service.dart';
 import 'package:zonix/features/services/order_service.dart';
@@ -399,11 +395,11 @@ import 'package:zonix/features/screens/admin/admin_users_page.dart';
 import 'package:zonix/features/screens/admin/admin_security_page.dart';
 import 'package:zonix/features/screens/admin/admin_analytics_page.dart';
 
-import 'package:zonix/features/screens/help/help_and_faq_page.dart';
 import 'package:zonix/features/services/websocket_service.dart';
 import 'package:zonix/features/utils/app_colors.dart';
 import 'package:zonix/features/screens/commerce/commerce_notifications_page.dart';
 import 'package:zonix/features/screens/commerce/commerce_profile_page.dart';
+import 'package:zonix/config/app_config.dart';
 
 /*
  * ZONIX EATS - Aplicación Multi-Rol
@@ -447,7 +443,8 @@ Future<void> main() async {
     DeviceOrientation.portraitDown,
   ]);
 
-  await dotenv.load();
+  // Inicializar configuración desde .env
+  await AppConfig.initialize();
 
   // Bypass de login para tests de integración
   final bool isIntegrationTest = const String.fromEnvironment('INTEGRATION_TEST', defaultValue: 'false') == 'true';
