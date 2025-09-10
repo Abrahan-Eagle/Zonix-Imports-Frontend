@@ -1,26 +1,101 @@
 flutter_native_splash:
-  color: "#ffffff"
-  image: assets/images/splash_logo.png
-  branding: assets/images/brand-android.png
+  # Light theme configuration
+  color: "#FAFBFC"  # Softer white with subtle warmth
+  image: assets/splash/splash_logo.png
+  branding: assets/splash/brand-android.png
   branding_mode: bottom
-  branding_bottom_padding: 24
-  color_dark: "#0a0a0a"
-  image_dark: assets/images/splash_logo_dark.png
-  branding_dark: assets/images/dart_dark-android.png
-
+  branding_bottom_padding: 40  # Increased for better breathing room
+  
+  # Dark theme configuration  
+  color_dark: "#0A1929"  # Deeper, richer dark blue
+  image_dark: assets/splash/splash_logo_dark.png
+  branding_dark: assets/splash/dart_dark-android.png
+  
+  # Android 12+ specific configuration
   android_12:
-    image: assets/images/splash_logo.png
-    color: "#ffffff"
-    icon_background_color: "#ffffff"
-    branding: assets/images/brand-android.png
-    image_dark: assets/images/splash_logo_dark.png
-    color_dark: "#0a0a0a"
-    icon_background_color_dark: "#0a0a0a"
-    branding_dark: assets/images/dart_dark-android.png
-
+    image: assets/splash/splash_logo.png
+    color: "#FAFBFC"
+    icon_background_color: "#FAFBFC"
+    branding: assets/splash/brand-android.png
+    image_dark: assets/splash/splash_logo_dark.png
+    color_dark: "#0A1929"
+    icon_background_color_dark: "#0A1929"
+    branding_dark: assets/splash/dart_dark-android.png
+  
+  # Platform support
   android: true
-  ios: false
+  ios: true
   web: true
-  branding_android: assets/images/brand-android.png
-  branding_dark_android: assets/images/dart_dark-android.png
+  
+  # Android-specific branding
+  branding_android: assets/splash/brand-android.png
+  branding_dark_android: assets/splash/dart_dark-android.png
+  
+  # Display settings
   fullscreen: true
+
+
+
+
+# flutter_native_splash:
+#   color: "#FAFBFC"
+#   image: assets/splash/splash_logo.png
+#   branding: assets/splash/brand-android.png
+#   branding_mode: bottom
+#   branding_bottom_padding: 40
+#   color_dark: "#0A1929" 
+#   image_dark: assets/splash/splash_logo_dark.png
+#   branding_dark: assets/splash/dart_dark-android.png
+
+#   android_12:
+#     image: assets/splash/splash_logo.png
+#     color: "#FAFBFC"
+#     icon_background_color: "#FAFBFC"
+#     branding: assets/splash/brand-android.png
+#     image_dark: assets/splash/splash_logo_dark.png
+#     color_dark: "#0A1929" 
+#     icon_background_color_dark: "#0A1929" 
+#     branding_dark: assets/splash/dart_dark-android.png
+
+#   android: true
+#   ios: false
+#   web: true
+#   branding_android: assets/splash/brand-android.png
+#   branding_dark_android: assets/splash/dart_dark-android.png
+#   fullscreen: true
+
+
+
+# flutter_native_splash:
+#   # Activa por plataforma
+#   android: true
+#   ios: true
+#   web: true
+
+#   # === MODO CLARO ===
+#   color: "#FFFFFF"                          # Fondo blanco
+#   image: assets/splash/splash_logo.png # Logo original con fondo transparente (PNG)
+
+#   # Branding opcional (pequeño texto/wordmark debajo)
+#   branding: assets/splash/brand-android.png
+#   branding_mode: bottom                     # bottom / center
+
+#   # === MODO OSCURO ===
+#   color_dark: "#00356A"                     # Fondo azul marino
+#   image_dark: assets/splash/splash_logo_dark.png   # Logo invertido (wordmark claro/blanco), PNG transparente
+#   branding_dark: assets/splash/dart_dark-android.png
+
+#   # Opciones generales
+#   fullscreen: true
+#   android_gravity: center                   # center / fill / bottom
+#   ios_content_mode: center                  # center / scaleAspectFill / scaleAspectFit
+
+#   # === ANDROID 12+ (usa layout nuevo) ===
+#   android_12:
+#     color: "#FFFFFF"
+#     color_dark: "#001A2B"                   # Un navy aún más profundo para contraste
+#     image: assets/splash/splash_logo.png
+#     image_dark: assets/splash/splash_logo_dark.png
+#     # Fondo del ícono en Android 12 (solo si tu imagen no ocupa todo y quieres un halo)
+#     icon_background_color: "#FFBE1A"
+#     icon_background_color_dark: "#0A4A88"
