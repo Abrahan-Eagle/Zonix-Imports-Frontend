@@ -618,8 +618,8 @@ class SignInScreenState extends State<SignInScreen>
             scale: _pulseAnimation,
             child: Image.asset(
               'assets/images/logo_login2.png',
-              width: 375,
-              height: 156,
+              width: 421.875,
+              height: 175.5,
               fit: BoxFit.contain,
             ),
           ),
@@ -693,8 +693,8 @@ class SignInScreenState extends State<SignInScreen>
             scale: _pulseAnimation,
             child: Image.asset(
               'assets/images/logo_login2.png',
-              width: 625,
-              height: 281,
+              width: 703.125,
+              height: 316.125,
               fit: BoxFit.contain,
             ),
           ),
