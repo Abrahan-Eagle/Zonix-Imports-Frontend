@@ -10,14 +10,14 @@ class ZonixColors {
   static const Color lightGray = Color(0xFFE5E5E5); // Gris Claro (Soporte)
 }
 
-class OnboardingPage3 extends StatefulWidget {
-  const OnboardingPage3({super.key});
+class OnboardingPage6 extends StatefulWidget {
+  const OnboardingPage6({super.key});
 
   @override
-  State<OnboardingPage3> createState() => _OnboardingPage3State();
+  State<OnboardingPage6> createState() => _OnboardingPage6State();
 }
 
-class _OnboardingPage3State extends State<OnboardingPage3>
+class _OnboardingPage6State extends State<OnboardingPage6>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
@@ -75,7 +75,7 @@ class _OnboardingPage3State extends State<OnboardingPage3>
               child: Container(
                 decoration: BoxDecoration(
                   image: const DecorationImage(
-                    image: AssetImage('assets/onboarding/onboardingPage4.png'),
+                    image: AssetImage('assets/onboarding/onboardingPage7.png'),
                     fit: BoxFit.cover,
                   ),
                   gradient: LinearGradient(
@@ -119,8 +119,8 @@ class _OnboardingPage3State extends State<OnboardingPage3>
                                 height:
                                     isTablet ? 32 : (isSmallPhone ? 20 : 24)),
 
-                            // Opciones de compra
-                            _buildPurchaseOptions(isTablet, isSmallPhone),
+                            // Características de perfil y pedidos
+                            _buildProfileFeatures(isTablet, isSmallPhone),
 
                             // Espaciador flexible
                             const Spacer(flex: 2),
@@ -144,7 +144,7 @@ class _OnboardingPage3State extends State<OnboardingPage3>
   Widget _buildMainContent(bool isTablet, bool isSmallPhone) {
     return Column(
       children: [
-        // Icono de compra
+        // Icono de perfil y pedidos
         Container(
           padding: EdgeInsets.all(isTablet ? 20 : (isSmallPhone ? 12 : 16)),
           decoration: BoxDecoration(
@@ -159,7 +159,7 @@ class _OnboardingPage3State extends State<OnboardingPage3>
             ],
           ),
           child: Icon(
-            Icons.shopping_cart,
+            Icons.person_outline,
             size: isTablet ? 50 : (isSmallPhone ? 35 : 40),
             color: ZonixColors.darkBlue,
           ),
@@ -169,7 +169,7 @@ class _OnboardingPage3State extends State<OnboardingPage3>
 
         // Título principal
         Text(
-          'Compra al detal o por mayor',
+          'Perfil y pedidos',
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: isTablet ? 36 : (isSmallPhone ? 24 : 28),
@@ -201,7 +201,7 @@ class _OnboardingPage3State extends State<OnboardingPage3>
             ],
           ),
           child: Text(
-            'Llévate una sola pieza o arma tu lote al por mayor. Tú decides cómo comprar.',
+            'Administra tus pedidos, datos de envío y pagos en un solo lugar.',
             textAlign: TextAlign.center,
             style: TextStyle(
               color: ZonixColors.pureWhite,
@@ -215,29 +215,29 @@ class _OnboardingPage3State extends State<OnboardingPage3>
     );
   }
 
-  Widget _buildPurchaseOptions(bool isTablet, bool isSmallPhone) {
+  Widget _buildProfileFeatures(bool isTablet, bool isSmallPhone) {
     return Wrap(
       spacing: isTablet ? 32 : (isSmallPhone ? 24 : 28),
       runSpacing: isTablet ? 24 : (isSmallPhone ? 16 : 20),
       alignment: WrapAlignment.center,
       children: [
-        _buildPurchaseOption(
-          Icons.shopping_bag,
-          'Al Detal',
+        _buildProfileFeature(
+          Icons.shopping_bag_outlined,
+          'Pedidos',
           ZonixColors.goldenYellow,
           isTablet,
           isSmallPhone,
         ),
-        _buildPurchaseOption(
-          Icons.inventory,
-          'Al Por Mayor',
+        _buildProfileFeature(
+          Icons.local_shipping,
+          'Envío',
           ZonixColors.brightBlue,
           isTablet,
           isSmallPhone,
         ),
-        _buildPurchaseOption(
-          Icons.tune,
-          'Flexible',
+        _buildProfileFeature(
+          Icons.payment,
+          'Pagos',
           ZonixColors.pureWhite,
           isTablet,
           isSmallPhone,
@@ -246,7 +246,7 @@ class _OnboardingPage3State extends State<OnboardingPage3>
     );
   }
 
-  Widget _buildPurchaseOption(IconData icon, String label, Color color,
+  Widget _buildProfileFeature(IconData icon, String label, Color color,
       bool isTablet, bool isSmallPhone) {
     return Column(
       mainAxisSize: MainAxisSize.min,

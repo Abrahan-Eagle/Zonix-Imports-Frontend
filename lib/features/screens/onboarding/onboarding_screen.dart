@@ -5,10 +5,11 @@ import 'onboarding_page2.dart';
 import 'onboarding_page3.dart';
 import 'onboarding_page4.dart';
 import 'onboarding_page5.dart';
-import 'package:zonix/features/utils/user_provider.dart';
-import 'package:provider/provider.dart';
+import 'onboarding_page6.dart';
 import 'onboarding_service.dart';
 import 'package:zonix/main.dart';
+import 'package:provider/provider.dart';
+import 'package:zonix/features/utils/user_provider.dart';
 
 // Paleta de colores Zonix Imports
 class ZonixColors {
@@ -42,15 +43,27 @@ class OnboardingScreenState extends State<OnboardingScreen> {
       OnboardingPage3(),
       OnboardingPage4(),
       OnboardingPage5(),
+      OnboardingPage6(),
     ];
   }
 
-  Future<void> _completeOnboarding(int userId) async {
+  Future<void> _completeOnboarding(BuildContext context) async {
     if (_isLoading) return;
 
     setState(() => _isLoading = true);
 
     try {
+      // Obtener el userId del UserProvider
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+      // Asegurar que tenemos los detalles más recientes del usuario
+      final userDetails = await userProvider.getUserDetails();
+      final userId = userDetails['userId'];
+
+      if (userId == null || userId == 0) {
+        throw Exception("ID de usuario no encontrado");
+      }
+
       await _onboardingService.completeOnboarding(userId);
       if (!mounted) return;
 
@@ -80,8 +93,7 @@ class OnboardingScreenState extends State<OnboardingScreen> {
     if (_isLoading) return;
 
     if (_currentPage == onboardingPages.length - 1) {
-      final userId = Provider.of<UserProvider>(context, listen: false).userId;
-      _completeOnboarding(userId);
+      _completeOnboarding(context);
     } else {
       _controller.nextPage(
         duration: const Duration(milliseconds: 300),
@@ -107,8 +119,6 @@ class OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
@@ -171,8 +181,7 @@ class OnboardingScreenState extends State<OnboardingScreen> {
                           else
                             TextButton(
                               onPressed: () async {
-                                final userId = userProvider.userId;
-                                await _completeOnboarding(userId);
+                                await _completeOnboarding(context);
                               },
                               child: const Text('Saltar'),
                             ),

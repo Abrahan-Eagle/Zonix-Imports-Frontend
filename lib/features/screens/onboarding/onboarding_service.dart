@@ -24,12 +24,12 @@ class OnboardingService {
   // Completar el proceso de onboarding del usuario
   Future<void> completeOnboarding(int userId) async {
     final token = await _getToken();
-    
+
     if (token == null) {
       logger.e("Token no encontrado. No se puede completar el onboarding.");
       throw Exception("Token no encontrado.");
     }
-    
+
     try {
       final response = await http.put(
         Uri.parse('$baseUrl/api/onboarding/$userId'),
@@ -46,8 +46,10 @@ class OnboardingService {
         logger.i("Onboarding completado con éxito.");
       } else {
         // Manejo de error
-        logger.e("Error al completar el onboarding: ${response.statusCode} - ${response.body}");
-        throw Exception("Error al completar el onboarding: ${response.statusCode}");
+        logger.e(
+            "Error al completar el onboarding: ${response.statusCode} - ${response.body}");
+        throw Exception(
+            "Error al completar el onboarding: ${response.statusCode}");
       }
     } catch (e) {
       logger.e("Excepción al hacer la solicitud de onboarding: $e");
