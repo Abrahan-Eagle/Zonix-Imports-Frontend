@@ -106,6 +106,22 @@ flutter:
     - assets/onboarding/onboarding_eats_familia.png
     - assets/onboarding/onboarding_eats.png
     - assets/onboarding/onboarding_eats2.png 
+    - assets/onboarding/onboardingPage1.png
+    # - assets/onboarding/onboardingPage2.png  # Temporalmente comentado - imagen no existe
+    - assets/onboarding/onboardingPage3.png
+    - assets/onboarding/onboardingPage4.png
+    - assets/onboarding/onboardingPage5.png
+    - assets/onboarding/onboardingPage6.png
+    - assets/onboarding/onboardingPage7.png
+    - assets/onboarding/onboardingPage8.png
+    - assets/onboarding/onboardingPage9.png
+    - assets/onboarding/onboardingPage10.png
+    - assets/onboarding/onboardingPage11.png
+    - assets/onboarding/onboardingPage12.png
+    - assets/onboarding/onboardingPage13.png
+    - assets/onboarding/onboardingPage14.png
+    - assets/onboarding/onboardingPage15.png
+    - assets/onboarding/onboardingPage16.png
     - assets/images/profile_photos/16a4f66ff40d30c7a8fa1fe44b1e3c3e.jpg
     - assets/images/profile_photos/HD-wallpaper-floating-in-asteroids-astronaut-asteroid-belt-space.jpg
     - .env

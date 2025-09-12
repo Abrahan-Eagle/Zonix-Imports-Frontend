@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'onboarding_page1.dart';
 import 'onboarding_page2.dart';
@@ -10,6 +9,16 @@ import 'package:zonix/features/utils/user_provider.dart';
 import 'package:provider/provider.dart';
 import 'onboarding_service.dart';
 import 'package:zonix/main.dart';
+
+// Paleta de colores Zonix Imports
+class ZonixColors {
+  static const Color darkBlue = Color(0xFF0C2D57); // Azul Oscuro (Principal)
+  static const Color goldenYellow =
+      Color(0xFFFFB400); // Amarillo Dorado (Secundario)
+  static const Color brightBlue = Color(0xFF1E90FF); // Azul Brillante (Soporte)
+  static const Color pureWhite = Color(0xFFFFFFFF); // Blanco Puro (Neutral)
+  static const Color lightGray = Color(0xFFE5E5E5); // Gris Claro (Soporte)
+}
 
 final OnboardingService _onboardingService = OnboardingService();
 
@@ -38,13 +47,13 @@ class OnboardingScreenState extends State<OnboardingScreen> {
 
   Future<void> _completeOnboarding(int userId) async {
     if (_isLoading) return;
-    
+
     setState(() => _isLoading = true);
-    
+
     try {
       await _onboardingService.completeOnboarding(userId);
       if (!mounted) return;
-      
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const MainRouter()),
@@ -52,12 +61,12 @@ class OnboardingScreenState extends State<OnboardingScreen> {
     } catch (e) {
       debugPrint("Error al completar el onboarding: $e");
       if (!mounted) return;
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
-       const SnackBar(
-          content:  Text('Error al completar el onboarding'),
+        const SnackBar(
+          content: Text('Error al completar el onboarding'),
           behavior: SnackBarBehavior.floating,
-          margin:  EdgeInsets.all(20),
+          margin: EdgeInsets.all(20),
         ),
       );
     } finally {
@@ -69,12 +78,10 @@ class OnboardingScreenState extends State<OnboardingScreen> {
 
   void _handleNext() {
     if (_isLoading) return;
-    
+
     if (_currentPage == onboardingPages.length - 1) {
       final userId = Provider.of<UserProvider>(context, listen: false).userId;
-      if (userId != null) {
-        _completeOnboarding(userId);
-      }
+      _completeOnboarding(userId);
     } else {
       _controller.nextPage(
         duration: const Duration(milliseconds: 300),
@@ -100,7 +107,6 @@ class OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final userProvider = Provider.of<UserProvider>(context, listen: false);
 
     return WillPopScope(
@@ -141,8 +147,10 @@ class OnboardingScreenState extends State<OnboardingScreen> {
                           // activeDotColor: theme.primaryColor,
                           // dotColor: theme.dividerColor,
 
-                          activeDotColor: Colors.white, // Punto activo blanco
-                        dotColor: Colors.white.withOpacity(0.5), // Puntos inactivos semitransparentes
+                          activeDotColor:
+                              ZonixColors.goldenYellow, // Punto activo dorado
+                          dotColor: ZonixColors.pureWhite.withOpacity(
+                              0.4), // Puntos inactivos semitransparentes
                           spacing: 8,
                           expansionFactor: 3,
                         ),
@@ -164,9 +172,7 @@ class OnboardingScreenState extends State<OnboardingScreen> {
                             TextButton(
                               onPressed: () async {
                                 final userId = userProvider.userId;
-                                if (userId != null) {
-                                  await _completeOnboarding(userId);
-                                }
+                                await _completeOnboarding(userId);
                               },
                               child: const Text('Saltar'),
                             ),
@@ -174,18 +180,18 @@ class OnboardingScreenState extends State<OnboardingScreen> {
                           // Botón Siguiente/Finalizar
                           FloatingActionButton(
                             onPressed: _handleNext,
-                            backgroundColor: theme.primaryColor,
-                            elevation: 2,
+                            backgroundColor: ZonixColors.goldenYellow,
+                            elevation: 4,
                             child: _isLoading
                                 ? const CircularProgressIndicator(
-                                    color: Colors.white,
+                                    color: ZonixColors.darkBlue,
                                     strokeWidth: 2,
                                   )
                                 : Icon(
                                     _currentPage == onboardingPages.length - 1
                                         ? Icons.check
                                         : Icons.arrow_forward,
-                                    color: Colors.white,
+                                    color: ZonixColors.darkBlue,
                                   ),
                           ),
                         ],
@@ -207,221 +213,208 @@ class WelcomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    
     return Container(
       decoration: const BoxDecoration(
-        gradient: RadialGradient(
-          center: Alignment.center,
-          radius: 1.2,
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
           colors: [
-            Color(0xFF0F172A), // Azul muy oscuro (espacio)
-            Color(0xFF1E293B), // Azul oscuro
-            Color(0xFF334155), // Azul medio
+            ZonixColors.darkBlue, // Azul oscuro arriba
+            Color(0xFF1A3A5C), // Azul medio
+            Color(0xFF2A4A6C), // Azul más claro abajo
           ],
           stops: [0.0, 0.6, 1.0],
         ),
       ),
       child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Espaciado superior flexible
-              const Spacer(flex: 1),
-              
-              // Imagen de familia con efecto planetario
-              Container(
-                padding: const EdgeInsets.all(24),
+        child: Stack(
+          children: [
+            // Imagen de fondo con overlay
+            Positioned.fill(
+              child: Container(
                 decoration: BoxDecoration(
-                  gradient: RadialGradient(
-                    colors: [
-                      const Color(0xFFF59E0B).withOpacity(0.2), // Naranja suave
-                      const Color(0xFF3B82F6).withOpacity(0.1), // Azul suave
-                      Colors.transparent,
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(100),
-                  border: Border.all(
-                    color: const Color(0xFFF59E0B).withOpacity(0.3),
-                    width: 2,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFFF59E0B).withOpacity(0.4),
-                      blurRadius: 30,
-                      spreadRadius: 5,
-                    ),
-                    BoxShadow(
-                      color: const Color(0xFF3B82F6).withOpacity(0.3),
-                      blurRadius: 15,
-                      spreadRadius: -5,
-                    ),
-                  ],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(80),
-                  child: Image.asset(
-                    'assets/onboarding/onboarding_eats_familia.png',
-                    height: size.height * 0.22,
+                  image: const DecorationImage(
+                    image: AssetImage('assets/onboarding/onboardingPage1.png'),
                     fit: BoxFit.cover,
+                  ),
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      ZonixColors.darkBlue.withOpacity(0.7),
+                      ZonixColors.darkBlue.withOpacity(0.4),
+                      ZonixColors.darkBlue.withOpacity(0.8),
+                    ],
+                    stops: const [0.0, 0.5, 1.0],
                   ),
                 ),
               ),
-              
-              const SizedBox(height: 40),
-              
-              // Título con temática espacial
-              Column(
+            ),
+
+            // Contenido principal
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    '🪐 Bienvenido al',
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.w400,
-                      fontSize: 22,
-                      color: Colors.white.withOpacity(0.8),
+                  // Espaciado superior flexible
+                  const Spacer(flex: 2),
+
+                  // Logo/Brand Zonix Imports
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: ZonixColors.pureWhite.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: ZonixColors.goldenYellow.withOpacity(0.3),
+                        width: 2,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: ZonixColors.goldenYellow.withOpacity(0.2),
+                          blurRadius: 20,
+                          spreadRadius: 2,
+                        ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  RichText(
-                    textAlign: TextAlign.center,
-                    text: TextSpan(
+                    child: Column(
                       children: [
-                        TextSpan(
-                          text: 'Universo ',
-                          style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 34,
-                            color: Colors.white,
-                            height: 1.1,
+                        // Icono de caja/importación
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: ZonixColors.goldenYellow,
+                            borderRadius: BorderRadius.circular(15),
+                            boxShadow: [
+                              BoxShadow(
+                                color:
+                                    ZonixColors.goldenYellow.withOpacity(0.4),
+                                blurRadius: 15,
+                                offset: const Offset(0, 5),
+                              ),
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.inventory_2_outlined,
+                            size: 40,
+                            color: ZonixColors.darkBlue,
                           ),
                         ),
-                        TextSpan(
-                          text: 'ZONIX',
-                          style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 34,
-                            color: const Color(0xFFF59E0B), // Naranja del logo
-                            height: 1.1,
-                          ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'ZONIX',
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineLarge
+                              ?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 32,
+                                color: ZonixColors.pureWhite,
+                                letterSpacing: 2,
+                              ),
+                        ),
+                        Text(
+                          'IMPORTS',
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineMedium
+                              ?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 18,
+                                color: ZonixColors.goldenYellow,
+                                letterSpacing: 1,
+                              ),
                         ),
                       ],
                     ),
                   ),
+
+                  const SizedBox(height: 40),
+
+                  // Mensaje de bienvenida
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 16),
+                    decoration: BoxDecoration(
+                      color: ZonixColors.pureWhite.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: ZonixColors.brightBlue.withOpacity(0.3),
+                        width: 1,
+                      ),
+                    ),
+                    child: Text(
+                      '¡Bienvenido a Zonix Imports!\nDonde lo que imaginas, lo traemos hasta tus manos.',
+                      textAlign: TextAlign.center,
+                      style:
+                          Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 20,
+                                color: ZonixColors.pureWhite,
+                                height: 1.4,
+                              ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 36),
+
+                  // Elementos de confianza
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 20, horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: ZonixColors.pureWhite.withOpacity(0.05),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: ZonixColors.lightGray.withOpacity(0.2),
+                        width: 1,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _buildTrustElement('📦', 'Importación\nGlobal'),
+                        _buildTrustElement('⚡', 'Entrega\nRápida'),
+                        _buildTrustElement('🛡️', 'Confianza\nTotal'),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 32),
+
+                  // Descripción adicional
+                  Text(
+                    'Conectamos el mundo con Venezuela\n🌍 Tu puerta de entrada a productos únicos',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: ZonixColors.pureWhite.withOpacity(0.8),
+                          fontSize: 16,
+                          height: 1.5,
+                          fontWeight: FontWeight.w400,
+                        ),
+                  ),
+
+                  // Espaciado inferior flexible
+                  const Spacer(flex: 2),
                 ],
               ),
-              
-              const SizedBox(height: 24),
-              
-              // Badge espacial
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [
-                      Color(0xFFEF4444), // Rojo
-                      Color(0xFFF59E0B), // Naranja
-                      Color(0xFFFBBF24), // Amarillo
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(30),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFFF59E0B).withOpacity(0.5),
-                      blurRadius: 15,
-                      offset: const Offset(0, 5),
-                    ),
-                  ],
-                ),
-                child: const Text(
-                  '🚀 ¡Comida a la velocidad de la luz!',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                    shadows: [
-                      Shadow(
-                        color: Colors.black26,
-                        blurRadius: 2,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              
-              const SizedBox(height: 36),
-              
-              // Elementos de trust con temática espacial
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      const Color(0xFF1E293B).withOpacity(0.8),
-                      const Color(0xFF334155).withOpacity(0.6),
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(25),
-                  border: Border.all(
-                    color: const Color(0xFFF59E0B).withOpacity(0.4),
-                    width: 1.5,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFFF59E0B).withOpacity(0.2),
-                      blurRadius: 20,
-                      spreadRadius: 2,
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildTrustElement('🛸', 'Entrega\nUltra Rápida'),
-                    _buildTrustElement('🌟', 'Experiencia\nEstelar'),
-                    _buildTrustElement('🪐', 'Miles de\nSabores'),
-                  ],
-                ),
-              ),
-              
-              const SizedBox(height: 32),
-              
-              // Descripción espacial
-              Text(
-                'Conecta con tu familia a través de la comida 👨‍👩‍👧‍👦\n¡Sabores que unen planetas! 🌍✨',
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: Colors.white.withOpacity(0.85),
-                  fontSize: 16,
-                  height: 1.5,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-              
-              // Espaciado inferior flexible
-              const Spacer(flex: 2),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
-  
+
   Widget _buildTrustElement(String emoji, String text) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        gradient: RadialGradient(
-          colors: [
-            const Color(0xFFF59E0B).withOpacity(0.2),
-            Colors.transparent,
-          ],
-        ),
+        color: ZonixColors.pureWhite.withOpacity(0.1),
         borderRadius: BorderRadius.circular(15),
         border: Border.all(
-          color: const Color(0xFFF59E0B).withOpacity(0.4),
+          color: ZonixColors.goldenYellow.withOpacity(0.3),
           width: 1,
         ),
       ),
@@ -437,7 +430,7 @@ class WelcomePage extends StatelessWidget {
             text,
             textAlign: TextAlign.center,
             style: const TextStyle(
-              color: Colors.white,
+              color: ZonixColors.pureWhite,
               fontSize: 12,
               fontWeight: FontWeight.w600,
               height: 1.2,
