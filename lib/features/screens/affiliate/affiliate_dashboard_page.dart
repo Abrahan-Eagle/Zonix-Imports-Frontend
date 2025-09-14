@@ -1,6 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:zonix/features/services/affiliate_service.dart';
 
+// Paleta de colores profesional
+class ZonixColors {
+  static const Color primaryBlue = Color(0xFF1E40AF); // Azul profesional
+  static const Color secondaryBlue = Color(0xFF3B82F6); // Azul secundario
+  static const Color accentBlue = Color(0xFF60A5FA); // Azul de acento
+  static const Color darkGray = Color(0xFF1E293B); // Gris oscuro
+  static const Color mediumGray = Color(0xFF64748B); // Gris medio
+  static const Color lightGray = Color(0xFFF1F5F9); // Gris claro
+  static const Color white = Color(0xFFFFFFFF); // Blanco
+  static const Color successGreen = Color(0xFF10B981); // Verde éxito
+  static const Color warningOrange = Color(0xFFF59E0B); // Naranja advertencia
+  static const Color errorRed = Color(0xFFEF4444); // Rojo error
+  
+  // Colores para efectos modernos
+  static const Color glassBackground = Color(0x1AFFFFFF); // Fondo glassmorphism
+  static const Color neumorphicLight = Color(0xFFFFFFFF); // Neumorfismo claro
+  static const Color neumorphicDark = Color(0xFFE0E0E0); // Neumorfismo oscuro
+}
+
 class AffiliateDashboardPage extends StatefulWidget {
   @override
   _AffiliateDashboardPageState createState() => _AffiliateDashboardPageState();
@@ -45,10 +64,29 @@ class _AffiliateDashboardPageState extends State<AffiliateDashboardPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Scaffold(
+      backgroundColor: isDark ? ZonixColors.darkGray : ZonixColors.lightGray,
       appBar: AppBar(
-        title: Text('Dashboard de Afiliado'),
-        backgroundColor: Colors.purple,
+        title: Builder(
+          builder: (context) {
+            final screenWidth = MediaQuery.of(context).size.width;
+            final isTablet = screenWidth > 600;
+            final fontSize = isTablet ? 24.0 : 20.0;
+            
+            return Text(
+              'Dashboard de Afiliado',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+                fontSize: fontSize,
+                letterSpacing: 0.5,
+              ),
+            );
+          },
+        ),
+        backgroundColor: isDark ? ZonixColors.darkGray : ZonixColors.primaryBlue,
         foregroundColor: Colors.white,
         actions: [
           IconButton(
@@ -64,12 +102,21 @@ class _AffiliateDashboardPageState extends State<AffiliateDashboardPage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.error, size: 64, color: Colors.red),
+                      Icon(Icons.error, size: 64, color: ZonixColors.errorRed),
                       SizedBox(height: 16),
-                      Text('Error: $_error'),
+                      Text(
+                        'Error: $_error',
+                        style: TextStyle(
+                          color: isDark ? ZonixColors.white : ZonixColors.darkGray,
+                        ),
+                      ),
                       SizedBox(height: 16),
                       ElevatedButton(
                         onPressed: _loadDashboardData,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: ZonixColors.primaryBlue,
+                          foregroundColor: Colors.white,
+                        ),
                         child: Text('Reintentar'),
                       ),
                     ],
@@ -100,9 +147,11 @@ class _AffiliateDashboardPageState extends State<AffiliateDashboardPage> {
 
   Widget _buildProfileCard() {
     if (_profile == null) return SizedBox.shrink();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Card(
       elevation: 4,
+      color: isDark ? ZonixColors.darkGray : ZonixColors.white,
       child: Padding(
         padding: EdgeInsets.all(20),
         child: Column(
@@ -208,6 +257,7 @@ class _AffiliateDashboardPageState extends State<AffiliateDashboardPage> {
 
   Widget _buildStatisticsGrid() {
     if (_statistics == null) return SizedBox.shrink();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -217,6 +267,7 @@ class _AffiliateDashboardPageState extends State<AffiliateDashboardPage> {
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
+            color: isDark ? ZonixColors.white : ZonixColors.darkGray,
           ),
         ),
         SizedBox(height: 16),
@@ -259,8 +310,11 @@ class _AffiliateDashboardPageState extends State<AffiliateDashboardPage> {
   }
 
   Widget _buildStatCard(String title, String value, IconData icon, Color color) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Card(
       elevation: 2,
+      color: isDark ? ZonixColors.darkGray : ZonixColors.white,
       child: Padding(
         padding: EdgeInsets.all(16),
         child: Column(
@@ -281,7 +335,7 @@ class _AffiliateDashboardPageState extends State<AffiliateDashboardPage> {
               title,
               style: TextStyle(
                 fontSize: 12,
-                color: Colors.grey[600],
+                color: ZonixColors.mediumGray,
                 fontWeight: FontWeight.w500,
               ),
               textAlign: TextAlign.center,
