@@ -1,13 +1,21 @@
 import 'package:flutter/material.dart';
+import 'dart:ui';
 
-// Paleta de colores Zonix Imports
+// Paleta de colores Material You vibrante (2025)
 class ZonixColors {
+  static const Color seedColor =
+      Color(0xFF6750A4); // Púrpura vibrante como base
   static const Color darkBlue = Color(0xFF0C2D57); // Azul Oscuro (Principal)
   static const Color goldenYellow =
       Color(0xFFFFB400); // Amarillo Dorado (Secundario)
   static const Color brightBlue = Color(0xFF1E90FF); // Azul Brillante (Soporte)
   static const Color pureWhite = Color(0xFFFFFFFF); // Blanco Puro (Neutral)
   static const Color lightGray = Color(0xFFE5E5E5); // Gris Claro (Soporte)
+
+  // Colores adicionales para efectos modernos
+  static const Color glassBackground = Color(0x1AFFFFFF);
+  static const Color neumorphicLight = Color(0xFFFFFFFF);
+  static const Color neumorphicDark = Color(0xFFE0E0E0);
 }
 
 class OnboardingPage4 extends StatefulWidget {
@@ -167,47 +175,74 @@ class _OnboardingPage4State extends State<OnboardingPage4>
 
         SizedBox(height: isTablet ? 24 : (isSmallPhone ? 16 : 20)),
 
-        // Título principal
+        // Título principal con tipografía expresiva
         Text(
           'Encargos especiales',
           textAlign: TextAlign.center,
           style: TextStyle(
-            fontSize: isTablet ? 36 : (isSmallPhone ? 24 : 28),
-            fontWeight: FontWeight.bold,
+            fontSize: isTablet ? 40 : (isSmallPhone ? 26 : 32),
+            fontWeight: FontWeight.w800, // Más audaz
             color: ZonixColors.pureWhite,
-            height: 1.2,
-            letterSpacing: 1.2,
+            height: 1.1,
+            letterSpacing: 1.5, // Más espaciado para expresividad
+            shadows: [
+              Shadow(
+                color: ZonixColors.darkBlue.withOpacity(0.3),
+                offset: const Offset(0, 2),
+                blurRadius: 4,
+              ),
+            ],
           ),
         ),
 
         SizedBox(height: isTablet ? 20 : (isSmallPhone ? 12 : 16)),
 
-        // Mensaje descriptivo
-        Container(
-          padding: EdgeInsets.all(isTablet ? 24 : (isSmallPhone ? 16 : 20)),
-          decoration: BoxDecoration(
-            color: ZonixColors.pureWhite.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: ZonixColors.brightBlue.withOpacity(0.3),
-              width: 1,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: ZonixColors.darkBlue.withOpacity(0.2),
-                blurRadius: 15,
-                offset: const Offset(0, 5),
+        // Mensaje descriptivo con glassmorphism
+        ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              padding: EdgeInsets.all(isTablet ? 24 : (isSmallPhone ? 16 : 20)),
+              decoration: BoxDecoration(
+                color: ZonixColors.glassBackground.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(
+                  color: ZonixColors.pureWhite.withOpacity(0.2),
+                  width: 1.5,
+                ),
+                // Efecto neumórfico sutil
+                boxShadow: [
+                  BoxShadow(
+                    color: ZonixColors.neumorphicDark.withOpacity(0.1),
+                    blurRadius: 15,
+                    offset: const Offset(4, 4),
+                  ),
+                  BoxShadow(
+                    color: ZonixColors.neumorphicLight.withOpacity(0.15),
+                    blurRadius: 15,
+                    offset: const Offset(-4, -4),
+                  ),
+                ],
               ),
-            ],
-          ),
-          child: Text(
-            '¿Algo que no ves en el catálogo? Lo pedimos por encargo directamente a fábrica.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: ZonixColors.pureWhite,
-              fontSize: isTablet ? 18 : (isSmallPhone ? 13 : 15),
-              height: 1.5,
-              fontWeight: FontWeight.w400,
+              child: Text(
+                '¿Algo que no ves en el catálogo? Lo pedimos por encargo directamente a fábrica.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: ZonixColors.pureWhite,
+                  fontSize: isTablet ? 18 : (isSmallPhone ? 13 : 15),
+                  height: 1.6, // Mejor interlineado
+                  fontWeight: FontWeight.w500, // Más peso
+                  letterSpacing: 0.3,
+                  shadows: [
+                    Shadow(
+                      color: ZonixColors.darkBlue.withOpacity(0.2),
+                      offset: const Offset(0, 1),
+                      blurRadius: 2,
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),

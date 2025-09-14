@@ -8,6 +8,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:zonix/features/utils/auth_utils.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:zonix/features/screens/onboarding/onboarding_screen.dart';
+import 'dart:ui';
 
 const FlutterSecureStorage _storage = FlutterSecureStorage();
 final ApiService apiService = ApiService();
@@ -36,7 +37,9 @@ class SignInScreenState extends State<SignInScreen>
   String? _loginError;
   bool _isLoading = false;
 
-  // Paleta de colores Zonix Imports mejorada
+  // Paleta de colores Material You vibrante (2025)
+  static const Color seedColor =
+      Color(0xFF6750A4); // Púrpura vibrante como base
   static const Color primaryBlue = Color(0xFF00356A);
   static const Color secondaryGold = Color(0xFFFFBE1A);
   static const Color accentBlue = Color(0xFF0A4A88);
@@ -45,6 +48,11 @@ class SignInScreenState extends State<SignInScreen>
   static const Color cardBackground = Color(0xFFF8FAFC);
   static const Color textPrimary = Color(0xFF1E293B);
   static const Color textSecondary = Color(0xFF64748B);
+
+  // Colores adicionales para efectos modernos
+  static const Color glassBackground = Color(0x1AFFFFFF);
+  static const Color neumorphicLight = Color(0xFFFFFFFF);
+  static const Color neumorphicDark = Color(0xFFE0E0E0);
 
   @override
   void initState() {
@@ -322,7 +330,7 @@ class SignInScreenState extends State<SignInScreen>
 
   Widget _buildEnhancedBackground() {
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -337,35 +345,43 @@ class SignInScreenState extends State<SignInScreen>
       ),
       child: Stack(
         children: [
-          // Elementos geométricos animados mejorados
+          // Efecto glassmorphism de fondo
+          Positioned.fill(
+            child: ClipRRect(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.transparent,
+                        glassBackground.withOpacity(0.1),
+                        Colors.transparent,
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          // Elementos geométricos animados con neumorfismo
           Positioned(
             top: -100,
             right: -100,
             child: RotationTransition(
               turns: _rotateAnimation,
-              child: Container(
-                width: 250,
-                height: 250,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: RadialGradient(
-                    colors: [
-                      secondaryGold.withOpacity(0.1),
-                      secondaryGold.withOpacity(0.05),
-                      Colors.transparent,
-                    ],
-                  ),
-                ),
-                child: Container(
-                  margin: const EdgeInsets.all(40),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: secondaryGold.withOpacity(0.2),
-                      width: 1,
-                    ),
-                  ),
-                ),
+              child: _buildNeumorphicCircle(
+                size: 250,
+                colors: [
+                  secondaryGold.withOpacity(0.15),
+                  secondaryGold.withOpacity(0.08),
+                  Colors.transparent,
+                ],
+                innerMargin: 40,
+                borderColor: secondaryGold.withOpacity(0.3),
               ),
             ),
           ),
@@ -375,47 +391,30 @@ class SignInScreenState extends State<SignInScreen>
             left: -150,
             child: RotationTransition(
               turns: _rotateAnimation,
-              child: Container(
-                width: 350,
-                height: 350,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: RadialGradient(
-                    colors: [
-                      lightBackground.withOpacity(0.08),
-                      lightBackground.withOpacity(0.03),
-                      Colors.transparent,
-                    ],
-                  ),
-                ),
+              child: _buildNeumorphicCircle(
+                size: 350,
+                colors: [
+                  lightBackground.withOpacity(0.12),
+                  lightBackground.withOpacity(0.06),
+                  Colors.transparent,
+                ],
               ),
             ),
           ),
 
-          // Patrón de puntos mejorado
-          ...List.generate(20, (index) {
+          // Patrón de puntos con efectos neumórficos
+          ...List.generate(25, (index) {
             return Positioned(
-              top: ((index * 60.0) % 800).roundToDouble(),
-              left: ((index * 90.0) % 500).roundToDouble(),
+              top: ((index * 50.0) % 800).roundToDouble(),
+              left: ((index * 75.0) % 500).roundToDouble(),
               child: AnimatedBuilder(
                 animation: _pulseController,
                 builder: (context, child) {
                   return Transform.scale(
-                    scale: 0.8 + (_pulseAnimation.value * 0.2),
-                    child: Container(
-                      width: 3,
-                      height: 3,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: secondaryGold.withOpacity(0.4),
-                        boxShadow: [
-                          BoxShadow(
-                            color: secondaryGold.withOpacity(0.2),
-                            blurRadius: 4,
-                            spreadRadius: 1,
-                          ),
-                        ],
-                      ),
+                    scale: 0.7 + (_pulseAnimation.value * 0.3),
+                    child: _buildNeumorphicDot(
+                      size: 4,
+                      color: secondaryGold.withOpacity(0.6),
                     ),
                   );
                 },
@@ -423,45 +422,120 @@ class SignInScreenState extends State<SignInScreen>
             );
           }),
 
-          // Elementos decorativos adicionales
+          // Elementos decorativos con glassmorphism
           Positioned(
             top: 200,
             left: 50,
-            child: _buildFloatingElement(size: 12, opacity: 0.15),
+            child: _buildGlassElement(size: 16, opacity: 0.2),
           ),
           Positioned(
             top: 400,
             right: 80,
-            child: _buildFloatingElement(size: 8, opacity: 0.1),
+            child: _buildGlassElement(size: 12, opacity: 0.15),
           ),
           Positioned(
             bottom: 300,
             left: 100,
-            child: _buildFloatingElement(size: 15, opacity: 0.2),
+            child: _buildGlassElement(size: 20, opacity: 0.25),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildFloatingElement(
-      {required double size, required double opacity}) {
+  // Método para crear círculos neumórficos
+  Widget _buildNeumorphicCircle({
+    required double size,
+    required List<Color> colors,
+    double innerMargin = 0,
+    Color? borderColor,
+  }) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: RadialGradient(colors: colors),
+        boxShadow: [
+          // Sombra externa (neumorfismo)
+          BoxShadow(
+            color: neumorphicDark.withOpacity(0.3),
+            blurRadius: 20,
+            offset: const Offset(8, 8),
+          ),
+          BoxShadow(
+            color: neumorphicLight.withOpacity(0.2),
+            blurRadius: 20,
+            offset: const Offset(-8, -8),
+          ),
+        ],
+      ),
+      child: innerMargin > 0
+          ? Container(
+              margin: EdgeInsets.all(innerMargin),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: borderColor != null
+                    ? Border.all(color: borderColor, width: 1)
+                    : null,
+              ),
+            )
+          : null,
+    );
+  }
+
+  // Método para crear puntos neumórficos
+  Widget _buildNeumorphicDot({required double size, required Color color}) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: color,
+        boxShadow: [
+          BoxShadow(
+            color: neumorphicDark.withOpacity(0.4),
+            blurRadius: 8,
+            offset: const Offset(3, 3),
+          ),
+          BoxShadow(
+            color: neumorphicLight.withOpacity(0.3),
+            blurRadius: 8,
+            offset: const Offset(-3, -3),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Método para crear elementos glassmorphism
+  Widget _buildGlassElement({required double size, required double opacity}) {
     return AnimatedBuilder(
       animation: _pulseController,
       builder: (context, child) {
         return Transform.scale(
-          scale: 0.9 + (_pulseAnimation.value * 0.1),
-          child: Container(
-            width: size,
-            height: size,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: RadialGradient(
-                colors: [
-                  secondaryGold.withOpacity(opacity),
-                  secondaryGold.withOpacity(opacity * 0.5),
-                  Colors.transparent,
-                ],
+          scale: 0.8 + (_pulseAnimation.value * 0.2),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(size / 2),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+              child: Container(
+                width: size,
+                height: size,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [
+                      glassBackground.withOpacity(opacity),
+                      glassBackground.withOpacity(opacity * 0.5),
+                      Colors.transparent,
+                    ],
+                  ),
+                  border: Border.all(
+                    color: lightBackground.withOpacity(0.2),
+                    width: 1,
+                  ),
+                ),
               ),
             ),
           ),
@@ -941,37 +1015,54 @@ class SignInScreenState extends State<SignInScreen>
   }
 
   Widget _buildGoogleSignInButton({bool isTablet = false}) {
-    return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
       width: isTablet ? 400 : double.infinity,
       height: isTablet ? 72 : 56,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(isTablet ? 20 : 14),
+        borderRadius: BorderRadius.circular(isTablet ? 20 : 16),
         gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
           colors: [
             lightBackground,
             lightBackground.withOpacity(0.95),
           ],
         ),
+        // Efecto neumórfico sutil
         boxShadow: [
           BoxShadow(
-            color: secondaryGold.withOpacity(0.4),
-            blurRadius: isTablet ? 25 : 15,
-            offset: const Offset(0, 6),
-            spreadRadius: 0,
+            color: neumorphicDark.withOpacity(0.2),
+            blurRadius: isTablet ? 20 : 15,
+            offset: const Offset(6, 6),
           ),
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: isTablet ? 12 : 6,
-            offset: const Offset(0, 2),
+            color: neumorphicLight.withOpacity(0.3),
+            blurRadius: isTablet ? 20 : 15,
+            offset: const Offset(-6, -6),
+          ),
+          // Sombra de elevación adicional
+          BoxShadow(
+            color: secondaryGold.withOpacity(0.3),
+            blurRadius: isTablet ? 25 : 18,
+            offset: const Offset(0, 8),
+            spreadRadius: 0,
           ),
         ],
       ),
       child: Material(
         color: Colors.transparent,
+        borderRadius: BorderRadius.circular(isTablet ? 20 : 16),
         child: InkWell(
           onTap: _isLoading ? null : _handleSignIn,
-          borderRadius: BorderRadius.circular(isTablet ? 20 : 14),
+          borderRadius: BorderRadius.circular(isTablet ? 20 : 16),
+          splashColor: secondaryGold.withOpacity(0.1),
+          highlightColor: secondaryGold.withOpacity(0.05),
           child: Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: isTablet ? 24 : 20,
+              vertical: isTablet ? 16 : 12,
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -980,17 +1071,30 @@ class SignInScreenState extends State<SignInScreen>
                     width: isTablet ? 28 : 20,
                     height: isTablet ? 28 : 20,
                     child: CircularProgressIndicator(
-                      strokeWidth: 2,
+                      strokeWidth: 2.5,
                       valueColor: AlwaysStoppedAnimation<Color>(primaryBlue),
                     ),
                   ),
-                  SizedBox(width: isTablet ? 16 : 10),
+                  SizedBox(width: isTablet ? 16 : 12),
                 ] else ...[
+                  // Contenedor neumórfico para el ícono
                   Container(
-                    padding: EdgeInsets.all(isTablet ? 12 : 8),
+                    padding: EdgeInsets.all(isTablet ? 12 : 10),
                     decoration: BoxDecoration(
-                      color: primaryBlue.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(isTablet ? 14 : 10),
+                      color: primaryBlue.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(isTablet ? 14 : 12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: neumorphicDark.withOpacity(0.1),
+                          blurRadius: 8,
+                          offset: const Offset(2, 2),
+                        ),
+                        BoxShadow(
+                          color: neumorphicLight.withOpacity(0.2),
+                          blurRadius: 8,
+                          offset: const Offset(-2, -2),
+                        ),
+                      ],
                     ),
                     child: Image.asset(
                       'assets/images/google_logo.png',
@@ -1005,32 +1109,38 @@ class SignInScreenState extends State<SignInScreen>
                       },
                     ),
                   ),
-                  SizedBox(width: isTablet ? 16 : 10),
+                  SizedBox(width: isTablet ? 16 : 12),
                 ],
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _isLoading ? 'INICIANDO...' : 'COMENZAR COMPRAS',
-                      style: TextStyle(
-                        fontSize: isTablet ? 16 : 13,
-                        fontWeight: FontWeight.w800,
-                        color: primaryBlue,
-                        letterSpacing: 0.8,
-                      ),
-                    ),
-                    if (!_isLoading)
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       Text(
-                        'Con Google',
+                        _isLoading ? 'INICIANDO...' : 'COMENZAR COMPRAS',
                         style: TextStyle(
-                          fontSize: isTablet ? 12 : 10,
-                          fontWeight: FontWeight.w500,
-                          color: primaryBlue.withOpacity(0.7),
-                          letterSpacing: 0.3,
+                          fontSize: isTablet ? 16 : 14,
+                          fontWeight: FontWeight.w800,
+                          color: primaryBlue,
+                          letterSpacing: 0.8,
+                          height: 1.1,
                         ),
                       ),
-                  ],
+                      if (!_isLoading) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          'Con Google',
+                          style: TextStyle(
+                            fontSize: isTablet ? 12 : 10,
+                            fontWeight: FontWeight.w500,
+                            color: primaryBlue.withOpacity(0.7),
+                            letterSpacing: 0.3,
+                            height: 1.0,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -1042,31 +1152,82 @@ class SignInScreenState extends State<SignInScreen>
 
   Widget _buildTrustIndicator(String emoji, String number, String label,
       {bool isTablet = false}) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          emoji,
-          style: TextStyle(fontSize: isTablet ? 28 : 18),
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      padding: EdgeInsets.symmetric(
+        horizontal: isTablet ? 16 : 12,
+        vertical: isTablet ? 12 : 8,
+      ),
+      decoration: BoxDecoration(
+        color: glassBackground.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(isTablet ? 16 : 12),
+        border: Border.all(
+          color: lightBackground.withOpacity(0.2),
+          width: 1,
         ),
-        const SizedBox(height: 1),
-        Text(
-          number,
-          style: TextStyle(
-            color: secondaryGold,
-            fontSize: isTablet ? 20 : 14,
-            fontWeight: FontWeight.w800,
+        // Efecto glassmorphism sutil
+        boxShadow: [
+          BoxShadow(
+            color: neumorphicDark.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(2, 2),
           ),
-        ),
-        Text(
-          label,
-          style: TextStyle(
-            color: lightBackground.withOpacity(0.8),
-            fontSize: isTablet ? 12 : 9,
-            fontWeight: FontWeight.w500,
+          BoxShadow(
+            color: neumorphicLight.withOpacity(0.15),
+            blurRadius: 8,
+            offset: const Offset(-2, -2),
           ),
-        ),
-      ],
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Contenedor neumórfico para el emoji
+          Container(
+            padding: EdgeInsets.all(isTablet ? 8 : 6),
+            decoration: BoxDecoration(
+              color: secondaryGold.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(isTablet ? 12 : 8),
+              boxShadow: [
+                BoxShadow(
+                  color: neumorphicDark.withOpacity(0.08),
+                  blurRadius: 6,
+                  offset: const Offset(1, 1),
+                ),
+                BoxShadow(
+                  color: neumorphicLight.withOpacity(0.12),
+                  blurRadius: 6,
+                  offset: const Offset(-1, -1),
+                ),
+              ],
+            ),
+            child: Text(
+              emoji,
+              style: TextStyle(fontSize: isTablet ? 28 : 20),
+            ),
+          ),
+          SizedBox(height: isTablet ? 8 : 6),
+          Text(
+            number,
+            style: TextStyle(
+              color: secondaryGold,
+              fontSize: isTablet ? 20 : 16,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.5,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: TextStyle(
+              color: lightBackground.withOpacity(0.9),
+              fontSize: isTablet ? 12 : 10,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.3,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
