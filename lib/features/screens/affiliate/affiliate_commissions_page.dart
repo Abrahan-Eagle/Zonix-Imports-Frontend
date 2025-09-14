@@ -1,5 +1,24 @@
 import 'package:flutter/material.dart';
 
+// Paleta de colores profesional
+class ZonixColors {
+  static const Color primaryBlue = Color(0xFF1E40AF); // Azul profesional
+  static const Color secondaryBlue = Color(0xFF3B82F6); // Azul secundario
+  static const Color accentBlue = Color(0xFF60A5FA); // Azul de acento
+  static const Color darkGray = Color(0xFF1E293B); // Gris oscuro
+  static const Color mediumGray = Color(0xFF64748B); // Gris medio
+  static const Color lightGray = Color(0xFFF1F5F9); // Gris claro
+  static const Color white = Color(0xFFFFFFFF); // Blanco
+  static const Color successGreen = Color(0xFF10B981); // Verde éxito
+  static const Color warningOrange = Color(0xFFF59E0B); // Naranja advertencia
+  static const Color errorRed = Color(0xFFEF4444); // Rojo error
+  
+  // Colores para efectos modernos
+  static const Color glassBackground = Color(0x1AFFFFFF); // Fondo glassmorphism
+  static const Color neumorphicLight = Color(0xFFFFFFFF); // Neumorfismo claro
+  static const Color neumorphicDark = Color(0xFFE0E0E0); // Neumorfismo oscuro
+}
+
 class AffiliateCommissionsPage extends StatefulWidget {
   const AffiliateCommissionsPage({super.key});
 
@@ -13,10 +32,29 @@ class _AffiliateCommissionsPageState extends State<AffiliateCommissionsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Scaffold(
+      backgroundColor: isDark ? ZonixColors.darkGray : ZonixColors.lightGray,
       appBar: AppBar(
-        title: const Text('Comisiones'),
-        backgroundColor: Colors.purple[700],
+        title: Builder(
+          builder: (context) {
+            final screenWidth = MediaQuery.of(context).size.width;
+            final isTablet = screenWidth > 600;
+            final fontSize = isTablet ? 24.0 : 20.0;
+            
+            return Text(
+              'Comisiones',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+                fontSize: fontSize,
+                letterSpacing: 0.5,
+              ),
+            );
+          },
+        ),
+        backgroundColor: isDark ? ZonixColors.darkGray : ZonixColors.primaryBlue,
         foregroundColor: Colors.white,
         elevation: 0,
         actions: [
@@ -36,15 +74,15 @@ class _AffiliateCommissionsPageState extends State<AffiliateCommissionsPage> {
             child: Row(
               children: [
                 Expanded(
-                  child: _buildSummaryCard('Total Ganado', '\$2,450', Colors.green),
+                  child: _buildSummaryCard('Total Ganado', '\$2,450', ZonixColors.successGreen),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: _buildSummaryCard('Pendiente', '\$180', Colors.orange),
+                  child: _buildSummaryCard('Pendiente', '\$180', ZonixColors.warningOrange),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: _buildSummaryCard('Este Mes', '\$450', Colors.blue),
+                  child: _buildSummaryCard('Este Mes', '\$450', ZonixColors.primaryBlue),
                 ),
               ],
             ),
@@ -53,20 +91,39 @@ class _AffiliateCommissionsPageState extends State<AffiliateCommissionsPage> {
           // Filter Section
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            color: Colors.grey[50],
+            color: isDark ? ZonixColors.darkGray : ZonixColors.white,
             child: Row(
               children: [
-                const Text('Filtrar: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                Text(
+                  'Filtrar: ',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? ZonixColors.white : ZonixColors.darkGray,
+                  ),
+                ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: DropdownButtonFormField<String>(
                     value: _selectedFilter,
+                    style: TextStyle(color: isDark ? ZonixColors.white : ZonixColors.darkGray),
                     decoration: InputDecoration(
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                      filled: true,
+                      fillColor: isDark ? ZonixColors.darkGray : ZonixColors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide.none,
+                      ),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     ),
+                    dropdownColor: isDark ? ZonixColors.darkGray : ZonixColors.white,
                     items: _filters.map((filter) {
-                      return DropdownMenuItem(value: filter, child: Text(filter));
+                      return DropdownMenuItem(
+                        value: filter,
+                        child: Text(
+                          filter,
+                          style: TextStyle(color: isDark ? ZonixColors.white : ZonixColors.darkGray),
+                        ),
+                      );
                     }).toList(),
                     onChanged: (value) {
                       setState(() {
@@ -95,22 +152,25 @@ class _AffiliateCommissionsPageState extends State<AffiliateCommissionsPage> {
         onPressed: () {
           _showWithdrawalDialog();
         },
-        backgroundColor: Colors.purple[700],
+        backgroundColor: ZonixColors.primaryBlue,
         child: const Icon(Icons.payment, color: Colors.white),
       ),
     );
   }
 
   Widget _buildSummaryCard(String title, String amount, Color color) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Card(
       elevation: 2,
+      color: isDark ? ZonixColors.darkGray : ZonixColors.white,
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
           children: [
             Text(
               title,
-              style: TextStyle(color: Colors.grey[600], fontSize: 12),
+              style: TextStyle(color: ZonixColors.mediumGray, fontSize: 12),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 4),
