@@ -1,5 +1,24 @@
 import 'package:flutter/material.dart';
 
+// Paleta de colores profesional
+class ZonixColors {
+  static const Color primaryBlue = Color(0xFF1E40AF); // Azul profesional
+  static const Color secondaryBlue = Color(0xFF3B82F6); // Azul secundario
+  static const Color accentBlue = Color(0xFF60A5FA); // Azul de acento
+  static const Color darkGray = Color(0xFF1E293B); // Gris oscuro
+  static const Color mediumGray = Color(0xFF64748B); // Gris medio
+  static const Color lightGray = Color(0xFFF1F5F9); // Gris claro
+  static const Color white = Color(0xFFFFFFFF); // Blanco
+  static const Color successGreen = Color(0xFF10B981); // Verde éxito
+  static const Color warningOrange = Color(0xFFF59E0B); // Naranja advertencia
+  static const Color errorRed = Color(0xFFEF4444); // Rojo error
+  
+  // Colores para efectos modernos
+  static const Color glassBackground = Color(0x1AFFFFFF); // Fondo glassmorphism
+  static const Color neumorphicLight = Color(0xFFFFFFFF); // Neumorfismo claro
+  static const Color neumorphicDark = Color(0xFFE0E0E0); // Neumorfismo oscuro
+}
+
 class TransportOrdersPage extends StatefulWidget {
   const TransportOrdersPage({super.key});
 
@@ -13,10 +32,29 @@ class _TransportOrdersPageState extends State<TransportOrdersPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Scaffold(
+      backgroundColor: isDark ? ZonixColors.darkGray : ZonixColors.lightGray,
       appBar: AppBar(
-        title: const Text('Gestión de Pedidos'),
-        backgroundColor: Colors.blue[700],
+        title: Builder(
+          builder: (context) {
+            final screenWidth = MediaQuery.of(context).size.width;
+            final isTablet = screenWidth > 600;
+            final fontSize = isTablet ? 24.0 : 20.0;
+            
+            return Text(
+              'Gestión de Pedidos',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+                fontSize: fontSize,
+                letterSpacing: 0.5,
+              ),
+            );
+          },
+        ),
+        backgroundColor: isDark ? ZonixColors.darkGray : ZonixColors.primaryBlue,
         foregroundColor: Colors.white,
         elevation: 0,
       ),
@@ -25,20 +63,39 @@ class _TransportOrdersPageState extends State<TransportOrdersPage> {
           // Filter Section
           Container(
             padding: const EdgeInsets.all(16),
-            color: Colors.grey[50],
+            color: isDark ? ZonixColors.darkGray : ZonixColors.white,
             child: Row(
               children: [
-                const Text('Filtrar por: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                Text(
+                  'Filtrar por: ',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? ZonixColors.white : ZonixColors.darkGray,
+                  ),
+                ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: DropdownButtonFormField<String>(
                     value: _selectedFilter,
+                    style: TextStyle(color: isDark ? ZonixColors.white : ZonixColors.darkGray),
                     decoration: InputDecoration(
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                      filled: true,
+                      fillColor: isDark ? ZonixColors.darkGray : ZonixColors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide.none,
+                      ),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     ),
+                    dropdownColor: isDark ? ZonixColors.darkGray : ZonixColors.white,
                     items: _filters.map((filter) {
-                      return DropdownMenuItem(value: filter, child: Text(filter));
+                      return DropdownMenuItem(
+                        value: filter,
+                        child: Text(
+                          filter,
+                          style: TextStyle(color: isDark ? ZonixColors.white : ZonixColors.darkGray),
+                        ),
+                      );
                     }).toList(),
                     onChanged: (value) {
                       setState(() {
@@ -67,7 +124,7 @@ class _TransportOrdersPageState extends State<TransportOrdersPage> {
         onPressed: () {
           _showAssignDriverDialog(context);
         },
-        backgroundColor: Colors.blue[700],
+        backgroundColor: ZonixColors.primaryBlue,
         child: const Icon(Icons.person_add, color: Colors.white),
       ),
     );
@@ -76,10 +133,12 @@ class _TransportOrdersPageState extends State<TransportOrdersPage> {
   Widget _buildOrderCard(int index) {
     final orderStatus = ['Pendiente', 'En Progreso', 'Completado', 'Cancelado'][index % 4];
     final isUrgent = index % 5 == 0;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 2,
+      color: isDark ? ZonixColors.darkGray : ZonixColors.white,
       child: Container(
         decoration: BoxDecoration(
           border: Border(
@@ -99,7 +158,11 @@ class _TransportOrdersPageState extends State<TransportOrdersPage> {
                 children: [
                   Text(
                     'Pedido #${1000 + index}',
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: isDark ? ZonixColors.white : ZonixColors.darkGray,
+                    ),
                   ),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -228,15 +291,15 @@ class _TransportOrdersPageState extends State<TransportOrdersPage> {
   Color _getStatusColor(String status) {
     switch (status) {
       case 'Pendiente':
-        return Colors.orange;
+        return ZonixColors.warningOrange;
       case 'En Progreso':
-        return Colors.blue;
+        return ZonixColors.primaryBlue;
       case 'Completado':
-        return Colors.green;
+        return ZonixColors.successGreen;
       case 'Cancelado':
-        return Colors.red;
+        return ZonixColors.errorRed;
       default:
-        return Colors.grey;
+        return ZonixColors.mediumGray;
     }
   }
 
