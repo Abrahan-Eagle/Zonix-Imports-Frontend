@@ -1,5 +1,24 @@
 import 'package:flutter/material.dart';
 
+// Paleta de colores profesional
+class ZonixColors {
+  static const Color primaryBlue = Color(0xFF1E40AF); // Azul profesional
+  static const Color secondaryBlue = Color(0xFF3B82F6); // Azul secundario
+  static const Color accentBlue = Color(0xFF60A5FA); // Azul de acento
+  static const Color darkGray = Color(0xFF1E293B); // Gris oscuro
+  static const Color mediumGray = Color(0xFF64748B); // Gris medio
+  static const Color lightGray = Color(0xFFF1F5F9); // Gris claro
+  static const Color white = Color(0xFFFFFFFF); // Blanco
+  static const Color successGreen = Color(0xFF10B981); // Verde éxito
+  static const Color warningOrange = Color(0xFFF59E0B); // Naranja advertencia
+  static const Color errorRed = Color(0xFFEF4444); // Rojo error
+  
+  // Colores para efectos modernos
+  static const Color glassBackground = Color(0x1AFFFFFF); // Fondo glassmorphism
+  static const Color neumorphicLight = Color(0xFFFFFFFF); // Neumorfismo claro
+  static const Color neumorphicDark = Color(0xFFE0E0E0); // Neumorfismo oscuro
+}
+
 class DeliveryEarningsPage extends StatefulWidget {
   const DeliveryEarningsPage({Key? key}) : super(key: key);
 
@@ -128,8 +147,11 @@ class _DeliveryEarningsPageState extends State<DeliveryEarningsPage> {
   }
 
   Widget _buildEarningsCard(String title, String value, IconData icon, Color color, String subtitle) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Card(
       elevation: 4,
+      color: isDark ? ZonixColors.darkGray : ZonixColors.white,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -141,10 +163,10 @@ class _DeliveryEarningsPageState extends State<DeliveryEarningsPage> {
                 const SizedBox(width: 8),
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
-                    color: Colors.grey,
+                    color: ZonixColors.mediumGray,
                   ),
                 ),
               ],
@@ -160,9 +182,9 @@ class _DeliveryEarningsPageState extends State<DeliveryEarningsPage> {
             ),
             Text(
               subtitle,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
-                color: Colors.grey,
+                color: ZonixColors.mediumGray,
               ),
             ),
           ],
@@ -172,18 +194,22 @@ class _DeliveryEarningsPageState extends State<DeliveryEarningsPage> {
   }
 
   Widget _buildEarningsBreakdown() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Card(
       elevation: 4,
+      color: isDark ? ZonixColors.darkGray : ZonixColors.white,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Desglose de Ganancias',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
+                color: isDark ? ZonixColors.white : ZonixColors.darkGray,
               ),
             ),
             const SizedBox(height: 16),
@@ -340,18 +366,22 @@ class _DeliveryEarningsPageState extends State<DeliveryEarningsPage> {
   }
 
   Widget _buildTopEarningDaysCard() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Card(
       elevation: 4,
+      color: isDark ? ZonixColors.darkGray : ZonixColors.white,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Mejores Días',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
+                color: isDark ? ZonixColors.white : ZonixColors.darkGray,
               ),
             ),
             const SizedBox(height: 16),
@@ -522,8 +552,11 @@ class _DeliveryEarningsPageState extends State<DeliveryEarningsPage> {
   }
 
   Widget _buildEarningsHistoryCard() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Card(
       elevation: 4,
+      color: isDark ? ZonixColors.darkGray : ZonixColors.white,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -532,11 +565,12 @@ class _DeliveryEarningsPageState extends State<DeliveryEarningsPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'Historial de Ganancias',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
+                    color: isDark ? ZonixColors.white : ZonixColors.darkGray,
                   ),
                 ),
                 TextButton(
@@ -545,7 +579,10 @@ class _DeliveryEarningsPageState extends State<DeliveryEarningsPage> {
                       const SnackBar(content: Text('Ver historial completo')),
                     );
                   },
-                  child: const Text('Ver todo'),
+                  child: Text(
+                    'Ver todo',
+                    style: TextStyle(color: ZonixColors.primaryBlue),
+                  ),
                 ),
               ],
             ),
@@ -608,9 +645,30 @@ class _DeliveryEarningsPageState extends State<DeliveryEarningsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Scaffold(
+      backgroundColor: isDark ? ZonixColors.darkGray : ZonixColors.lightGray,
       appBar: AppBar(
-        title: const Text('Ganancias'),
+        title: Builder(
+          builder: (context) {
+            final screenWidth = MediaQuery.of(context).size.width;
+            final isTablet = screenWidth > 600;
+            final fontSize = isTablet ? 24.0 : 20.0;
+            
+            return Text(
+              'Ganancias',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+                fontSize: fontSize,
+                letterSpacing: 0.5,
+              ),
+            );
+          },
+        ),
+        backgroundColor: isDark ? ZonixColors.darkGray : ZonixColors.primaryBlue,
+        foregroundColor: Colors.white,
         actions: [
           // Filtro de período
           PopupMenuButton<String>(
@@ -655,11 +713,12 @@ class _DeliveryEarningsPageState extends State<DeliveryEarningsPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Estadísticas principales
-                    const Text(
+                    Text(
                       'Resumen de Ganancias',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
+                        color: isDark ? ZonixColors.white : ZonixColors.darkGray,
                       ),
                     ),
                     const SizedBox(height: 16),
