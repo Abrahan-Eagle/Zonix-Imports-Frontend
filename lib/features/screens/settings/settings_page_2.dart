@@ -17,7 +17,7 @@ import 'package:zonix/features/DomainProfiles/Profiles/screens/activity_history_
 import 'package:zonix/features/DomainProfiles/Profiles/screens/data_export_page.dart';
 import 'package:zonix/features/DomainProfiles/Profiles/screens/privacy_settings_page.dart';
 import 'package:zonix/features/screens/account_deletion_page.dart';
-import 'package:zonix/features/utils/app_colors.dart';
+// Removed app_colors import - using professional color palette
 
 import 'package:zonix/features/screens/settings/commerce_data_page.dart';
 import 'package:zonix/features/screens/settings/commerce_payment_page.dart';
@@ -30,6 +30,25 @@ import 'package:zonix/features/screens/commerce/commerce_notifications_page.dart
 
 // Configuración del logger
 final logger = Logger();
+
+// Paleta de colores profesional
+class ZonixColors {
+  static const Color primaryBlue = Color(0xFF1E40AF); // Azul profesional
+  static const Color secondaryBlue = Color(0xFF3B82F6); // Azul secundario
+  static const Color accentBlue = Color(0xFF60A5FA); // Azul de acento
+  static const Color darkGray = Color(0xFF1E293B); // Gris oscuro
+  static const Color mediumGray = Color(0xFF64748B); // Gris medio
+  static const Color lightGray = Color(0xFFF1F5F9); // Gris claro
+  static const Color white = Color(0xFFFFFFFF); // Blanco
+  static const Color successGreen = Color(0xFF10B981); // Verde éxito
+  static const Color warningOrange = Color(0xFFF59E0B); // Naranja advertencia
+  static const Color errorRed = Color(0xFFEF4444); // Rojo error
+  
+  // Colores adicionales para efectos modernos
+  static const Color glassBackground = Color(0x1AFFFFFF);
+  static const Color neumorphicLight = Color(0xFFFFFFFF);
+  static const Color neumorphicDark = Color(0xFFE0E0E0);
+}
 
 
 
@@ -105,7 +124,7 @@ class _SettingsPage2State extends State<SettingsPage2> {
     // Log success as info, not error
     logger.i('Perfil cargado correctamente: $_profile');
     
-  } catch (e, stackTrace) {
+  } catch (e) {
     // logger.e('Error al cargar el perfil', error: e, stackTrace: stackTrace);
     setState(() {
       // _error = 'Error al cargar el perfil: ${e.toString()}';
@@ -151,14 +170,28 @@ class _SettingsPage2State extends State<SettingsPage2> {
       builder: (context, userProvider, child) {
         return Scaffold(
           appBar: AppBar(
-            title: const Text("Configuraciones"), // TODO: internacionalizar
-            backgroundColor: AppColors.purple,
-            titleTextStyle: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 26,
-              color: Colors.white,
+            title: Builder(
+              builder: (context) {
+                final screenWidth = MediaQuery.of(context).size.width;
+                final isTablet = screenWidth > 600;
+                final fontSize = isTablet ? 24.0 : 20.0;
+                
+                return Text(
+                  "Configuraciones",
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: fontSize,
+                    color: Colors.white,
+                    letterSpacing: 0.5,
+                  ),
+                );
+              },
             ),
+            backgroundColor: Theme.of(context).brightness == Brightness.dark
+                ? ZonixColors.darkGray
+                : ZonixColors.primaryBlue,
             elevation: 0,
+            centerTitle: false,
           ),
           body: SafeArea(
             child: SingleChildScrollView(
@@ -168,9 +201,11 @@ class _SettingsPage2State extends State<SettingsPage2> {
                 children: [
                   // Encabezado de usuario destacado
                   Card(
-                    color: AppColors.cardBg(context),
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? ZonixColors.darkGray
+                        : ZonixColors.white,
                     elevation: 8,
-                    shadowColor: AppColors.purple.withOpacity(0.10),
+                    shadowColor: ZonixColors.primaryBlue.withOpacity(0.15),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
                     child: Padding(
                       padding: const EdgeInsets.all(24),
@@ -179,7 +214,7 @@ class _SettingsPage2State extends State<SettingsPage2> {
                           CircleAvatar(
                             radius: 36,
                             backgroundImage: _getProfileImage(_profile?.photo),
-                            backgroundColor: AppColors.purple.withOpacity(0.15),
+                            backgroundColor: ZonixColors.primaryBlue.withOpacity(0.15),
                             child: (_profile?.photo == null)
                                 ? const Icon(Icons.person, color: Colors.white, size: 40)
                                 : null,
@@ -191,17 +226,22 @@ class _SettingsPage2State extends State<SettingsPage2> {
                               children: [
                                 Text(
                                   '${_profile?.firstName ?? ''} ${_profile?.lastName ?? ''}',
-                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                    fontWeight: FontWeight.bold,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w700,
                                     fontSize: 22,
-                                    color: AppColors.primaryText(context),
+                                    color: Theme.of(context).brightness == Brightness.dark
+                                        ? ZonixColors.white
+                                        : ZonixColors.darkGray,
+                                    letterSpacing: 0.5,
                                   ),
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
                                   _email ?? 'Correo no disponible',
-                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    color: AppColors.secondaryText(context),
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: ZonixColors.mediumGray,
+                                    fontWeight: FontWeight.w500,
                                   ),
                                 ),
                               ],
@@ -215,25 +255,29 @@ class _SettingsPage2State extends State<SettingsPage2> {
 
                   // Sección: Información de cuenta
                   Text(
-                    "Mi cuenta", // TODO: internacionalizar
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: AppColors.accentButton(context),
-                      fontWeight: FontWeight.bold,
+                    "Mi cuenta",
+                    style: TextStyle(
+                      color: ZonixColors.primaryBlue,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 18,
+                      letterSpacing: 0.5,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Card(
-                    color: AppColors.cardBg(context),
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? ZonixColors.darkGray
+                        : ZonixColors.white,
                     elevation: 6,
-                    shadowColor: AppColors.orange.withOpacity(0.10),
+                    shadowColor: ZonixColors.primaryBlue.withOpacity(0.1),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                     child: Column(
                       children: [
                         _buildListTile(
                           context,
                           icon: Icons.person_outline_rounded,
-                          color: AppColors.accentButton(context),
-                          title: "Perfil", // TODO: internacionalizar
+                          color: ZonixColors.primaryBlue,
+                          title: "Perfil",
                           onTap: () {
                             Navigator.push(
                               context,
@@ -246,8 +290,8 @@ class _SettingsPage2State extends State<SettingsPage2> {
                         _buildListTile(
                           context,
                           icon: Icons.folder_outlined,
-                          color: AppColors.purple,
-                          title: "Documentos", // TODO: internacionalizar
+                          color: ZonixColors.secondaryBlue,
+                          title: "Documentos",
                           onTap: () {
                             Navigator.push(
                               context,
@@ -260,8 +304,8 @@ class _SettingsPage2State extends State<SettingsPage2> {
                         _buildListTile(
                           context,
                           icon: Icons.location_on_outlined,
-                          color: AppColors.orange,
-                          title: "Direcciones", // TODO: internacionalizar
+                          color: ZonixColors.warningOrange,
+                          title: "Direcciones",
                           onTap: () {
                             Navigator.push(
                               context,
@@ -274,8 +318,8 @@ class _SettingsPage2State extends State<SettingsPage2> {
                         _buildListTile(
                           context,
                           icon: Icons.phone_outlined,
-                          color: AppColors.green,
-                          title: "Teléfonos", // TODO: internacionalizar
+                          color: ZonixColors.successGreen,
+                          title: "Teléfonos",
                           onTap: () {
                             Navigator.push(
                               context,
@@ -294,23 +338,27 @@ class _SettingsPage2State extends State<SettingsPage2> {
                     const SizedBox(height: 24),
                     Text(
                       "Gestión del comercio",
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: AppColors.accentButton(context),
-                        fontWeight: FontWeight.bold,
+                      style: TextStyle(
+                        color: ZonixColors.primaryBlue,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 18,
+                        letterSpacing: 0.5,
                       ),
                     ),
                     const SizedBox(height: 8),
                     Card(
-                      color: AppColors.cardBg(context),
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? ZonixColors.darkGray
+                          : ZonixColors.white,
                       elevation: 6,
-                      shadowColor: AppColors.purple.withOpacity(0.10),
+                      shadowColor: ZonixColors.primaryBlue.withOpacity(0.1),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                       child: Column(
                         children: [
                           _buildListTile(
                             context,
                             icon: Icons.store,
-                            color: AppColors.purple,
+                            color: ZonixColors.primaryBlue,
                             title: "Datos del comercio",
                             onTap: () {
                               Navigator.push(
@@ -324,7 +372,7 @@ class _SettingsPage2State extends State<SettingsPage2> {
                           _buildListTile(
                             context,
                             icon: Icons.payment,
-                            color: AppColors.green,
+                            color: ZonixColors.successGreen,
                             title: "Datos de pago móvil",
                             onTap: () {
                               Navigator.push(
@@ -338,7 +386,7 @@ class _SettingsPage2State extends State<SettingsPage2> {
                           _buildListTile(
                             context,
                             icon: Icons.schedule,
-                            color: AppColors.orange,
+                            color: ZonixColors.warningOrange,
                             title: "Horario de atención",
                             onTap: () {
                               Navigator.push(
@@ -352,7 +400,7 @@ class _SettingsPage2State extends State<SettingsPage2> {
                           _buildListTile(
                             context,
                             icon: Icons.toggle_on,
-                            color: AppColors.red,
+                            color: ZonixColors.errorRed,
                             title: "Estado abierto/cerrado",
                             onTap: () {
                               Navigator.push(
@@ -368,7 +416,7 @@ class _SettingsPage2State extends State<SettingsPage2> {
                           _buildListTile(
                             context,
                             icon: Icons.local_offer,
-                            color: AppColors.red,
+                            color: ZonixColors.errorRed,
                             title: "Promociones/Cupones",
                             onTap: () {
                               Navigator.push(
@@ -383,7 +431,7 @@ class _SettingsPage2State extends State<SettingsPage2> {
                           _buildListTile(
                             context,
                             icon: Icons.map,
-                            color: AppColors.brown,
+                            color: ZonixColors.mediumGray,
                             title: "Zonas/costos de delivery",
                             onTap: () {
                               Navigator.push(
@@ -397,7 +445,7 @@ class _SettingsPage2State extends State<SettingsPage2> {
                           _buildListTile(
                             context,
                             icon: Icons.notifications,
-                            color: AppColors.amber,
+                            color: ZonixColors.warningOrange,
                             title: "Notificaciones y alertas",
                             onTap: () {
                               Navigator.push(
@@ -416,25 +464,30 @@ class _SettingsPage2State extends State<SettingsPage2> {
 
                   // Sección: Funcionalidades Avanzadas
                   Text(
-                    "Funcionalidades Avanzadas", // TODO: internacionalizar
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: AppColors.accentButton(context),
-                      fontWeight: FontWeight.bold,
+                    "Funcionalidades Avanzadas",
+                    style: TextStyle(
+                      color: ZonixColors.primaryBlue,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 18,
+                      letterSpacing: 0.5,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Card(
-                    color: AppColors.cardBg(context),
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? ZonixColors.darkGray
+                        : ZonixColors.white,
                     elevation: 2,
+                    shadowColor: ZonixColors.primaryBlue.withOpacity(0.1),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     child: Column(
                       children: [
                         _buildListTile(
                           context,
                           icon: Icons.history,
-                          color: AppColors.accentButton(context),
-                          title: "Historial de Actividad", // TODO: internacionalizar
-                          subtitle: "Revisa todas tus actividades en la aplicación", // TODO: internacionalizar
+                          color: ZonixColors.primaryBlue,
+                          title: "Historial de Actividad",
+                          subtitle: "Revisa todas tus actividades en la aplicación",
                           onTap: () {
                             Navigator.push(
                               context,
@@ -447,9 +500,9 @@ class _SettingsPage2State extends State<SettingsPage2> {
                         _buildListTile(
                           context,
                           icon: Icons.download,
-                          color: AppColors.green,
-                          title: "Exportar Datos", // TODO: internacionalizar
-                          subtitle: "Descarga una copia de todos tus datos personales", // TODO: internacionalizar
+                          color: ZonixColors.successGreen,
+                          title: "Exportar Datos",
+                          subtitle: "Descarga una copia de todos tus datos personales",
                           onTap: () {
                             Navigator.push(
                               context,
@@ -462,9 +515,9 @@ class _SettingsPage2State extends State<SettingsPage2> {
                         _buildListTile(
                           context,
                           icon: Icons.privacy_tip,
-                          color: AppColors.orange,
-                          title: "Configuración de Privacidad", // TODO: internacionalizar
-                          subtitle: "Controla cómo se utilizan y comparten tus datos", // TODO: internacionalizar
+                          color: ZonixColors.warningOrange,
+                          title: "Configuración de Privacidad",
+                          subtitle: "Controla cómo se utilizan y comparten tus datos",
                           onTap: () {
                             Navigator.push(
                               context,
@@ -477,9 +530,9 @@ class _SettingsPage2State extends State<SettingsPage2> {
                         _buildListTile(
                           context,
                           icon: Icons.delete_forever,
-                          color: AppColors.red,
-                          title: "Eliminación de Cuenta", // TODO: internacionalizar
-                          subtitle: "Solicitar eliminación permanente de tu cuenta", // TODO: internacionalizar
+                          color: ZonixColors.errorRed,
+                          title: "Eliminación de Cuenta",
+                          subtitle: "Solicitar eliminación permanente de tu cuenta",
                           onTap: () {
                             Navigator.push(
                               context,
@@ -496,24 +549,29 @@ class _SettingsPage2State extends State<SettingsPage2> {
 
                   // Sección: Administración y Ayuda
                   Text(
-                    "Administración y Ayuda", // TODO: internacionalizar
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: AppColors.accentButton(context),
-                      fontWeight: FontWeight.bold,
+                    "Administración y Ayuda",
+                    style: TextStyle(
+                      color: ZonixColors.primaryBlue,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 18,
+                      letterSpacing: 0.5,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Card(
-                    color: AppColors.cardBg(context),
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? ZonixColors.darkGray
+                        : ZonixColors.white,
                     elevation: 2,
+                    shadowColor: ZonixColors.primaryBlue.withOpacity(0.1),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     child: Column(
                       children: [
                         _buildListTile(
                           context,
                           icon: Icons.notifications_none_rounded,
-                          color: AppColors.purple,
-                          title: "Notificaciones", // TODO: internacionalizar
+                          color: ZonixColors.primaryBlue,
+                          title: "Notificaciones",
                           onTap: () {
                             Navigator.push(
                               context,
@@ -526,8 +584,8 @@ class _SettingsPage2State extends State<SettingsPage2> {
                         _buildListTile(
                           context,
                           icon: Icons.help_outline_rounded,
-                          color: AppColors.purple,
-                          title: "Ayuda y Comentarios", // TODO: internacionalizar
+                          color: ZonixColors.secondaryBlue,
+                          title: "Ayuda y Comentarios",
                           onTap: () {
                             Navigator.push(
                               context,
@@ -540,8 +598,8 @@ class _SettingsPage2State extends State<SettingsPage2> {
                         _buildListTile(
                           context,
                           icon: Icons.info_outline_rounded,
-                          color: AppColors.gray,
-                          title: "Acerca de", // TODO: internacionalizar
+                          color: ZonixColors.mediumGray,
+                          title: "Acerca de",
                           onTap: () {
                             Navigator.push(
                               context,
@@ -578,20 +636,22 @@ class _SettingsPage2State extends State<SettingsPage2> {
                           size: 24,
                         ),
                         label: const Text(
-                          "Cerrar sesión", // TODO: internacionalizar
+                          "Cerrar sesión",
                           style: TextStyle(
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w700,
                             fontSize: 16,
                             color: Colors.white,
+                            letterSpacing: 0.5,
                           ),
                         ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.red,
+                          backgroundColor: ZonixColors.errorRed,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(25),
                           ),
                           padding: const EdgeInsets.symmetric(horizontal: 16),
-                          elevation: 2,
+                          elevation: 4,
+                          shadowColor: ZonixColors.errorRed.withOpacity(0.3),
                         ),
                       ),
                     ),
@@ -615,16 +675,31 @@ class _SettingsPage2State extends State<SettingsPage2> {
       ),
       title: Text(
         title, 
-        style: const TextStyle(fontWeight: FontWeight.bold),
+        style: TextStyle(
+          fontWeight: FontWeight.w600,
+          color: Theme.of(context).brightness == Brightness.dark
+              ? ZonixColors.white
+              : ZonixColors.darkGray,
+          fontSize: 16,
+        ),
         overflow: TextOverflow.ellipsis,
         maxLines: 1,
       ),
       subtitle: subtitle != null ? Text(
         subtitle,
+        style: TextStyle(
+          color: ZonixColors.mediumGray,
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+        ),
         overflow: TextOverflow.ellipsis,
         maxLines: 2,
       ) : null,
-      trailing: const Icon(Icons.chevron_right, color: Colors.grey),
+      trailing: Icon(
+        Icons.chevron_right, 
+        color: ZonixColors.mediumGray,
+        size: 20,
+      ),
       onTap: onTap,
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
     );
