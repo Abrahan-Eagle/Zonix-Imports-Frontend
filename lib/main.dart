@@ -384,10 +384,8 @@ import 'package:zonix/features/screens/admin/admin_security_page.dart';
 import 'package:zonix/features/screens/admin/admin_analytics_page.dart';
 
 import 'package:zonix/features/services/websocket_service.dart';
-import 'package:zonix/features/utils/app_colors.dart';
 import 'package:zonix/features/screens/commerce/commerce_notifications_page.dart';
 import 'package:zonix/features/screens/commerce/commerce_profile_page.dart';
-import 'package:zonix/helpers/env_helper.dart';
 
 /*
  * ZONIX EATS - Aplicación Multi-Rol
@@ -486,61 +484,115 @@ class MyApp extends StatelessWidget {
       title: 'ZONIX',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        useMaterial3: true,
         brightness: Brightness.light,
-        primaryColor: AppColors.blue,
-        scaffoldBackgroundColor: AppColors.white,
-        appBarTheme: AppBarTheme(
-          backgroundColor: AppColors.blue,
-          foregroundColor: AppColors.white,
-          elevation: 2,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF1E40AF), // Azul profesional
+          brightness: Brightness.light,
+        ),
+        scaffoldBackgroundColor: const Color(0xFFF8FAFC),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF1E40AF),
+          foregroundColor: Colors.white,
+          elevation: 0,
+          centerTitle: false,
           titleTextStyle: TextStyle(
-            color: AppColors.white,
-            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            fontWeight: FontWeight.w700,
             fontSize: 22,
+            letterSpacing: 0.5,
           ),
         ),
-        colorScheme: ColorScheme.light(
-          primary: AppColors.blue,
-          secondary: AppColors.orange,
-          error: AppColors.red,
-          background: AppColors.white,
+        cardTheme: CardThemeData(
+          color: Colors.white,
+          elevation: 2,
+          shadowColor: const Color(0xFF1E40AF).withOpacity(0.1),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
         ),
-        cardColor: AppColors.grayLight,
-        buttonTheme: ButtonThemeData(
-          buttonColor: AppColors.orange,
-          textTheme: ButtonTextTheme.primary,
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF1E40AF),
+            foregroundColor: Colors.white,
+            elevation: 2,
+            shadowColor: const Color(0xFF1E40AF).withOpacity(0.3),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            textStyle: const TextStyle(
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.5,
+            ),
+          ),
         ),
-        floatingActionButtonTheme: FloatingActionButtonThemeData(
-          backgroundColor: AppColors.orange,
+        floatingActionButtonTheme: const FloatingActionButtonThemeData(
+          backgroundColor: Color(0xFF1E40AF),
+          foregroundColor: Colors.white,
+          elevation: 4,
+        ),
+        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+          backgroundColor: Colors.white,
+          selectedItemColor: Color(0xFF1E40AF),
+          unselectedItemColor: Color(0xFF64748B),
+          elevation: 8,
+          type: BottomNavigationBarType.fixed,
         ),
       ),
       darkTheme: ThemeData(
+        useMaterial3: true,
         brightness: Brightness.dark,
-        primaryColor: AppColors.purple,
-        scaffoldBackgroundColor: AppColors.backgroundDark,
-        appBarTheme: AppBarTheme(
-          backgroundColor: AppColors.purple,
-          foregroundColor: AppColors.white,
-          elevation: 2,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF1E40AF), // Azul profesional
+          brightness: Brightness.dark,
+        ),
+        scaffoldBackgroundColor: const Color(0xFF0F172A),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF1E293B),
+          foregroundColor: Colors.white,
+          elevation: 0,
+          centerTitle: false,
           titleTextStyle: TextStyle(
-            color: AppColors.white,
-            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            fontWeight: FontWeight.w700,
             fontSize: 22,
+            letterSpacing: 0.5,
           ),
         ),
-        colorScheme: ColorScheme.dark(
-          primary: AppColors.purple,
-          secondary: AppColors.orangeCoral,
-          error: AppColors.red,
-          background: AppColors.backgroundDark,
+        cardTheme: CardThemeData(
+          color: const Color(0xFF1E293B),
+          elevation: 2,
+          shadowColor: const Color(0xFF1E40AF).withOpacity(0.2),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
         ),
-        cardColor: AppColors.grayDark,
-        buttonTheme: ButtonThemeData(
-          buttonColor: AppColors.orangeCoral,
-          textTheme: ButtonTextTheme.primary,
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF1E40AF),
+            foregroundColor: Colors.white,
+            elevation: 2,
+            shadowColor: const Color(0xFF1E40AF).withOpacity(0.4),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            textStyle: const TextStyle(
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.5,
+            ),
+          ),
         ),
-        floatingActionButtonTheme: FloatingActionButtonThemeData(
-          backgroundColor: AppColors.orangeCoral,
+        floatingActionButtonTheme: const FloatingActionButtonThemeData(
+          backgroundColor: Color(0xFF1E40AF),
+          foregroundColor: Colors.white,
+          elevation: 4,
+        ),
+        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+          backgroundColor: Color(0xFF1E293B),
+          selectedItemColor: Color(0xFF60A5FA),
+          unselectedItemColor: Color(0xFF64748B),
+          elevation: 8,
+          type: BottomNavigationBarType.fixed,
         ),
       ),
       themeMode: ThemeMode.system,
@@ -824,16 +876,29 @@ class MainRouterState extends State<MainRouter> {
   }
 
   Widget _createLevelButton(int level, IconData icon, String tooltip) {
-    return FloatingActionButton.small(
-      heroTag: 'level$level',
-      backgroundColor: _selectedLevel == level
-          ? Colors.blueAccent[700]
-          : Colors.blueAccent[50],
-      child: Icon(
-        icon,
-        color: _selectedLevel == level ? Colors.white : Colors.black,
+    final isSelected = _selectedLevel == level;
+    
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      child: FloatingActionButton.small(
+        heroTag: 'level$level',
+        backgroundColor: isSelected
+            ? const Color(0xFF1E40AF)
+            : Theme.of(context).brightness == Brightness.dark
+                ? const Color(0xFF334155)
+                : const Color(0xFFF1F5F9),
+        elevation: isSelected ? 6 : 2,
+        child: Icon(
+          icon,
+          color: isSelected 
+              ? Colors.white 
+              : Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white
+                  : const Color(0xFF1E40AF),
+          size: 20,
+        ),
+        onPressed: () => _onLevelSelected(level),
       ),
-      onPressed: () => _onLevelSelected(level),
     );
   }
 
@@ -844,36 +909,43 @@ class MainRouterState extends State<MainRouter> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        elevation: 4.0,
-        title: RichText(
-          text: TextSpan(
-            children: [
-              TextSpan(
-                text: 'ZONI',
-                style: TextStyle(
-                  fontFamily: 'system-ui',
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.white
-                      : Colors.black,
-                  letterSpacing: 1.2,
-                ),
+        elevation: 0,
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? const Color(0xFF1E293B)
+            : const Color(0xFF1E40AF),
+        title: Builder(
+          builder: (context) {
+            final screenWidth = MediaQuery.of(context).size.width;
+            final isTablet = screenWidth > 600;
+            final fontSize = isTablet ? 28.0 : 24.0;
+            
+            return RichText(
+              text: TextSpan(
+                children: [
+                  TextSpan(
+                    text: 'ZONI',
+                    style: TextStyle(
+                      fontFamily: 'system-ui',
+                      fontSize: fontSize,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                      letterSpacing: 1.5,
+                    ),
+                  ),
+                  TextSpan(
+                    text: 'X',
+                    style: TextStyle(
+                      fontFamily: 'system-ui',
+                      fontSize: fontSize,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF60A5FA),
+                      letterSpacing: 1.5,
+                    ),
+                  ),
+                ],
               ),
-              TextSpan(
-                text: 'X',
-                style: TextStyle(
-                  fontFamily: 'system-ui',
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.blueAccent[700]
-                      : Colors.orange,
-                  letterSpacing: 1.2,
-                ),
-              ),
-            ],
-          ),
+            );
+          },
         ),
         centerTitle: false,
         actions: [
@@ -1114,22 +1186,49 @@ class MainRouterState extends State<MainRouter> {
           _createLevelButton(5, Icons.admin_panel_settings, 'Administrador'),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: _getBottomNavItems(_selectedLevel, userProvider.userRole),
-        currentIndex: _bottomNavIndex,
-        selectedItemColor: Colors.blueAccent,
-        unselectedItemColor: Colors.grey,
-        onTap: (index) {
-          // Obtener el itemCount llamando a _getBottomNavItems antes de la navegación
-          List<BottomNavigationBarItem> items = _getBottomNavItems(
-            _selectedLevel,
-            userProvider.userRole,
-          );
-          int itemCount = items.length;
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? const Color(0xFF1E293B)
+              : Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.black.withOpacity(0.3)
+                  : const Color(0xFF1E40AF).withOpacity(0.1),
+              blurRadius: 8,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: BottomNavigationBar(
+          items: _getBottomNavItems(_selectedLevel, userProvider.userRole),
+          currentIndex: _bottomNavIndex,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          selectedItemColor: const Color(0xFF1E40AF),
+          unselectedItemColor: const Color(0xFF64748B),
+          selectedLabelStyle: const TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 12,
+          ),
+          unselectedLabelStyle: const TextStyle(
+            fontWeight: FontWeight.w500,
+            fontSize: 11,
+          ),
+          type: BottomNavigationBarType.fixed,
+          onTap: (index) {
+            // Obtener el itemCount llamando a _getBottomNavItems antes de la navegación
+            List<BottomNavigationBarItem> items = _getBottomNavItems(
+              _selectedLevel,
+              userProvider.userRole,
+            );
+            int itemCount = items.length;
 
-          // Llamar a la función _onBottomNavTapped con el index y el itemCount
-          _onBottomNavTapped(index, itemCount);
-        },
+            // Llamar a la función _onBottomNavTapped con el index y el itemCount
+            _onBottomNavTapped(index, itemCount);
+          },
+        ),
       ),
     );
   }
