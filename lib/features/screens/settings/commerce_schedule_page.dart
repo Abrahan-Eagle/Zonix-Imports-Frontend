@@ -1,6 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:zonix/features/services/commerce_data_service.dart';
-import 'package:zonix/features/utils/app_colors.dart';
+
+// Paleta de colores profesional
+class ZonixColors {
+  static const Color primaryBlue = Color(0xFF1E40AF); // Azul profesional
+  static const Color secondaryBlue = Color(0xFF3B82F6); // Azul secundario
+  static const Color accentBlue = Color(0xFF60A5FA); // Azul de acento
+  static const Color darkGray = Color(0xFF1E293B); // Gris oscuro
+  static const Color mediumGray = Color(0xFF64748B); // Gris medio
+  static const Color lightGray = Color(0xFFF1F5F9); // Gris claro
+  static const Color white = Color(0xFFFFFFFF); // Blanco
+  static const Color successGreen = Color(0xFF10B981); // Verde éxito
+  static const Color warningOrange = Color(0xFFF59E0B); // Naranja advertencia
+  static const Color errorRed = Color(0xFFEF4444); // Rojo error
+  
+  // Colores para efectos modernos
+  static const Color glassBackground = Color(0x1AFFFFFF); // Fondo glassmorphism
+  static const Color neumorphicLight = Color(0xFFFFFFFF); // Neumorfismo claro
+  static const Color neumorphicDark = Color(0xFFE0E0E0); // Neumorfismo oscuro
+}
 
 class CommerceSchedulePage extends StatefulWidget {
   const CommerceSchedulePage({Key? key}) : super(key: key);
@@ -139,9 +157,11 @@ class _CommerceSchedulePageState extends State<CommerceSchedulePage> {
 
   Widget _buildDaySchedule(String day, String dayName) {
     final data = _scheduleData[day]!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     
     return Card(
       elevation: 2,
+      color: isDark ? ZonixColors.darkGray : ZonixColors.white,
       margin: const EdgeInsets.symmetric(vertical: 4),
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -156,22 +176,26 @@ class _CommerceSchedulePageState extends State<CommerceSchedulePage> {
                       data['enabled'] = value ?? false;
                     });
                   },
-                  activeColor: AppColors.purple,
+                  activeColor: ZonixColors.primaryBlue,
                 ),
                 Text(
                   dayName,
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: isDark ? ZonixColors.white : ZonixColors.darkGray,
+                  ),
                 ),
                 const Spacer(),
                 if (data['enabled'])
                   Text(
                     '${data['open']} - ${data['close']}',
-                    style: const TextStyle(color: AppColors.green, fontWeight: FontWeight.bold),
+                    style: TextStyle(color: ZonixColors.successGreen, fontWeight: FontWeight.bold),
                   )
                 else
-                  const Text(
+                  Text(
                     'Cerrado',
-                    style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                    style: TextStyle(color: ZonixColors.errorRed, fontWeight: FontWeight.bold),
                   ),
               ],
             ),
@@ -182,9 +206,16 @@ class _CommerceSchedulePageState extends State<CommerceSchedulePage> {
                   Expanded(
                     child: TextFormField(
                       initialValue: data['open'],
-                      decoration: const InputDecoration(
+                      style: TextStyle(color: isDark ? ZonixColors.white : ZonixColors.darkGray),
+                      decoration: InputDecoration(
                         labelText: 'Apertura',
-                        border: OutlineInputBorder(),
+                        labelStyle: TextStyle(color: ZonixColors.mediumGray),
+                        filled: true,
+                        fillColor: isDark ? ZonixColors.darkGray : ZonixColors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
                         contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       ),
                       onChanged: (value) {
@@ -193,14 +224,21 @@ class _CommerceSchedulePageState extends State<CommerceSchedulePage> {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  const Text('a', style: TextStyle(fontSize: 16)),
+                  Text('a', style: TextStyle(fontSize: 16, color: ZonixColors.mediumGray)),
                   const SizedBox(width: 12),
                   Expanded(
                     child: TextFormField(
                       initialValue: data['close'],
-                      decoration: const InputDecoration(
+                      style: TextStyle(color: isDark ? ZonixColors.white : ZonixColors.darkGray),
+                      decoration: InputDecoration(
                         labelText: 'Cierre',
-                        border: OutlineInputBorder(),
+                        labelStyle: TextStyle(color: ZonixColors.mediumGray),
+                        filled: true,
+                        fillColor: isDark ? ZonixColors.darkGray : ZonixColors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
                         contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       ),
                       onChanged: (value) {
@@ -219,11 +257,30 @@ class _CommerceSchedulePageState extends State<CommerceSchedulePage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     if (_initialLoading) {
       return Scaffold(
+        backgroundColor: isDark ? ZonixColors.darkGray : ZonixColors.lightGray,
         appBar: AppBar(
-          title: const Text('Horario de atención'),
-          backgroundColor: AppColors.purple,
+          title: Builder(
+            builder: (context) {
+              final screenWidth = MediaQuery.of(context).size.width;
+              final isTablet = screenWidth > 600;
+              final fontSize = isTablet ? 24.0 : 20.0;
+              
+              return Text(
+                'Horario de atención',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                  fontSize: fontSize,
+                  letterSpacing: 0.5,
+                ),
+              );
+            },
+          ),
+          backgroundColor: isDark ? ZonixColors.darkGray : ZonixColors.primaryBlue,
           foregroundColor: Colors.white,
         ),
         body: const Center(child: CircularProgressIndicator()),
@@ -231,9 +288,26 @@ class _CommerceSchedulePageState extends State<CommerceSchedulePage> {
     }
 
     return Scaffold(
+      backgroundColor: isDark ? ZonixColors.darkGray : ZonixColors.lightGray,
       appBar: AppBar(
-        title: const Text('Horario de atención'),
-        backgroundColor: AppColors.purple,
+        title: Builder(
+          builder: (context) {
+            final screenWidth = MediaQuery.of(context).size.width;
+            final isTablet = screenWidth > 600;
+            final fontSize = isTablet ? 24.0 : 20.0;
+            
+            return Text(
+              'Horario de atención',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+                fontSize: fontSize,
+                letterSpacing: 0.5,
+              ),
+            );
+          },
+        ),
+        backgroundColor: isDark ? ZonixColors.darkGray : ZonixColors.primaryBlue,
         foregroundColor: Colors.white,
       ),
       body: Padding(
@@ -245,6 +319,7 @@ class _CommerceSchedulePageState extends State<CommerceSchedulePage> {
               // Selector de horarios por día
               Card(
                 elevation: 4,
+                color: isDark ? ZonixColors.darkGray : ZonixColors.white,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -253,11 +328,15 @@ class _CommerceSchedulePageState extends State<CommerceSchedulePage> {
                     children: [
                       Row(
                         children: [
-                          const Icon(Icons.schedule, color: AppColors.blue),
+                          Icon(Icons.schedule, color: ZonixColors.primaryBlue),
                           const SizedBox(width: 8),
-                          const Text(
+                          Text(
                             'Horario por Días',
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? ZonixColors.white : ZonixColors.darkGray,
+                            ),
                           ),
                         ],
                       ),
@@ -272,28 +351,41 @@ class _CommerceSchedulePageState extends State<CommerceSchedulePage> {
               // Horario personalizado
               Card(
                 elevation: 4,
+                color: isDark ? ZonixColors.darkGray : ZonixColors.white,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Horario Personalizado',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? ZonixColors.white : ZonixColors.darkGray,
+                        ),
                       ),
                       const SizedBox(height: 8),
-                      const Text(
+                      Text(
                         'Si necesitas un horario más específico, puedes escribirlo aquí:',
-                        style: TextStyle(color: Colors.grey),
+                        style: TextStyle(color: ZonixColors.mediumGray),
                       ),
                       const SizedBox(height: 16),
                       TextFormField(
                         controller: _scheduleController,
-                        decoration: const InputDecoration(
+                        style: TextStyle(color: isDark ? ZonixColors.white : ZonixColors.darkGray),
+                        decoration: InputDecoration(
                           labelText: 'Horario personalizado',
-                          border: OutlineInputBorder(),
+                          labelStyle: TextStyle(color: ZonixColors.mediumGray),
                           hintText: 'Ejemplo:\nL-V 8:00-18:00\nS 9:00-14:00\nD cerrado',
+                          hintStyle: TextStyle(color: ZonixColors.mediumGray),
+                          filled: true,
+                          fillColor: isDark ? ZonixColors.darkGray : ZonixColors.white,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
                           alignLabelWithHint: true,
                         ),
                         maxLines: 4,
@@ -307,6 +399,7 @@ class _CommerceSchedulePageState extends State<CommerceSchedulePage> {
               // Información adicional
               Card(
                 elevation: 2,
+                color: isDark ? ZonixColors.darkGray : ZonixColors.white,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -315,21 +408,28 @@ class _CommerceSchedulePageState extends State<CommerceSchedulePage> {
                     children: [
                       Row(
                         children: [
-                          const Icon(Icons.info_outline, color: AppColors.blue),
+                          Icon(Icons.info_outline, color: ZonixColors.primaryBlue),
                           const SizedBox(width: 8),
-                          const Text(
+                          Text(
                             'Información',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? ZonixColors.white : ZonixColors.darkGray,
+                            ),
                           ),
                         ],
                       ),
                       const SizedBox(height: 12),
-                      const Text(
+                      Text(
                         '• El horario se muestra a los clientes para que sepan cuándo pueden hacer pedidos\n'
                         '• Los días marcados como "Cerrado" no aparecerán en el horario público\n'
                         '• Puedes usar el horario personalizado para casos especiales\n'
                         '• Los cambios se aplican inmediatamente',
-                        style: const TextStyle(fontSize: 14, color: Colors.grey),
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: ZonixColors.mediumGray,
+                        ),
                       ),
                     ],
                   ),
@@ -342,15 +442,15 @@ class _CommerceSchedulePageState extends State<CommerceSchedulePage> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.red.shade50,
+                    color: ZonixColors.errorRed.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.red.shade200),
+                    border: Border.all(color: ZonixColors.errorRed.withOpacity(0.3)),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.error, color: Colors.red),
+                      Icon(Icons.error, color: ZonixColors.errorRed),
                       const SizedBox(width: 8),
-                      Expanded(child: Text(_error!, style: const TextStyle(color: Colors.red))),
+                      Expanded(child: Text(_error!, style: TextStyle(color: ZonixColors.errorRed))),
                     ],
                   ),
                 ),
@@ -359,15 +459,15 @@ class _CommerceSchedulePageState extends State<CommerceSchedulePage> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.green.shade50,
+                    color: ZonixColors.successGreen.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.green.shade200),
+                    border: Border.all(color: ZonixColors.successGreen.withOpacity(0.3)),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.check_circle, color: Colors.green),
+                      Icon(Icons.check_circle, color: ZonixColors.successGreen),
                       const SizedBox(width: 8),
-                      Expanded(child: Text(_success!, style: const TextStyle(color: Colors.green))),
+                      Expanded(child: Text(_success!, style: TextStyle(color: ZonixColors.successGreen))),
                     ],
                   ),
                 ),
@@ -392,7 +492,7 @@ class _CommerceSchedulePageState extends State<CommerceSchedulePage> {
                     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.purple,
+                    backgroundColor: ZonixColors.primaryBlue,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
                   ),
