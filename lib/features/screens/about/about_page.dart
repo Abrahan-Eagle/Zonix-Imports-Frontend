@@ -3,7 +3,25 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'pubspec.dart';
-import 'package:zonix/features/utils/app_colors.dart';
+
+// Paleta de colores profesional
+class ZonixColors {
+  static const Color primaryBlue = Color(0xFF1E40AF); // Azul profesional
+  static const Color secondaryBlue = Color(0xFF3B82F6); // Azul secundario
+  static const Color accentBlue = Color(0xFF60A5FA); // Azul de acento
+  static const Color darkGray = Color(0xFF1E293B); // Gris oscuro
+  static const Color mediumGray = Color(0xFF64748B); // Gris medio
+  static const Color lightGray = Color(0xFFF1F5F9); // Gris claro
+  static const Color white = Color(0xFFFFFFFF); // Blanco
+  static const Color successGreen = Color(0xFF10B981); // Verde éxito
+  static const Color warningOrange = Color(0xFFF59E0B); // Naranja advertencia
+  static const Color errorRed = Color(0xFFEF4444); // Rojo error
+  
+  // Colores adicionales para efectos modernos
+  static const Color glassBackground = Color(0x1AFFFFFF);
+  static const Color neumorphicLight = Color(0xFFFFFFFF);
+  static const Color neumorphicDark = Color(0xFFE0E0E0);
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -17,7 +35,31 @@ class MyApp extends StatelessWidget {
       future: PackageInfo.fromPlatform(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return const Center(child: CircularProgressIndicator());  // Mostrar un cargador mientras se obtienen los datos
+          return Scaffold(
+            backgroundColor: Theme.of(context).brightness == Brightness.dark
+                ? ZonixColors.darkGray
+                : ZonixColors.lightGray,
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(
+                    color: ZonixColors.primaryBlue,
+                    strokeWidth: 3,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Cargando información...',
+                    style: TextStyle(
+                      color: ZonixColors.mediumGray,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
         }
 
         final packageInfo = snapshot.data!;
@@ -28,17 +70,35 @@ class MyApp extends StatelessWidget {
             'year': DateTime.now().year.toString(),
             'author': Pubspec.authorsName.join(', '),
           },
-          title: const Text(
-            'Acerca de Zonix',
-            style: TextStyle(
-              fontSize: 24, // Ajusta el tamaño del texto si es necesario
-              fontWeight: FontWeight.bold,
-            ),
+          title: Builder(
+            builder: (context) {
+              final screenWidth = MediaQuery.of(context).size.width;
+              final isTablet = screenWidth > 600;
+              final fontSize = isTablet ? 28.0 : 24.0;
+              
+              return Text(
+                'Acerca de Zonix',
+                style: TextStyle(
+                  fontSize: fontSize,
+                  fontWeight: FontWeight.w700,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? ZonixColors.white
+                      : ZonixColors.darkGray,
+                  letterSpacing: 0.5,
+                ),
+              );
+            },
           ),
           applicationVersion: 'Versión ${packageInfo.version}, Build #${packageInfo.buildNumber}',
           applicationDescription: Text(
             getAppDescription(),
             textAlign: TextAlign.justify,
+            style: TextStyle(
+              fontSize: 16,
+              color: ZonixColors.mediumGray,
+              fontWeight: FontWeight.w500,
+              height: 1.4,
+            ),
           ),
           applicationIcon: Container(
             margin: const EdgeInsets.only(bottom: 0), // Ajuste de margen sin valores negativos
@@ -102,32 +162,34 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false, // Quitar el banner de depuración
       home: SafeArea(child: aboutPage),
       theme: ThemeData(
-        primaryColor: AppColors.purple,
+        primaryColor: ZonixColors.primaryBlue,
         brightness: Brightness.light,
         visualDensity: VisualDensity.adaptivePlatformDensity,
         appBarTheme: AppBarTheme(
-          backgroundColor: AppColors.purple,
-          foregroundColor: AppColors.white,
+          backgroundColor: ZonixColors.primaryBlue,
+          foregroundColor: ZonixColors.white,
           elevation: 0,
           titleTextStyle: const TextStyle(
             color: Colors.white,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w700,
             fontSize: 22,
+            letterSpacing: 0.5,
           ),
         ),
       ),
       darkTheme: ThemeData(
         brightness: Brightness.dark,
-        primaryColor: AppColors.purple,
+        primaryColor: ZonixColors.primaryBlue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
         appBarTheme: AppBarTheme(
-          backgroundColor: AppColors.purple,
-          foregroundColor: AppColors.white,
+          backgroundColor: ZonixColors.darkGray,
+          foregroundColor: ZonixColors.white,
           elevation: 0,
           titleTextStyle: const TextStyle(
             color: Colors.white,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w700,
             fontSize: 22,
+            letterSpacing: 0.5,
           ),
         ),
       ),

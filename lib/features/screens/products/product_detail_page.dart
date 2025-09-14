@@ -8,7 +8,25 @@ import 'package:zonix/features/services/restaurant_service.dart';
 import 'package:zonix/features/screens/restaurants/restaurant_details_page.dart';
 import 'package:zonix/features/utils/network_image_with_fallback.dart';
 import 'package:logger/logger.dart';
-import 'package:zonix/features/utils/app_colors.dart';
+
+// Paleta de colores profesional
+class ZonixColors {
+  static const Color primaryBlue = Color(0xFF1E40AF); // Azul profesional
+  static const Color secondaryBlue = Color(0xFF3B82F6); // Azul secundario
+  static const Color accentBlue = Color(0xFF60A5FA); // Azul de acento
+  static const Color darkGray = Color(0xFF1E293B); // Gris oscuro
+  static const Color mediumGray = Color(0xFF64748B); // Gris medio
+  static const Color lightGray = Color(0xFFF1F5F9); // Gris claro
+  static const Color white = Color(0xFFFFFFFF); // Blanco
+  static const Color successGreen = Color(0xFF10B981); // Verde éxito
+  static const Color warningOrange = Color(0xFFF59E0B); // Naranja advertencia
+  static const Color errorRed = Color(0xFFEF4444); // Rojo error
+  
+  // Colores adicionales para efectos modernos
+  static const Color glassBackground = Color(0x1AFFFFFF);
+  static const Color neumorphicLight = Color(0xFFFFFFFF);
+  static const Color neumorphicDark = Color(0xFFE0E0E0);
+}
 
 class ProductDetailPage extends StatefulWidget {
   final Product product;
@@ -78,28 +96,33 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     final cartService = Provider.of<CartService>(context, listen: false);
     final double total = (widget.product.price) * _quantity;
     return Scaffold(
-      backgroundColor: AppColors.scaffoldBg(context),
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(100),
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                AppColors.headerGradientStart(context),
-                AppColors.headerGradientMid(context),
-                AppColors.headerGradientEnd(context),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-          child: AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            title: const Text('Detalles del producto', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 24)), // TODO: internacionalizar
-            iconTheme: IconThemeData(color: AppColors.white),
-          ),
+      backgroundColor: Theme.of(context).brightness == Brightness.dark
+          ? ZonixColors.darkGray
+          : ZonixColors.lightGray,
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? ZonixColors.darkGray
+            : ZonixColors.primaryBlue,
+        elevation: 0,
+        title: Builder(
+          builder: (context) {
+            final screenWidth = MediaQuery.of(context).size.width;
+            final isTablet = screenWidth > 600;
+            final fontSize = isTablet ? 24.0 : 20.0;
+            
+            return Text(
+              'Detalles del producto',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+                fontSize: fontSize,
+                letterSpacing: 0.5,
+              ),
+            );
+          },
         ),
+        iconTheme: const IconThemeData(color: Colors.white),
+        centerTitle: false,
       ),
       body: SafeArea(
         child: Stack(
@@ -108,16 +131,20 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               padding: const EdgeInsets.fromLTRB(24, 24, 24, 90),
               children: [
                 Card(
-                  color: AppColors.cardBg(context),
-                  shadowColor: AppColors.orange.withOpacity(0.10),
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? ZonixColors.darkGray
+                      : ZonixColors.white,
+                  shadowColor: ZonixColors.primaryBlue.withOpacity(0.15),
                   elevation: 8,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                   child: _buildProductImage(),
                 ),
                 const SizedBox(height: 24),
                 Card(
-                  color: AppColors.cardBg(context),
-                  shadowColor: AppColors.orange.withOpacity(0.10),
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? ZonixColors.darkGray
+                      : ZonixColors.white,
+                  shadowColor: ZonixColors.primaryBlue.withOpacity(0.15),
                   elevation: 8,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                   child: Padding(
@@ -158,8 +185,11 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 widget.product.name,
                 style: TextStyle(
                   fontSize: 22, 
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primaryText(context),
+                  fontWeight: FontWeight.w700,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? ZonixColors.white
+                      : ZonixColors.darkGray,
+                  letterSpacing: 0.5,
                 ),
               ),
               const SizedBox(height: 8),
@@ -187,8 +217,12 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
         if (snapshot.hasError || snapshot.data == null) {
           return Text(
-            'Tienda no disponible', // TODO: internacionalizar
-            style: TextStyle(color: AppColors.secondaryText(context)),
+            'Tienda no disponible',
+            style: TextStyle(
+              color: ZonixColors.mediumGray,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
           );
         }
 
@@ -197,10 +231,11 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         return GestureDetector(
           onTap: _isLoading ? null : _navigateToRestaurant,
           child: Text(
-            _restaurant?.nombreLocal ?? 'Tienda desconocida', // TODO: internacionalizar
+            _restaurant?.nombreLocal ?? 'Tienda desconocida',
             style: TextStyle(
-              color: AppColors.accentButton(context),
-              fontWeight: FontWeight.w500,
+              color: ZonixColors.primaryBlue,
+              fontWeight: FontWeight.w600,
+              fontSize: 16,
               decoration: TextDecoration.underline,
             ),
           ),
@@ -214,19 +249,24 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Descripción', // TODO: internacionalizar
+          'Descripción',
           style: TextStyle(
             fontSize: 18,
-            fontWeight: FontWeight.w500,
-            color: AppColors.primaryText(context),
+            fontWeight: FontWeight.w700,
+            color: Theme.of(context).brightness == Brightness.dark
+                ? ZonixColors.white
+                : ZonixColors.darkGray,
+            letterSpacing: 0.5,
           ),
         ),
         const SizedBox(height: 4),
         Text(
-          widget.product.description ?? 'Sin descripción', // TODO: internacionalizar
+          widget.product.description ?? 'Sin descripción',
           style: TextStyle(
             fontSize: 16, 
-            color: AppColors.secondaryText(context),
+            color: ZonixColors.mediumGray,
+            fontWeight: FontWeight.w500,
+            height: 1.4,
           ),
         ),
       ],
@@ -235,11 +275,12 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
   Widget _buildPrice(double total, BuildContext context) {
     return Text(
-      '\$${total.toStringAsFixed(2)}',
+      '\u20a1${total.toStringAsFixed(2)}',
       style: TextStyle(
-        fontSize: 24,
-        fontWeight: FontWeight.bold,
-        color: AppColors.success(context),
+        fontSize: 28,
+        fontWeight: FontWeight.w700,
+        color: ZonixColors.successGreen,
+        letterSpacing: 0.5,
       ),
     );
   }
@@ -258,9 +299,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             Expanded(
               child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryButton(context),
+                  backgroundColor: ZonixColors.primaryBlue,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  elevation: 2,
+                  elevation: 4,
+                  shadowColor: ZonixColors.primaryBlue.withOpacity(0.3),
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
                 onPressed: () {
@@ -271,11 +313,30 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     quantity: _quantity,
                   ));
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Producto añadido al carrito')), // TODO: internacionalizar
+                    SnackBar(
+                      content: const Text('Producto añadido al carrito'),
+                      backgroundColor: ZonixColors.successGreen,
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
                   );
                 },
-                icon: const Icon(Icons.add_shopping_cart, color: Colors.white),
-                label: const Text('Añadir al carrito', style: TextStyle(color: Colors.white, fontSize: 18)), // TODO: internacionalizar
+                icon: const Icon(
+                  Icons.add_shopping_cart, 
+                  color: Colors.white,
+                  size: 24,
+                ),
+                label: const Text(
+                  'Añadir al carrito', 
+                  style: TextStyle(
+                    color: Colors.white, 
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.5,
+                  ),
+                ),
               ),
             ),
           ],
@@ -287,18 +348,52 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   Widget _buildQuantitySelector(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.cardBg(context),
+        color: Theme.of(context).brightness == Brightness.dark
+            ? ZonixColors.darkGray
+            : ZonixColors.white,
         borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: ZonixColors.mediumGray.withOpacity(0.2),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: ZonixColors.primaryBlue.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
           IconButton(
-            icon: Icon(Icons.remove, color: AppColors.primaryText(context)),
+            icon: Icon(
+              Icons.remove, 
+              color: _quantity > 1 
+                  ? ZonixColors.primaryBlue 
+                  : ZonixColors.mediumGray,
+            ),
             onPressed: _quantity > 1 ? () => setState(() => _quantity--) : null,
           ),
-          Text('$_quantity', style: TextStyle(fontSize: 18, color: AppColors.primaryText(context))),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Text(
+              '$_quantity', 
+              style: TextStyle(
+                fontSize: 18, 
+                fontWeight: FontWeight.w700,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? ZonixColors.white
+                    : ZonixColors.darkGray,
+              ),
+            ),
+          ),
           IconButton(
-            icon: Icon(Icons.add, color: AppColors.primaryText(context)),
+            icon: Icon(
+              Icons.add, 
+              color: ZonixColors.primaryBlue,
+            ),
             onPressed: () => setState(() => _quantity++),
           ),
         ],
@@ -306,38 +401,4 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     );
   }
 
-  Widget _buildAddToCartButton(CartService cartService, BuildContext context) {
-    return Expanded(
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.accentButton(context),
-          foregroundColor: AppColors.primaryText(context),
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          elevation: 2,
-        ),
-        onPressed: () {
-          cartService.addToCart(CartItem(
-            id: widget.product.id,
-            nombre: widget.product.name,
-            precio: widget.product.price,
-            quantity: _quantity,
-          ));
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Producto agregado al carrito')),
-          );
-        },
-        child: Text(
-          'Agregar al carrito',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: AppColors.primaryText(context),
-          ),
-        ),
-      ),
-    );
-  }
 }

@@ -1,5 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:zonix/features/utils/app_colors.dart';
+
+// Paleta de colores profesional
+class ZonixColors {
+  static const Color primaryBlue = Color(0xFF1E40AF); // Azul profesional
+  static const Color secondaryBlue = Color(0xFF3B82F6); // Azul secundario
+  static const Color accentBlue = Color(0xFF60A5FA); // Azul de acento
+  static const Color darkGray = Color(0xFF1E293B); // Gris oscuro
+  static const Color mediumGray = Color(0xFF64748B); // Gris medio
+  static const Color lightGray = Color(0xFFF1F5F9); // Gris claro
+  static const Color white = Color(0xFFFFFFFF); // Blanco
+  static const Color successGreen = Color(0xFF10B981); // Verde éxito
+  static const Color warningOrange = Color(0xFFF59E0B); // Naranja advertencia
+  static const Color errorRed = Color(0xFFEF4444); // Rojo error
+  
+  // Colores adicionales para efectos modernos
+  static const Color glassBackground = Color(0x1AFFFFFF);
+  static const Color neumorphicLight = Color(0xFFFFFFFF);
+  static const Color neumorphicDark = Color(0xFFE0E0E0);
+}
 
 class HelpAndFAQPage extends StatelessWidget {
   const HelpAndFAQPage({super.key});
@@ -7,44 +25,64 @@ class HelpAndFAQPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.scaffoldBg(context),
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(100),
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                AppColors.headerGradientStart(context),
-                AppColors.headerGradientMid(context),
-                AppColors.headerGradientEnd(context),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-          child: AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            title: const Text('Ayuda y Comentarios', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 24)), // TODO: internacionalizar
-            iconTheme: IconThemeData(color: AppColors.white),
-          ),
+      backgroundColor: Theme.of(context).brightness == Brightness.dark
+          ? ZonixColors.darkGray
+          : ZonixColors.lightGray,
+      appBar: AppBar(
+        title: Builder(
+          builder: (context) {
+            final screenWidth = MediaQuery.of(context).size.width;
+            final isTablet = screenWidth > 600;
+            final fontSize = isTablet ? 24.0 : 20.0;
+            
+            return Text(
+              'Ayuda y Comentarios',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+                fontSize: fontSize,
+                letterSpacing: 0.5,
+              ),
+            );
+          },
         ),
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? ZonixColors.darkGray
+            : ZonixColors.primaryBlue,
+        foregroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: false,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: [
-            const Text(
-              'Bienvenido a la sección de Ayuda y Comentarios', // TODO: internacionalizar
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            Text(
+              'Bienvenido a la sección de Ayuda y Comentarios',
+              style: TextStyle(
+                fontSize: 24, 
+                fontWeight: FontWeight.w700,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? ZonixColors.white
+                    : ZonixColors.darkGray,
+                letterSpacing: 0.5,
+              ),
             ),
             const SizedBox(height: 20),
-            const Text(
-              'Aquí encontrarás información útil sobre cómo utilizar la aplicación Zonix.', // TODO: internacionalizar
-              style: TextStyle(fontSize: 16),
+            Text(
+              'Aquí encontrarás información útil sobre cómo utilizar la aplicación Zonix.',
+              style: TextStyle(
+                fontSize: 16,
+                color: ZonixColors.mediumGray,
+                fontWeight: FontWeight.w500,
+                height: 1.4,
+              ),
             ),
             const SizedBox(height: 20),
-            const Divider(),
+            Divider(
+              color: ZonixColors.mediumGray.withOpacity(0.2),
+              thickness: 1,
+            ),
             const SizedBox(height: 20),
             _buildFAQItem(
               context,
@@ -93,7 +131,10 @@ class HelpAndFAQPage extends StatelessWidget {
               '3. Visitar nuestra página web y utilizar el chat en vivo.',
             ),
             const SizedBox(height: 20),
-            const Divider(),
+            Divider(
+              color: ZonixColors.mediumGray.withOpacity(0.2),
+              thickness: 1,
+            ),
             const SizedBox(height: 20),
             const Text(
               'Comentarios y Sugerencias', // TODO: internacionalizar
@@ -113,21 +154,35 @@ class HelpAndFAQPage extends StatelessWidget {
   Widget _buildFAQItem(BuildContext context, String question, String answer) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 10),
-      color: AppColors.cardBg(context),
-      shadowColor: AppColors.purple.withOpacity(0.10),
+      color: Theme.of(context).brightness == Brightness.dark
+          ? ZonixColors.darkGray
+          : ZonixColors.white,
+      shadowColor: ZonixColors.primaryBlue.withOpacity(0.15),
       elevation: 6,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       child: ExpansionTile(
         title: Text(
           question,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: 18, 
+            fontWeight: FontWeight.w700,
+            color: Theme.of(context).brightness == Brightness.dark
+                ? ZonixColors.white
+                : ZonixColors.darkGray,
+            letterSpacing: 0.5,
+          ),
         ),
         children: [
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Text(
               answer,
-              style: const TextStyle(fontSize: 16),
+              style: TextStyle(
+                fontSize: 16,
+                color: ZonixColors.mediumGray,
+                fontWeight: FontWeight.w500,
+                height: 1.4,
+              ),
             ),
           ),
         ],

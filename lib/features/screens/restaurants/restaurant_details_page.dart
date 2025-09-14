@@ -28,9 +28,26 @@ import 'package:zonix/features/services/buyer_review_service.dart';
 import 'package:zonix/features/services/favorites_service.dart';
 import 'package:zonix/models/product.dart';
 import 'package:zonix/models/cart_item.dart';
-import 'package:zonix/models/restaurant.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:zonix/features/screens/cart/cart_page.dart';
+
+// Paleta de colores profesional
+class ZonixColors {
+  static const Color primaryBlue = Color(0xFF1E40AF); // Azul profesional
+  static const Color secondaryBlue = Color(0xFF3B82F6); // Azul secundario
+  static const Color accentBlue = Color(0xFF60A5FA); // Azul de acento
+  static const Color darkGray = Color(0xFF1E293B); // Gris oscuro
+  static const Color mediumGray = Color(0xFF64748B); // Gris medio
+  static const Color lightGray = Color(0xFFF1F5F9); // Gris claro
+  static const Color white = Color(0xFFFFFFFF); // Blanco
+  static const Color successGreen = Color(0xFF10B981); // Verde éxito
+  static const Color warningOrange = Color(0xFFF59E0B); // Naranja advertencia
+  static const Color errorRed = Color(0xFFEF4444); // Rojo error
+  
+  // Colores para efectos modernos
+  static const Color glassBackground = Color(0x1AFFFFFF); // Fondo glassmorphism
+  static const Color neumorphicLight = Color(0xFFFFFFFF); // Neumorfismo claro
+  static const Color neumorphicDark = Color(0xFFE0E0E0); // Neumorfismo oscuro
+}
 
 class RestaurantDetailsPage extends StatefulWidget {
   final int commerceId;
@@ -202,11 +219,7 @@ class _RestaurantDetailsPageState extends State<RestaurantDetailsPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final bgColor = theme.scaffoldBackgroundColor;
-    final cardColor = theme.cardColor;
-    final textColor = theme.textTheme.bodyLarge?.color ?? Colors.black;
-    final secondaryText = theme.textTheme.bodyMedium?.color?.withOpacity(0.7) ?? Colors.grey;
-    final accentColor = theme.colorScheme.secondary;
+    final bgColor = isDark ? ZonixColors.darkGray : ZonixColors.lightGray;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -231,7 +244,7 @@ class _RestaurantDetailsPageState extends State<RestaurantDetailsPage> {
                     child: Container(
                       padding: const EdgeInsets.all(2),
                       decoration: BoxDecoration(
-                        color: Colors.red,
+                        color: ZonixColors.errorRed,
                         borderRadius: BorderRadius.circular(10),
                       ),
                       constraints: const BoxConstraints(
@@ -252,7 +265,7 @@ class _RestaurantDetailsPageState extends State<RestaurantDetailsPage> {
               ],
             ),
             label: const Text('Ver carrito'),
-            backgroundColor: Colors.orange,
+            backgroundColor: ZonixColors.primaryBlue,
           );
         },
       ),
@@ -263,8 +276,8 @@ class _RestaurantDetailsPageState extends State<RestaurantDetailsPage> {
             floating: false,
             pinned: true,
             backgroundColor: widget.abierto
-                ? (isDark ? Colors.green.shade800 : Colors.green.shade600)
-                : (isDark ? Colors.red.shade800 : Colors.red.shade600),
+                ? ZonixColors.successGreen
+                : ZonixColors.errorRed,
             flexibleSpace: FlexibleSpaceBar(
               background: Stack(
                 children: [
@@ -272,8 +285,8 @@ class _RestaurantDetailsPageState extends State<RestaurantDetailsPage> {
                     width: double.infinity,
                     height: double.infinity,
                     color: widget.abierto
-                        ? (isDark ? Colors.green.shade800 : Colors.green.shade600)
-                        : (isDark ? Colors.red.shade800 : Colors.red.shade600),
+                        ? ZonixColors.successGreen
+                        : ZonixColors.errorRed,
                     child: SafeArea(
                       child: SingleChildScrollView(
                         physics: const ClampingScrollPhysics(),
@@ -483,11 +496,12 @@ class _RestaurantDetailsPageState extends State<RestaurantDetailsPage> {
                 ),
                 child: TextField(
                   controller: _searchController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: 'Buscar productos...',
-                    prefixIcon: Icon(Icons.search, color: Colors.grey),
+                    hintStyle: TextStyle(color: ZonixColors.mediumGray),
+                    prefixIcon: Icon(Icons.search, color: ZonixColors.mediumGray),
                     border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                   ),
                   onChanged: (value) {
                     setState(() {
@@ -500,7 +514,7 @@ class _RestaurantDetailsPageState extends State<RestaurantDetailsPage> {
           ),
           SliverToBoxAdapter(
             child: Container(
-              color: Colors.grey.shade50,
+              color: isDark ? ZonixColors.darkGray : ZonixColors.lightGray,
               height: 60,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
@@ -519,11 +533,11 @@ class _RestaurantDetailsPageState extends State<RestaurantDetailsPage> {
                           _selectedCategory = category;
                         });
                       },
-                      backgroundColor: Colors.white,
-                      selectedColor: Colors.orange.shade100,
-                      checkmarkColor: Colors.orange,
+                      backgroundColor: isDark ? ZonixColors.darkGray : ZonixColors.white,
+                      selectedColor: ZonixColors.primaryBlue.withOpacity(0.2),
+                      checkmarkColor: ZonixColors.primaryBlue,
                       labelStyle: TextStyle(
-                        color: isSelected ? Colors.orange.shade800 : Colors.grey.shade700,
+                        color: isSelected ? ZonixColors.primaryBlue : ZonixColors.mediumGray,
                         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                       ),
                     ),
@@ -716,14 +730,18 @@ class _RestaurantDetailsPageState extends State<RestaurantDetailsPage> {
   }
 
   Widget _buildProductCard(Product product) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final textColor = isDark ? ZonixColors.white : ZonixColors.darkGray;
+    final secondaryText = ZonixColors.mediumGray;
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? ZonixColors.darkGray : ZonixColors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: isDark ? Colors.black.withOpacity(0.3) : Colors.grey.withOpacity(0.1),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -765,9 +783,10 @@ class _RestaurantDetailsPageState extends State<RestaurantDetailsPage> {
                   children: [
                     Text(
                       product.name,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
+                        color: textColor,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -777,7 +796,7 @@ class _RestaurantDetailsPageState extends State<RestaurantDetailsPage> {
                       Text(
                         product.description!,
                         style: TextStyle(
-                          color: Colors.grey.shade600,
+                          color: secondaryText,
                           fontSize: 14,
                         ),
                         maxLines: 2,
@@ -793,7 +812,7 @@ class _RestaurantDetailsPageState extends State<RestaurantDetailsPage> {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: Colors.green.shade600,
+                            color: ZonixColors.successGreen,
                           ),
                         ),
                         GestureDetector(
@@ -809,7 +828,7 @@ class _RestaurantDetailsPageState extends State<RestaurantDetailsPage> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text('Producto agregado al carrito'),
-                                backgroundColor: Colors.green,
+                                backgroundColor: ZonixColors.successGreen,
                                 duration: const Duration(seconds: 1),
                               ),
                             );
@@ -817,13 +836,13 @@ class _RestaurantDetailsPageState extends State<RestaurantDetailsPage> {
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                             decoration: BoxDecoration(
-                              color: Colors.orange.shade100,
+                              color: ZonixColors.primaryBlue.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(20),
                             ),
-                            child: const Text(
+                            child: Text(
                               'Agregar',
                               style: TextStyle(
-                                color: Colors.orange,
+                                color: ZonixColors.primaryBlue,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 12,
                               ),
@@ -937,7 +956,7 @@ class _RestaurantDetailsPageState extends State<RestaurantDetailsPage> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text('Producto agregado al carrito'),
-                                backgroundColor: Colors.green,
+                                backgroundColor: ZonixColors.successGreen,
                                 duration: const Duration(seconds: 1),
                               ),
                             );

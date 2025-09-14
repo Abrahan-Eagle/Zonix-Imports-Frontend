@@ -7,12 +7,27 @@ import 'package:shimmer/shimmer.dart';
 import 'package:zonix/features/services/restaurant_service.dart';
 import 'package:zonix/models/restaurant.dart';
 import 'restaurant_details_page.dart';
-import 'package:zonix/features/services/product_service.dart';
-import 'package:zonix/models/product.dart';
 import '../../services/test_auth_service.dart';
-import 'package:zonix/features/utils/debouncer.dart';
 import 'package:zonix/features/utils/network_image_with_fallback.dart';
-import 'package:zonix/features/utils/app_colors.dart';
+
+// Paleta de colores profesional
+class ZonixColors {
+  static const Color primaryBlue = Color(0xFF1E40AF); // Azul profesional
+  static const Color secondaryBlue = Color(0xFF3B82F6); // Azul secundario
+  static const Color accentBlue = Color(0xFF60A5FA); // Azul de acento
+  static const Color darkGray = Color(0xFF1E293B); // Gris oscuro
+  static const Color mediumGray = Color(0xFF64748B); // Gris medio
+  static const Color lightGray = Color(0xFFF1F5F9); // Gris claro
+  static const Color white = Color(0xFFFFFFFF); // Blanco
+  static const Color successGreen = Color(0xFF10B981); // Verde éxito
+  static const Color warningOrange = Color(0xFFF59E0B); // Naranja advertencia
+  static const Color errorRed = Color(0xFFEF4444); // Rojo error
+  
+  // Colores adicionales para efectos modernos
+  static const Color glassBackground = Color(0x1AFFFFFF);
+  static const Color neumorphicLight = Color(0xFFFFFFFF);
+  static const Color neumorphicDark = Color(0xFFE0E0E0);
+}
 
 class RestaurantsPage extends StatefulWidget {
   const RestaurantsPage({Key? key}) : super(key: key);
@@ -111,8 +126,12 @@ class _RestaurantsPageState extends State<RestaurantsPage> {
 
   Widget _buildShimmerLoading() {
     return Shimmer.fromColors(
-      baseColor: AppColors.cardBg(context),
-      highlightColor: AppColors.scaffoldBg(context),
+      baseColor: Theme.of(context).brightness == Brightness.dark
+          ? ZonixColors.darkGray
+          : ZonixColors.white,
+      highlightColor: Theme.of(context).brightness == Brightness.dark
+          ? ZonixColors.darkGray.withOpacity(0.3)
+          : ZonixColors.lightGray,
       child: ListView.builder(
         padding: const EdgeInsets.all(16),
         itemCount: 5,
@@ -121,7 +140,9 @@ class _RestaurantsPageState extends State<RestaurantsPage> {
           child: Container(
             height: 180,
             decoration: BoxDecoration(
-              color: AppColors.cardBg(context),
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? ZonixColors.darkGray
+                  : ZonixColors.white,
               borderRadius: BorderRadius.circular(16),
             ),
           ),
@@ -202,8 +223,10 @@ class _RestaurantsPageState extends State<RestaurantsPage> {
 
   Widget _buildRestaurantCard(Restaurant restaurant) {
     return Card(
-      color: AppColors.cardBg(context),
-      shadowColor: AppColors.orange.withOpacity(0.10),
+      color: Theme.of(context).brightness == Brightness.dark
+          ? ZonixColors.darkGray
+          : ZonixColors.white,
+      shadowColor: ZonixColors.primaryBlue.withOpacity(0.15),
       elevation: 6,
       clipBehavior: Clip.antiAliasWithSaveLayer,
       shape: RoundedRectangleBorder(
@@ -233,8 +256,8 @@ class _RestaurantsPageState extends State<RestaurantsPage> {
           );
         },
         borderRadius: BorderRadius.circular(20),
-        splashColor: AppColors.orange.withOpacity(0.15),
-        highlightColor: AppColors.orange.withOpacity(0.08),
+        splashColor: ZonixColors.primaryBlue.withOpacity(0.15),
+        highlightColor: ZonixColors.primaryBlue.withOpacity(0.08),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -261,7 +284,9 @@ class _RestaurantsPageState extends State<RestaurantsPage> {
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.primaryText(context),
+                      color: Theme.of(context).brightness == Brightness.dark
+          ? ZonixColors.white
+          : ZonixColors.darkGray,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -269,13 +294,13 @@ class _RestaurantsPageState extends State<RestaurantsPage> {
                   if (restaurant.direccion != null)
                     Row(
                       children: [
-                        Icon(Icons.location_on, color: AppColors.accentButton(context), size: 18),
+                        Icon(Icons.location_on, color: ZonixColors.primaryBlue, size: 18),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
                             restaurant.direccion!,
                             style: TextStyle(
-                              color: AppColors.secondaryText(context),
+                              color: ZonixColors.mediumGray,
                               fontSize: 14,
                             ),
                             maxLines: 1,
@@ -289,14 +314,14 @@ class _RestaurantsPageState extends State<RestaurantsPage> {
                     children: [
                       Icon(
                         restaurant.abierto == true ? Icons.check_circle : Icons.cancel,
-                        color: restaurant.abierto == true ? AppColors.success(context) : AppColors.error(context),
+                        color: restaurant.abierto == true ? ZonixColors.successGreen : ZonixColors.errorRed,
                         size: 18,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         restaurant.abierto == true ? 'Abierto' : 'Cerrado', // TODO: internacionalizar
                         style: TextStyle(
-                          color: restaurant.abierto == true ? AppColors.success(context) : AppColors.error(context),
+                          color: restaurant.abierto == true ? ZonixColors.successGreen : ZonixColors.errorRed,
                           fontSize: 14,
                         ),
                       ),
@@ -313,30 +338,34 @@ class _RestaurantsPageState extends State<RestaurantsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: AppColors.scaffoldBg(context),
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(100),
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                AppColors.headerGradientStart(context),
-                AppColors.headerGradientMid(context),
-                AppColors.headerGradientEnd(context),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-          child: AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            title: Text('Restaurantes', style: TextStyle(color: AppColors.white, fontWeight: FontWeight.bold, fontSize: 24)),
-            iconTheme: IconThemeData(color: AppColors.white),
-          ),
+      backgroundColor: Theme.of(context).brightness == Brightness.dark
+          ? ZonixColors.darkGray
+          : ZonixColors.lightGray,
+      appBar: AppBar(
+        title: Builder(
+          builder: (context) {
+            final screenWidth = MediaQuery.of(context).size.width;
+            final isTablet = screenWidth > 600;
+            final fontSize = isTablet ? 24.0 : 20.0;
+            
+            return Text(
+              'Restaurantes',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+                fontSize: fontSize,
+                letterSpacing: 0.5,
+              ),
+            );
+          },
         ),
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? ZonixColors.darkGray
+            : ZonixColors.primaryBlue,
+        foregroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: false,
       ),
       body: SafeArea(
         child: Column(
@@ -345,13 +374,19 @@ class _RestaurantsPageState extends State<RestaurantsPage> {
               padding: const EdgeInsets.all(16.0),
               child: TextField(
                 controller: _searchController,
-                style: TextStyle(color: AppColors.primaryText(context)),
+                style: TextStyle(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? ZonixColors.white
+                      : ZonixColors.darkGray,
+                ),
                 decoration: InputDecoration(
-                  hintText: 'Buscar restaurante...', // TODO: internacionalizar
-                  hintStyle: TextStyle(color: AppColors.secondaryText(context)),
+                  hintText: 'Buscar restaurante...',
+                  hintStyle: TextStyle(color: ZonixColors.mediumGray),
                   filled: true,
-                  fillColor: AppColors.cardBg(context),
-                  prefixIcon: Icon(Icons.search, color: AppColors.secondaryText(context)),
+                  fillColor: Theme.of(context).brightness == Brightness.dark
+                      ? ZonixColors.darkGray
+                      : ZonixColors.white,
+                  prefixIcon: Icon(Icons.search, color: ZonixColors.mediumGray),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
