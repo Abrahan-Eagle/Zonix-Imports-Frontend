@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
 
-// Paleta de colores Material You vibrante (2025)
+// Paleta de colores profesional (2025) - Inspirado en Alibaba/AliExpress/Amazon
 class ZonixColors {
-  static const Color seedColor =
-      Color(0xFF6750A4); // Púrpura vibrante como base
-  static const Color darkBlue = Color(0xFF0C2D57); // Azul Oscuro (Principal)
-  static const Color goldenYellow =
-      Color(0xFFFFB400); // Amarillo Dorado (Secundario)
-  static const Color brightBlue = Color(0xFF1E90FF); // Azul Brillante (Soporte)
-  static const Color pureWhite = Color(0xFFFFFFFF); // Blanco Puro (Neutral)
-  static const Color lightGray = Color(0xFFE5E5E5); // Gris Claro (Soporte)
+  static const Color primaryBlue = Color(0xFF1E40AF); // Azul profesional
+  static const Color secondaryBlue = Color(0xFF3B82F6); // Azul secundario
+  static const Color accentBlue = Color(0xFF60A5FA); // Azul de acento
+  static const Color darkGray = Color(0xFF1E293B); // Gris oscuro
+  static const Color mediumGray = Color(0xFF64748B); // Gris medio
+  static const Color lightGray = Color(0xFFF1F5F9); // Gris claro
+  static const Color white = Color(0xFFFFFFFF); // Blanco
+  static const Color successGreen = Color(0xFF10B981); // Verde éxito
+  static const Color warningOrange = Color(0xFFF59E0B); // Naranja advertencia
+  static const Color errorRed = Color(0xFFEF4444); // Rojo error
 
   // Colores adicionales para efectos modernos
   static const Color glassBackground = Color(0x1AFFFFFF);
@@ -25,123 +27,99 @@ class OnboardingPage6 extends StatefulWidget {
   State<OnboardingPage6> createState() => _OnboardingPage6State();
 }
 
-class _OnboardingPage6State extends State<OnboardingPage6>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-  late Animation<double> _fadeAnimation;
-  late Animation<double> _slideAnimation;
-
+class _OnboardingPage6State extends State<OnboardingPage6> {
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 1200),
-      vsync: this,
-    );
-
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
-    );
-
-    _slideAnimation = Tween<double>(begin: 50.0, end: 0.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack),
-    );
-
-    _animationController.forward();
   }
 
   @override
   void dispose() {
-    _animationController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final isTablet = size.width > 600;
-    final isSmallPhone = size.width < 360;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth >= 600;
 
+    return Scaffold(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              ZonixColors.lightGray,
+              ZonixColors.white,
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              if (isTablet) {
+                return _buildTabletLayout(constraints);
+              } else {
+                return _buildMobileLayout(constraints);
+              }
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMobileLayout(BoxConstraints constraints) {
     return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            ZonixColors.darkBlue, // Azul oscuro arriba
-            Color(0xFF1A3A5C), // Azul medio
-            Color(0xFF2A4A6C), // Azul más claro abajo
-          ],
-          stops: [0.0, 0.6, 1.0],
-        ),
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Spacer(flex: 1),
+
+          // Icono de perfil y pedidos
+          _buildProfileIcon(),
+          const SizedBox(height: 32),
+
+          // Título principal
+          _buildMainTitle(),
+          const SizedBox(height: 12),
+
+          // Subtítulo
+          _buildSubtitle(),
+          const SizedBox(height: 40),
+
+          // Características de perfil y pedidos
+          _buildProfileFeatures(),
+          const SizedBox(height: 40),
+
+          // Estadísticas
+          _buildStats(),
+
+          const Spacer(flex: 1),
+        ],
       ),
-      child: SafeArea(
-        child: Stack(
+    );
+  }
+
+  Widget _buildTabletLayout(BoxConstraints constraints) {
+    return Center(
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 1200),
+        padding: const EdgeInsets.all(48),
+        child: Row(
           children: [
-            // Imagen de fondo con overlay
-            Positioned.fill(
-              child: Container(
-                decoration: BoxDecoration(
-                  image: const DecorationImage(
-                    image: AssetImage('assets/onboarding/onboardingPage7.png'),
-                    fit: BoxFit.cover,
-                  ),
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      ZonixColors.darkBlue.withOpacity(0.8),
-                      ZonixColors.darkBlue.withOpacity(0.5),
-                      ZonixColors.darkBlue.withOpacity(0.9),
-                    ],
-                    stops: const [0.0, 0.5, 1.0],
-                  ),
-                ),
-              ),
+            // Sección izquierda - Información
+            Expanded(
+              flex: 1,
+              child: _buildTabletInfoSection(),
             ),
-
-            // Contenido principal
-            Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: isTablet ? 64.0 : (isSmallPhone ? 16.0 : 20.0),
-                vertical: isTablet ? 32.0 : 16.0,
-              ),
-              child: AnimatedBuilder(
-                animation: _animationController,
-                builder: (context, child) {
-                  return Transform.translate(
-                    offset: Offset(0, _slideAnimation.value),
-                    child: Opacity(
-                      opacity: _fadeAnimation.value,
-                      child: IntrinsicHeight(
-                        child: Column(
-                          children: [
-                            // Espaciado superior flexible
-                            const Spacer(flex: 1),
-
-                            // Contenido principal
-                            _buildMainContent(isTablet, isSmallPhone),
-
-                            // Espaciador
-                            SizedBox(
-                                height:
-                                    isTablet ? 32 : (isSmallPhone ? 20 : 24)),
-
-                            // Características de perfil y pedidos
-                            _buildProfileFeatures(isTablet, isSmallPhone),
-
-                            // Espaciador flexible
-                            const Spacer(flex: 2),
-
-                            // Espacio para la navegación flotante
-                            const SizedBox(height: 80),
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
+            const SizedBox(width: 48),
+            // Sección derecha - Visual
+            Expanded(
+              flex: 1,
+              child: _buildTabletVisualSection(),
             ),
           ],
         ),
@@ -149,175 +127,352 @@ class _OnboardingPage6State extends State<OnboardingPage6>
     );
   }
 
-  Widget _buildMainContent(bool isTablet, bool isSmallPhone) {
-    return Column(
-      children: [
-        // Icono de perfil y pedidos
-        Container(
-          padding: EdgeInsets.all(isTablet ? 20 : (isSmallPhone ? 12 : 16)),
-          decoration: BoxDecoration(
-            color: ZonixColors.goldenYellow,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: ZonixColors.goldenYellow.withOpacity(0.4),
-                blurRadius: 20,
-                offset: const Offset(0, 8),
-              ),
-            ],
-          ),
-          child: Icon(
-            Icons.person_outline,
-            size: isTablet ? 50 : (isSmallPhone ? 35 : 40),
-            color: ZonixColors.darkBlue,
-          ),
-        ),
-
-        SizedBox(height: isTablet ? 24 : (isSmallPhone ? 16 : 20)),
-
-        // Título principal con tipografía expresiva
-        Text(
-          'Perfil y pedidos',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: isTablet ? 40 : (isSmallPhone ? 26 : 32),
-            fontWeight: FontWeight.w800, // Más audaz
-            color: ZonixColors.pureWhite,
-            height: 1.1,
-            letterSpacing: 1.5, // Más espaciado para expresividad
-            shadows: [
-              Shadow(
-                color: ZonixColors.darkBlue.withOpacity(0.3),
-                offset: const Offset(0, 2),
-                blurRadius: 4,
-              ),
-            ],
-          ),
-        ),
-
-        SizedBox(height: isTablet ? 20 : (isSmallPhone ? 12 : 16)),
-
-        // Mensaje descriptivo con glassmorphism
-        ClipRRect(
-          borderRadius: BorderRadius.circular(24),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-            child: Container(
-              padding: EdgeInsets.all(isTablet ? 24 : (isSmallPhone ? 16 : 20)),
-              decoration: BoxDecoration(
-                color: ZonixColors.glassBackground.withOpacity(0.15),
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(
-                  color: ZonixColors.pureWhite.withOpacity(0.2),
-                  width: 1.5,
-                ),
-                // Efecto neumórfico sutil
-                boxShadow: [
-                  BoxShadow(
-                    color: ZonixColors.neumorphicDark.withOpacity(0.1),
-                    blurRadius: 15,
-                    offset: const Offset(4, 4),
-                  ),
-                  BoxShadow(
-                    color: ZonixColors.neumorphicLight.withOpacity(0.15),
-                    blurRadius: 15,
-                    offset: const Offset(-4, -4),
-                  ),
-                ],
-              ),
-              child: Text(
-                'Administra tus pedidos, datos de envío y pagos en un solo lugar.',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: ZonixColors.pureWhite,
-                  fontSize: isTablet ? 18 : (isSmallPhone ? 13 : 15),
-                  height: 1.6, // Mejor interlineado
-                  fontWeight: FontWeight.w500, // Más peso
-                  letterSpacing: 0.3,
-                  shadows: [
-                    Shadow(
-                      color: ZonixColors.darkBlue.withOpacity(0.2),
-                      offset: const Offset(0, 1),
-                      blurRadius: 2,
-                    ),
-                  ],
-                ),
-              ),
+  Widget _buildProfileIcon() {
+    return Center(
+      child: Container(
+        width: 120,
+        height: 120,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: ZonixColors.primaryBlue.withOpacity(0.1),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
             ),
+          ],
+        ),
+        child: Container(
+          decoration: BoxDecoration(
+            color: ZonixColors.primaryBlue,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: const Icon(
+            Icons.person_outline,
+            color: Colors.white,
+            size: 60,
           ),
         ),
-      ],
+      ),
     );
   }
 
-  Widget _buildProfileFeatures(bool isTablet, bool isSmallPhone) {
-    return Wrap(
-      spacing: isTablet ? 32 : (isSmallPhone ? 24 : 28),
-      runSpacing: isTablet ? 24 : (isSmallPhone ? 16 : 20),
-      alignment: WrapAlignment.center,
+  Widget _buildMainTitle() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final textScaleFactor = MediaQuery.of(context).textScaleFactor;
+    final isTablet = screenWidth >= 600;
+
+    // Tamaño responsive basado en el dispositivo y escala de texto
+    double baseFontSize = isTablet ? 48.0 : 32.0;
+    double responsiveFontSize = baseFontSize * textScaleFactor;
+
+    return Text(
+      'Perfil y Pedidos',
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        fontSize: responsiveFontSize,
+        fontWeight: FontWeight.w700,
+        color: ZonixColors.darkGray,
+        letterSpacing: -0.5,
+      ),
+    );
+  }
+
+  Widget _buildSubtitle() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final textScaleFactor = MediaQuery.of(context).textScaleFactor;
+    final isTablet = screenWidth >= 600;
+
+    // Tamaño responsive basado en el dispositivo y escala de texto
+    double baseFontSize = isTablet ? 20.0 : 16.0;
+    double responsiveFontSize = baseFontSize * textScaleFactor;
+
+    return Text(
+      'Administra tus pedidos, datos de envío y pagos en un solo lugar.',
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        fontSize: responsiveFontSize,
+        fontWeight: FontWeight.w400,
+        color: ZonixColors.mediumGray,
+        height: 1.5,
+      ),
+    );
+  }
+
+  Widget _buildProfileFeatures() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        _buildProfileFeature(
-          Icons.shopping_bag_outlined,
-          'Pedidos',
-          ZonixColors.goldenYellow,
-          isTablet,
-          isSmallPhone,
-        ),
-        _buildProfileFeature(
-          Icons.local_shipping,
-          'Envío',
-          ZonixColors.brightBlue,
-          isTablet,
-          isSmallPhone,
-        ),
-        _buildProfileFeature(
-          Icons.payment,
-          'Pagos',
-          ZonixColors.pureWhite,
-          isTablet,
-          isSmallPhone,
-        ),
+        _buildFeatureItem(Icons.shopping_bag_outlined, 'Pedidos'),
+        _buildFeatureItem(Icons.local_shipping, 'Envío'),
+        _buildFeatureItem(Icons.payment, 'Pagos'),
       ],
     );
   }
 
-  Widget _buildProfileFeature(IconData icon, String label, Color color,
-      bool isTablet, bool isSmallPhone) {
+  Widget _buildFeatureItem(IconData icon, String label) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final textScaleFactor = MediaQuery.of(context).textScaleFactor;
+    final isTablet = screenWidth >= 600;
+
+    // Tamaños responsive basados en el dispositivo y escala de texto
+    double containerSize = isTablet ? 56.0 : 48.0;
+    double iconSize = isTablet ? 28.0 : 24.0;
+    double baseFontSize = isTablet ? 14.0 : 12.0;
+    double responsiveFontSize = baseFontSize * textScaleFactor;
+
     return Column(
-      mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          padding: EdgeInsets.all(isTablet ? 16 : (isSmallPhone ? 10 : 12)),
+          width: containerSize,
+          height: containerSize,
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(16),
+            color: ZonixColors.lightGray,
+            borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: color.withOpacity(0.3),
+              color: ZonixColors.mediumGray.withOpacity(0.2),
               width: 1,
             ),
-            boxShadow: [
-              BoxShadow(
-                color: color.withOpacity(0.2),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
           ),
           child: Icon(
             icon,
-            color: color,
-            size: isTablet ? 28 : (isSmallPhone ? 20 : 24),
+            color: ZonixColors.primaryBlue,
+            size: iconSize,
           ),
         ),
-        SizedBox(height: isTablet ? 12 : (isSmallPhone ? 6 : 8)),
+        const SizedBox(height: 8),
         Text(
           label,
           style: TextStyle(
-            color: ZonixColors.pureWhite,
-            fontSize: isTablet ? 14 : (isSmallPhone ? 10 : 12),
-            fontWeight: FontWeight.w600,
+            fontSize: responsiveFontSize,
+            fontWeight: FontWeight.w500,
+            color: ZonixColors.mediumGray,
           ),
-          textAlign: TextAlign.center,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStats() {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF000000).withOpacity(0.05),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
+        border: Border.all(
+          color: ZonixColors.lightGray,
+          width: 1,
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          _buildStatItem('100%', 'Seguro'),
+          _buildStatItem('24/7', 'Soporte'),
+          _buildStatItem('1-Click', 'Pago'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatItem(String value, String label) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final textScaleFactor = MediaQuery.of(context).textScaleFactor;
+    final isTablet = screenWidth >= 600;
+
+    // Tamaños responsive basados en el dispositivo y escala de texto
+    double valueFontSize = isTablet ? 24.0 : 20.0;
+    double labelFontSize = isTablet ? 14.0 : 12.0;
+    double responsiveValueFontSize = valueFontSize * textScaleFactor;
+    double responsiveLabelFontSize = labelFontSize * textScaleFactor;
+
+    return Column(
+      children: [
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: responsiveValueFontSize,
+            fontWeight: FontWeight.w700,
+            color: ZonixColors.primaryBlue,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: responsiveLabelFontSize,
+            fontWeight: FontWeight.w500,
+            color: ZonixColors.mediumGray,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTabletInfoSection() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Icono de perfil y pedidos
+        Container(
+          width: 150,
+          height: 150,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: ZonixColors.primaryBlue.withOpacity(0.1),
+                blurRadius: 30,
+                offset: const Offset(0, 12),
+              ),
+            ],
+          ),
+          child: Container(
+            decoration: BoxDecoration(
+              color: ZonixColors.primaryBlue,
+              borderRadius: BorderRadius.circular(24),
+            ),
+            child: const Icon(
+              Icons.person_outline,
+              color: Colors.white,
+              size: 80,
+            ),
+          ),
+        ),
+        const SizedBox(height: 40),
+
+        // Título
+        Builder(
+          builder: (context) {
+            final textScaleFactor = MediaQuery.of(context).textScaleFactor;
+            double baseFontSize = 48.0;
+            double responsiveFontSize = baseFontSize * textScaleFactor;
+
+            return Text(
+              'Perfil y Pedidos',
+              style: TextStyle(
+                fontSize: responsiveFontSize,
+                fontWeight: FontWeight.w700,
+                color: ZonixColors.darkGray,
+                letterSpacing: -1,
+              ),
+            );
+          },
+        ),
+        const SizedBox(height: 16),
+
+        // Subtítulo
+        Builder(
+          builder: (context) {
+            final textScaleFactor = MediaQuery.of(context).textScaleFactor;
+            double baseFontSize = 20.0;
+            double responsiveFontSize = baseFontSize * textScaleFactor;
+
+            return Text(
+              'Administra tus pedidos, datos de envío y pagos en un solo lugar.',
+              style: TextStyle(
+                fontSize: responsiveFontSize,
+                fontWeight: FontWeight.w400,
+                color: ZonixColors.mediumGray,
+                height: 1.5,
+              ),
+            );
+          },
+        ),
+        const SizedBox(height: 40),
+
+        // Características
+        _buildTabletFeatures(),
+      ],
+    );
+  }
+
+  Widget _buildTabletVisualSection() {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: ZonixColors.primaryBlue.withOpacity(0.1),
+            blurRadius: 30,
+            offset: const Offset(0, 12),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: Image.asset(
+          'assets/onboarding/onboardingPage7.png',
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return Container(
+              decoration: BoxDecoration(
+                color: ZonixColors.lightGray,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: const Icon(
+                Icons.person_outline,
+                color: ZonixColors.primaryBlue,
+                size: 100,
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTabletFeatures() {
+    return Column(
+      children: [
+        _buildTabletFeatureItem(
+            Icons.shopping_bag_outlined, 'Historial de pedidos'),
+        const SizedBox(height: 16),
+        _buildTabletFeatureItem(Icons.local_shipping, 'Seguimiento de envío'),
+        const SizedBox(height: 16),
+        _buildTabletFeatureItem(Icons.payment, 'Métodos de pago'),
+      ],
+    );
+  }
+
+  Widget _buildTabletFeatureItem(IconData icon, String text) {
+    final textScaleFactor = MediaQuery.of(context).textScaleFactor;
+    double baseFontSize = 16.0;
+    double responsiveFontSize = baseFontSize * textScaleFactor;
+    double iconSize = 20 * textScaleFactor;
+    double containerSize = 40 * textScaleFactor;
+
+    return Row(
+      children: [
+        Container(
+          width: containerSize,
+          height: containerSize,
+          decoration: BoxDecoration(
+            color: ZonixColors.primaryBlue.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(
+            icon,
+            color: ZonixColors.primaryBlue,
+            size: iconSize,
+          ),
+        ),
+        const SizedBox(width: 16),
+        Text(
+          text,
+          style: TextStyle(
+            fontSize: responsiveFontSize,
+            fontWeight: FontWeight.w500,
+            color: ZonixColors.darkGray,
+          ),
         ),
       ],
     );

@@ -30,29 +30,20 @@ class SignInScreenState extends State<SignInScreen>
   late AnimationController _rotateController;
   late AnimationController _fadeController;
   late AnimationController _slideController;
-  late Animation<double> _pulseAnimation;
-  late Animation<double> _rotateAnimation;
-  late Animation<double> _fadeAnimation;
-  late Animation<Offset> _slideAnimation;
   String? _loginError;
   bool _isLoading = false;
 
-  // Paleta de colores Material You vibrante (2025)
-  static const Color seedColor =
-      Color(0xFF6750A4); // Púrpura vibrante como base
-  static const Color primaryBlue = Color(0xFF00356A);
-  static const Color secondaryGold = Color(0xFFFFBE1A);
-  static const Color accentBlue = Color(0xFF0A4A88);
-  static const Color darkBackground = Color(0xFF001A2B);
-  static const Color lightBackground = Color(0xFFFFFFFF);
-  static const Color cardBackground = Color(0xFFF8FAFC);
-  static const Color textPrimary = Color(0xFF1E293B);
-  static const Color textSecondary = Color(0xFF64748B);
-
-  // Colores adicionales para efectos modernos
-  static const Color glassBackground = Color(0x1AFFFFFF);
-  static const Color neumorphicLight = Color(0xFFFFFFFF);
-  static const Color neumorphicDark = Color(0xFFE0E0E0);
+  // Paleta de colores profesional (2025) - Inspirado en Alibaba/AliExpress/Amazon
+  static const Color primaryBlue = Color(0xFF1E40AF); // Azul profesional
+  static const Color secondaryBlue = Color(0xFF3B82F6); // Azul secundario
+  static const Color accentBlue = Color(0xFF60A5FA); // Azul de acento
+  static const Color darkGray = Color(0xFF1E293B); // Gris oscuro
+  static const Color mediumGray = Color(0xFF64748B); // Gris medio
+  static const Color lightGray = Color(0xFFF1F5F9); // Gris claro
+  static const Color white = Color(0xFFFFFFFF); // Blanco
+  static const Color successGreen = Color(0xFF10B981); // Verde éxito
+  static const Color warningOrange = Color(0xFFF59E0B); // Naranja advertencia
+  static const Color errorRed = Color(0xFFEF4444); // Rojo error
 
   @override
   void initState() {
@@ -65,51 +56,22 @@ class SignInScreenState extends State<SignInScreen>
     _pulseController = AnimationController(
       duration: const Duration(seconds: 2),
       vsync: this,
-    )..repeat(reverse: true);
-
+    );
     _rotateController = AnimationController(
       duration: const Duration(seconds: 30),
       vsync: this,
-    )..repeat();
-
+    );
     _fadeController = AnimationController(
       duration: const Duration(milliseconds: 1200),
       vsync: this,
-    )..forward();
-
+    );
     _slideController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
-    )..forward();
+    );
 
-    _pulseAnimation = Tween<double>(
-      begin: 0.9,
-      end: 1.05,
-    ).animate(CurvedAnimation(
-      parent: _pulseController,
-      curve: Curves.easeInOut,
-    ));
-
-    _rotateAnimation = Tween<double>(
-      begin: 0,
-      end: 1,
-    ).animate(_rotateController);
-
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _fadeController,
-      curve: Curves.easeOutCubic,
-    ));
-
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutCubic,
-    ));
+    _fadeController.forward();
+    _slideController.forward();
   }
 
   @override
@@ -245,41 +207,37 @@ class SignInScreenState extends State<SignInScreen>
 
   Widget _buildMobileLayout(BoxConstraints constraints) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      child: FadeTransition(
-        opacity: _fadeAnimation,
-        child: Column(
-          children: [
-            // Header compacto
-            _buildCompactHeader(),
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Spacer(flex: 1),
 
-            const SizedBox(height: 16),
+          // Logo profesional
+          _buildProfessionalLogo(),
+          const SizedBox(height: 32),
 
-            // Error message
-            if (_loginError != null) _buildErrorMessage(),
+          // Título principal
+          _buildMainTitle(),
+          const SizedBox(height: 12),
 
-            // Contenido principal
-            Expanded(
-              child: Column(
-                children: [
-                  // Hero section
-                  Expanded(
-                    flex: 4,
-                    child: _buildMobileHeroSection(),
-                  ),
+          // Subtítulo
+          _buildSubtitle(),
+          const SizedBox(height: 40),
 
-                  const SizedBox(height: 12),
+          // Tarjeta de login
+          _buildLoginCard(),
+          const SizedBox(height: 24),
 
-                  // Auth section
-                  Expanded(
-                    flex: 3,
-                    child: _buildMobileAuthSection(),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+          // Indicadores de confianza
+          _buildTrustIndicators(),
+
+          const Spacer(flex: 1),
+
+          // Footer
+          _buildProfessionalFooter(),
+          const SizedBox(height: 20),
+        ],
       ),
     );
   }
@@ -287,42 +245,22 @@ class SignInScreenState extends State<SignInScreen>
   Widget _buildTabletLayout(BoxConstraints constraints) {
     return Center(
       child: Container(
-        constraints: const BoxConstraints(maxWidth: 800),
-        padding: const EdgeInsets.all(40),
-        child: FadeTransition(
-          opacity: _fadeAnimation,
-          child: Column(
-            children: [
-              // Header para tablet
-              _buildTabletHeader(),
-
-              const SizedBox(height: 40),
-
-              // Error message
-              if (_loginError != null) _buildErrorMessage(),
-
-              // Contenido principal en dos columnas
-              Expanded(
-                child: Row(
-                  children: [
-                    // Columna izquierda - Hero
-                    Expanded(
-                      flex: 1,
-                      child: _buildTabletHeroSection(),
-                    ),
-
-                    const SizedBox(width: 40),
-
-                    // Columna derecha - Auth
-                    Expanded(
-                      flex: 1,
-                      child: _buildTabletAuthSection(),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+        constraints: const BoxConstraints(maxWidth: 1200),
+        padding: const EdgeInsets.all(48),
+        child: Row(
+          children: [
+            // Sección izquierda - Información
+            Expanded(
+              flex: 1,
+              child: _buildTabletInfoSection(),
+            ),
+            const SizedBox(width: 80),
+            // Sección derecha - Login
+            Expanded(
+              flex: 1,
+              child: _buildTabletLoginSection(),
+            ),
+          ],
         ),
       ),
     );
@@ -330,904 +268,612 @@ class SignInScreenState extends State<SignInScreen>
 
   Widget _buildEnhancedBackground() {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
           colors: [
-            darkBackground,
-            primaryBlue,
-            accentBlue,
-            Color(0xFF002D4A),
+            Color(0xFFF8FAFC),
+            Color(0xFFF1F5F9),
           ],
-          stops: [0.0, 0.3, 0.7, 1.0],
         ),
       ),
       child: Stack(
         children: [
-          // Efecto glassmorphism de fondo
-          Positioned.fill(
-            child: ClipRRect(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.transparent,
-                        glassBackground.withOpacity(0.1),
-                        Colors.transparent,
-                      ],
-                    ),
-                  ),
+          // Patrón sutil de fondo
+          _buildSubtlePattern(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSubtlePattern() {
+    return Positioned.fill(
+      child: CustomPaint(
+        painter: SubtlePatternPainter(),
+        size: Size.infinite,
+      ),
+    );
+  }
+
+  Widget _buildProfessionalLogo() {
+    return Center(
+      child: Container(
+        width: 120,
+        height: 120,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF1E40AF).withOpacity(0.1),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: Image.asset(
+            'assets/images/logo_login.png',
+            fit: BoxFit.contain,
+            errorBuilder: (context, error, stackTrace) {
+              return Container(
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1E40AF),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Icon(
+                  Icons.store,
+                  color: Colors.white,
+                  size: 60,
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMainTitle() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final textScaleFactor = MediaQuery.of(context).textScaleFactor;
+    final isTablet = screenWidth >= 600;
+
+    // Tamaño responsive basado en el dispositivo y escala de texto
+    double baseFontSize = isTablet ? 48.0 : 32.0;
+    double responsiveFontSize = baseFontSize * textScaleFactor;
+
+    return Text(
+      'Zonix Imports',
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        fontSize: responsiveFontSize,
+        fontWeight: FontWeight.w700,
+        color: const Color(0xFF1E293B),
+        letterSpacing: -0.5,
+      ),
+    );
+  }
+
+  Widget _buildSubtitle() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final textScaleFactor = MediaQuery.of(context).textScaleFactor;
+    final isTablet = screenWidth >= 600;
+
+    // Tamaño responsive basado en el dispositivo y escala de texto
+    double baseFontSize = isTablet ? 20.0 : 16.0;
+    double responsiveFontSize = baseFontSize * textScaleFactor;
+
+    return Text(
+      'Productos premium desde Estados Unidos',
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        fontSize: responsiveFontSize,
+        fontWeight: FontWeight.w400,
+        color: const Color(0xFF64748B),
+        height: 1.5,
+      ),
+    );
+  }
+
+  Widget _buildLoginCard() {
+    return Container(
+      padding: const EdgeInsets.all(32),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF000000).withOpacity(0.05),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
+        border: Border.all(
+          color: const Color(0xFFE2E8F0),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        children: [
+          Builder(
+            builder: (context) {
+              final screenWidth = MediaQuery.of(context).size.width;
+              final textScaleFactor = MediaQuery.of(context).textScaleFactor;
+              final isTablet = screenWidth >= 600;
+
+              // Tamaño responsive basado en el dispositivo y escala de texto
+              double baseFontSize = isTablet ? 32.0 : 24.0;
+              double responsiveFontSize = baseFontSize * textScaleFactor;
+
+              return Text(
+                'Iniciar Sesión',
+                style: TextStyle(
+                  fontSize: responsiveFontSize,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF1E293B),
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 24),
+
+          // Botón de Google
+          _buildGoogleButton(),
+          const SizedBox(height: 16),
+
+          // Mostrar error si existe
+          if (_loginError != null) ...[
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFEF2F2),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: const Color(0xFFFECACA),
+                  width: 1,
                 ),
               ),
-            ),
-          ),
+              child: Builder(
+                builder: (context) {
+                  final screenWidth = MediaQuery.of(context).size.width;
+                  final textScaleFactor =
+                      MediaQuery.of(context).textScaleFactor;
+                  final isTablet = screenWidth >= 600;
 
-          // Elementos geométricos animados con neumorfismo
-          Positioned(
-            top: -100,
-            right: -100,
-            child: RotationTransition(
-              turns: _rotateAnimation,
-              child: _buildNeumorphicCircle(
-                size: 250,
-                colors: [
-                  secondaryGold.withOpacity(0.15),
-                  secondaryGold.withOpacity(0.08),
-                  Colors.transparent,
-                ],
-                innerMargin: 40,
-                borderColor: secondaryGold.withOpacity(0.3),
-              ),
-            ),
-          ),
+                  // Tamaño responsive basado en el dispositivo y escala de texto
+                  double baseFontSize = isTablet ? 16.0 : 14.0;
+                  double responsiveFontSize = baseFontSize * textScaleFactor;
 
-          Positioned(
-            bottom: -150,
-            left: -150,
-            child: RotationTransition(
-              turns: _rotateAnimation,
-              child: _buildNeumorphicCircle(
-                size: 350,
-                colors: [
-                  lightBackground.withOpacity(0.12),
-                  lightBackground.withOpacity(0.06),
-                  Colors.transparent,
-                ],
-              ),
-            ),
-          ),
-
-          // Patrón de puntos con efectos neumórficos
-          ...List.generate(25, (index) {
-            return Positioned(
-              top: ((index * 50.0) % 800).roundToDouble(),
-              left: ((index * 75.0) % 500).roundToDouble(),
-              child: AnimatedBuilder(
-                animation: _pulseController,
-                builder: (context, child) {
-                  return Transform.scale(
-                    scale: 0.7 + (_pulseAnimation.value * 0.3),
-                    child: _buildNeumorphicDot(
-                      size: 4,
-                      color: secondaryGold.withOpacity(0.6),
+                  return Text(
+                    _loginError!,
+                    style: TextStyle(
+                      fontSize: responsiveFontSize,
+                      color: const Color(0xFFDC2626),
+                      fontWeight: FontWeight.w500,
                     ),
+                    textAlign: TextAlign.center,
                   );
                 },
               ),
-            );
-          }),
+            ),
+            const SizedBox(height: 16),
+          ],
 
-          // Elementos decorativos con glassmorphism
-          Positioned(
-            top: 200,
-            left: 50,
-            child: _buildGlassElement(size: 16, opacity: 0.2),
-          ),
-          Positioned(
-            top: 400,
-            right: 80,
-            child: _buildGlassElement(size: 12, opacity: 0.15),
-          ),
-          Positioned(
-            bottom: 300,
-            left: 100,
-            child: _buildGlassElement(size: 20, opacity: 0.25),
+          // Texto de términos
+          Builder(
+            builder: (context) {
+              final screenWidth = MediaQuery.of(context).size.width;
+              final textScaleFactor = MediaQuery.of(context).textScaleFactor;
+              final isTablet = screenWidth >= 600;
+
+              // Tamaño responsive basado en el dispositivo y escala de texto
+              double baseFontSize = isTablet ? 14.0 : 12.0;
+              double responsiveFontSize = baseFontSize * textScaleFactor;
+
+              return Text(
+                'Al continuar aceptas nuestros términos de servicio',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: responsiveFontSize,
+                  color: const Color(0xFF64748B),
+                  height: 1.4,
+                ),
+              );
+            },
           ),
         ],
       ),
     );
   }
 
-  // Método para crear círculos neumórficos
-  Widget _buildNeumorphicCircle({
-    required double size,
-    required List<Color> colors,
-    double innerMargin = 0,
-    Color? borderColor,
-  }) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: RadialGradient(colors: colors),
-        boxShadow: [
-          // Sombra externa (neumorfismo)
-          BoxShadow(
-            color: neumorphicDark.withOpacity(0.3),
-            blurRadius: 20,
-            offset: const Offset(8, 8),
-          ),
-          BoxShadow(
-            color: neumorphicLight.withOpacity(0.2),
-            blurRadius: 20,
-            offset: const Offset(-8, -8),
-          ),
-        ],
-      ),
-      child: innerMargin > 0
-          ? Container(
-              margin: EdgeInsets.all(innerMargin),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: borderColor != null
-                    ? Border.all(color: borderColor, width: 1)
-                    : null,
+  Widget _buildGoogleButton() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final textScaleFactor = MediaQuery.of(context).textScaleFactor;
+    final isTablet = screenWidth >= 600;
+
+    // Tamaño responsive basado en el dispositivo y escala de texto
+    double baseFontSize = isTablet ? 18.0 : 16.0;
+    double responsiveFontSize = baseFontSize * textScaleFactor;
+    double buttonHeight = isTablet ? 64.0 : 56.0;
+    double iconSize = 20 * textScaleFactor;
+
+    return SizedBox(
+      width: double.infinity,
+      height: buttonHeight,
+      child: ElevatedButton.icon(
+        onPressed: _isLoading ? null : _handleSignIn,
+        icon: _isLoading
+            ? SizedBox(
+                width: iconSize,
+                height: iconSize,
+                child: const CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              )
+            : Image.asset(
+                'assets/images/google_logo.png',
+                width: iconSize,
+                height: iconSize,
+                errorBuilder: (context, error, stackTrace) {
+                  return Icon(
+                    Icons.login,
+                    color: Colors.white,
+                    size: iconSize,
+                  );
+                },
               ),
-            )
-          : null,
-    );
-  }
-
-  // Método para crear puntos neumórficos
-  Widget _buildNeumorphicDot({required double size, required Color color}) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: color,
-        boxShadow: [
-          BoxShadow(
-            color: neumorphicDark.withOpacity(0.4),
-            blurRadius: 8,
-            offset: const Offset(3, 3),
+        label: Text(
+          _isLoading ? 'Iniciando sesión...' : 'Continuar con Google',
+          style: TextStyle(
+            fontSize: responsiveFontSize,
+            fontWeight: FontWeight.w500,
+            color: Colors.white,
           ),
-          BoxShadow(
-            color: neumorphicLight.withOpacity(0.3),
-            blurRadius: 8,
-            offset: const Offset(-3, -3),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF1E40AF),
+          foregroundColor: Colors.white,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
           ),
-        ],
+        ),
       ),
     );
   }
 
-  // Método para crear elementos glassmorphism
-  Widget _buildGlassElement({required double size, required double opacity}) {
-    return AnimatedBuilder(
-      animation: _pulseController,
-      builder: (context, child) {
-        return Transform.scale(
-          scale: 0.8 + (_pulseAnimation.value * 0.2),
+  Widget _buildTrustIndicators() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        _buildTrustItem(Icons.security, 'Seguro'),
+        _buildTrustItem(Icons.local_shipping, 'Envío rápido'),
+        _buildTrustItem(Icons.support_agent, 'Soporte 24/7'),
+      ],
+    );
+  }
+
+  Widget _buildTrustItem(IconData icon, String label) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final textScaleFactor = MediaQuery.of(context).textScaleFactor;
+    final isTablet = screenWidth >= 600;
+
+    // Tamaños responsive basados en el dispositivo y escala de texto
+    double containerSize = isTablet ? 56.0 : 48.0;
+    double iconSize = isTablet ? 28.0 : 24.0;
+    double baseFontSize = isTablet ? 14.0 : 12.0;
+    double responsiveFontSize = baseFontSize * textScaleFactor;
+
+    return Column(
+      children: [
+        Container(
+          width: containerSize,
+          height: containerSize,
+          decoration: BoxDecoration(
+            color: const Color(0xFFF1F5F9),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: const Color(0xFFE2E8F0),
+              width: 1,
+            ),
+          ),
+          child: Icon(
+            icon,
+            color: const Color(0xFF1E40AF),
+            size: iconSize,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: responsiveFontSize,
+            fontWeight: FontWeight.w500,
+            color: const Color(0xFF64748B),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildProfessionalFooter() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final textScaleFactor = MediaQuery.of(context).textScaleFactor;
+    final isTablet = screenWidth >= 600;
+
+    // Tamaño responsive basado en el dispositivo y escala de texto
+    double baseFontSize = isTablet ? 14.0 : 12.0;
+    double responsiveFontSize = baseFontSize * textScaleFactor;
+
+    return Text(
+      '© 2025 Zonix Imports. Todos los derechos reservados.',
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        fontSize: responsiveFontSize,
+        color: const Color(0xFF94A3B8),
+      ),
+    );
+  }
+
+  Widget _buildTabletInfoSection() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Logo
+        Container(
+          width: 150,
+          height: 150,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF1E40AF).withOpacity(0.1),
+                blurRadius: 30,
+                offset: const Offset(0, 12),
+              ),
+            ],
+          ),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(size / 2),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-              child: Container(
-                width: size,
-                height: size,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: RadialGradient(
-                    colors: [
-                      glassBackground.withOpacity(opacity),
-                      glassBackground.withOpacity(opacity * 0.5),
-                      Colors.transparent,
-                    ],
+            borderRadius: BorderRadius.circular(24),
+            child: Image.asset(
+              'assets/images/logo_login.png',
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1E40AF),
+                    borderRadius: BorderRadius.circular(24),
                   ),
+                  child: const Icon(
+                    Icons.store,
+                    color: Colors.white,
+                    size: 80,
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+        const SizedBox(height: 40),
+
+        // Título
+        Builder(
+          builder: (context) {
+            final textScaleFactor = MediaQuery.of(context).textScaleFactor;
+            double baseFontSize = 48.0;
+            double responsiveFontSize = baseFontSize * textScaleFactor;
+
+            return Text(
+              'Zonix Imports',
+              style: TextStyle(
+                fontSize: responsiveFontSize,
+                fontWeight: FontWeight.w700,
+                color: const Color(0xFF1E293B),
+                letterSpacing: -1,
+              ),
+            );
+          },
+        ),
+        const SizedBox(height: 16),
+
+        // Subtítulo
+        Builder(
+          builder: (context) {
+            final textScaleFactor = MediaQuery.of(context).textScaleFactor;
+            double baseFontSize = 20.0;
+            double responsiveFontSize = baseFontSize * textScaleFactor;
+
+            return Text(
+              'Productos premium desde Estados Unidos',
+              style: TextStyle(
+                fontSize: responsiveFontSize,
+                fontWeight: FontWeight.w400,
+                color: const Color(0xFF64748B),
+                height: 1.5,
+              ),
+            );
+          },
+        ),
+        const SizedBox(height: 40),
+
+        // Características
+        _buildFeatureList(),
+      ],
+    );
+  }
+
+  Widget _buildFeatureList() {
+    return Column(
+      children: [
+        _buildFeatureItem(Icons.verified, 'Productos verificados'),
+        const SizedBox(height: 16),
+        _buildFeatureItem(Icons.speed, 'Envío rápido y seguro'),
+        const SizedBox(height: 16),
+        _buildFeatureItem(Icons.support_agent, 'Soporte 24/7'),
+      ],
+    );
+  }
+
+  Widget _buildFeatureItem(IconData icon, String text) {
+    final textScaleFactor = MediaQuery.of(context).textScaleFactor;
+    double baseFontSize = 16.0;
+    double responsiveFontSize = baseFontSize * textScaleFactor;
+    double iconSize = 20 * textScaleFactor;
+    double containerSize = 40 * textScaleFactor;
+
+    return Row(
+      children: [
+        Container(
+          width: containerSize,
+          height: containerSize,
+          decoration: BoxDecoration(
+            color: const Color(0xFF1E40AF).withOpacity(0.1),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(
+            icon,
+            color: const Color(0xFF1E40AF),
+            size: iconSize,
+          ),
+        ),
+        const SizedBox(width: 16),
+        Text(
+          text,
+          style: TextStyle(
+            fontSize: responsiveFontSize,
+            fontWeight: FontWeight.w500,
+            color: const Color(0xFF1E293B),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTabletLoginSection() {
+    return Center(
+      child: Container(
+        width: 400,
+        padding: const EdgeInsets.all(40),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF000000).withOpacity(0.05),
+              blurRadius: 30,
+              offset: const Offset(0, 8),
+            ),
+          ],
+          border: Border.all(
+            color: const Color(0xFFE2E8F0),
+            width: 1,
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Builder(
+              builder: (context) {
+                final textScaleFactor = MediaQuery.of(context).textScaleFactor;
+                double baseFontSize = 28.0;
+                double responsiveFontSize = baseFontSize * textScaleFactor;
+
+                return Text(
+                  'Iniciar Sesión',
+                  style: TextStyle(
+                    fontSize: responsiveFontSize,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF1E293B),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 32),
+
+            // Botón de Google
+            _buildGoogleButton(),
+            const SizedBox(height: 24),
+
+            // Mostrar error si existe
+            if (_loginError != null) ...[
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFEF2F2),
+                  borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: lightBackground.withOpacity(0.2),
+                    color: const Color(0xFFFECACA),
                     width: 1,
                   ),
                 ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
+                child: Builder(
+                  builder: (context) {
+                    final textScaleFactor =
+                        MediaQuery.of(context).textScaleFactor;
+                    double baseFontSize = 14.0;
+                    double responsiveFontSize = baseFontSize * textScaleFactor;
 
-  Widget _buildErrorMessage() {
-    return SlideTransition(
-      position: _slideAnimation,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 20),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: Colors.red.shade50,
-          border: Border.all(color: Colors.red.shade200),
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.red.withOpacity(0.1),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Icon(
-              Icons.error_outline,
-              color: Colors.red.shade600,
-              size: 20,
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                _loginError!,
-                style: TextStyle(
-                  color: Colors.red.shade700,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCompactHeader() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              TimeOfDay.now().format(context),
-              style: const TextStyle(
-                color: lightBackground,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              'Importaciones globales',
-              style: TextStyle(
-                color: secondaryGold,
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                letterSpacing: 0.5,
-              ),
-            ),
-          ],
-        ),
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: lightBackground.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: secondaryGold.withOpacity(0.3),
-              width: 1,
-            ),
-          ),
-          child: Image.asset(
-            'assets/images/logo_login.png',
-            width: 60,
-            height: 60,
-            fit: BoxFit.contain,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTabletHeader() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              TimeOfDay.now().format(context),
-              style: const TextStyle(
-                color: lightBackground,
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Importaciones globales',
-              style: TextStyle(
-                color: secondaryGold,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                letterSpacing: 0.5,
-              ),
-            ),
-          ],
-        ),
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: lightBackground.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: secondaryGold.withOpacity(0.3),
-              width: 1,
-            ),
-          ),
-          child: Image.asset(
-            'assets/images/logo_login.png',
-            width: 80,
-            height: 80,
-            fit: BoxFit.contain,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildMobileHeroSection() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Logo principal con animación
-          ScaleTransition(
-            scale: _pulseAnimation,
-            child: Image.asset(
-              'assets/images/logo_login2.png',
-              width: 421.875,
-              height: 175.5,
-              fit: BoxFit.contain,
-            ),
-          ),
-
-          const SizedBox(height: 20),
-
-          // Mensaje principal
-          Text(
-            'El mundo en tus manos',
-            style: const TextStyle(
-              color: lightBackground,
-              fontSize: 24,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 0.5,
-            ),
-          ),
-
-          const SizedBox(height: 8),
-
-          Text(
-            'Productos únicos desde cualquier lugar del mundo',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: lightBackground.withOpacity(0.8),
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-              height: 1.3,
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // Íconos de productos
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: secondaryGold.withOpacity(0.15),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: secondaryGold.withOpacity(0.3),
-                width: 1,
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: const [
-                Text('📱', style: TextStyle(fontSize: 18)),
-                SizedBox(width: 10),
-                Text('🎧', style: TextStyle(fontSize: 18)),
-                SizedBox(width: 10),
-                Text('⌚', style: TextStyle(fontSize: 18)),
-                SizedBox(width: 10),
-                Text('💻', style: TextStyle(fontSize: 18)),
-                SizedBox(width: 10),
-                Text('🎮', style: TextStyle(fontSize: 18)),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTabletHeroSection() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Logo principal más grande para tablet
-          ScaleTransition(
-            scale: _pulseAnimation,
-            child: Image.asset(
-              'assets/images/logo_login2.png',
-              width: 703.125,
-              height: 316.125,
-              fit: BoxFit.contain,
-            ),
-          ),
-
-          const SizedBox(height: 40),
-
-          // Mensaje principal para tablet
-          Text(
-            'El mundo en tus manos',
-            style: const TextStyle(
-              color: lightBackground,
-              fontSize: 36,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 0.5,
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          Text(
-            'Productos únicos desde cualquier lugar del mundo',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: lightBackground.withOpacity(0.8),
-              fontSize: 18,
-              fontWeight: FontWeight.w400,
-              height: 1.4,
-            ),
-          ),
-
-          const SizedBox(height: 32),
-
-          // Íconos de productos para tablet
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-            decoration: BoxDecoration(
-              color: secondaryGold.withOpacity(0.15),
-              borderRadius: BorderRadius.circular(30),
-              border: Border.all(
-                color: secondaryGold.withOpacity(0.3),
-                width: 1,
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: const [
-                Text('📱', style: TextStyle(fontSize: 24)),
-                SizedBox(width: 16),
-                Text('🎧', style: TextStyle(fontSize: 24)),
-                SizedBox(width: 16),
-                Text('⌚', style: TextStyle(fontSize: 24)),
-                SizedBox(width: 16),
-                Text('💻', style: TextStyle(fontSize: 24)),
-                SizedBox(width: 16),
-                Text('🎮', style: TextStyle(fontSize: 24)),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMobileAuthSection() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        // Estadísticas de confianza
-        Container(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _buildTrustIndicator('🌍', '50+', 'Países'),
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 8),
-                width: 1,
-                height: 25,
-                decoration: BoxDecoration(
-                  color: secondaryGold.withOpacity(0.4),
-                  borderRadius: BorderRadius.circular(1),
-                ),
-              ),
-              _buildTrustIndicator('📦', '10K+', 'Productos'),
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 8),
-                width: 1,
-                height: 25,
-                decoration: BoxDecoration(
-                  color: secondaryGold.withOpacity(0.4),
-                  borderRadius: BorderRadius.circular(1),
-                ),
-              ),
-              _buildTrustIndicator('⭐', '4.8', 'Rating'),
-            ],
-          ),
-        ),
-
-        // Botón de Google mejorado
-        _buildGoogleSignInButton(),
-
-        // Garantías de seguridad
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          decoration: BoxDecoration(
-            color: lightBackground.withOpacity(0.05),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: lightBackground.withOpacity(0.1),
-              width: 1,
-            ),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.security,
-                color: secondaryGold,
-                size: 14,
-              ),
-              const SizedBox(width: 4),
-              Flexible(
-                child: Text(
-                  'Compras seguras • Envío garantizado • Soporte 24/7',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: lightBackground.withOpacity(0.9),
-                    fontSize: 10,
-                    fontWeight: FontWeight.w500,
-                    height: 1.1,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        // Términos legales
-        Text(
-          'Al continuar aceptas nuestros términos de servicio y política de privacidad',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: lightBackground.withOpacity(0.6),
-            fontSize: 8,
-            height: 1.2,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTabletAuthSection() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        // Estadísticas de confianza para tablet
-        Container(
-          padding: const EdgeInsets.symmetric(vertical: 24),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _buildTrustIndicator('🌍', '50+', 'Países', isTablet: true),
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 20),
-                width: 3,
-                height: 50,
-                decoration: BoxDecoration(
-                  color: secondaryGold.withOpacity(0.4),
-                  borderRadius: BorderRadius.circular(1),
-                ),
-              ),
-              _buildTrustIndicator('📦', '10K+', 'Productos', isTablet: true),
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 20),
-                width: 3,
-                height: 50,
-                decoration: BoxDecoration(
-                  color: secondaryGold.withOpacity(0.4),
-                  borderRadius: BorderRadius.circular(1),
-                ),
-              ),
-              _buildTrustIndicator('⭐', '4.8', 'Rating', isTablet: true),
-            ],
-          ),
-        ),
-
-        const SizedBox(height: 32),
-
-        // Botón de Google para tablet
-        _buildGoogleSignInButton(isTablet: true),
-
-        const SizedBox(height: 24),
-
-        // Garantías de seguridad para tablet
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          decoration: BoxDecoration(
-            color: lightBackground.withOpacity(0.05),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: lightBackground.withOpacity(0.1),
-              width: 1,
-            ),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.security,
-                color: secondaryGold,
-                size: 20,
-              ),
-              const SizedBox(width: 12),
-              Flexible(
-                child: Text(
-                  'Compras seguras • Envío garantizado • Soporte 24/7',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: lightBackground.withOpacity(0.9),
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    height: 1.3,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        const SizedBox(height: 20),
-
-        // Términos legales para tablet
-        Text(
-          'Al continuar aceptas nuestros términos de servicio y política de privacidad',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: lightBackground.withOpacity(0.6),
-            fontSize: 12,
-            height: 1.4,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildGoogleSignInButton({bool isTablet = false}) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      width: isTablet ? 400 : double.infinity,
-      height: isTablet ? 72 : 56,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(isTablet ? 20 : 16),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            lightBackground,
-            lightBackground.withOpacity(0.95),
-          ],
-        ),
-        // Efecto neumórfico sutil
-        boxShadow: [
-          BoxShadow(
-            color: neumorphicDark.withOpacity(0.2),
-            blurRadius: isTablet ? 20 : 15,
-            offset: const Offset(6, 6),
-          ),
-          BoxShadow(
-            color: neumorphicLight.withOpacity(0.3),
-            blurRadius: isTablet ? 20 : 15,
-            offset: const Offset(-6, -6),
-          ),
-          // Sombra de elevación adicional
-          BoxShadow(
-            color: secondaryGold.withOpacity(0.3),
-            blurRadius: isTablet ? 25 : 18,
-            offset: const Offset(0, 8),
-            spreadRadius: 0,
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(isTablet ? 20 : 16),
-        child: InkWell(
-          onTap: _isLoading ? null : _handleSignIn,
-          borderRadius: BorderRadius.circular(isTablet ? 20 : 16),
-          splashColor: secondaryGold.withOpacity(0.1),
-          highlightColor: secondaryGold.withOpacity(0.05),
-          child: Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: isTablet ? 24 : 20,
-              vertical: isTablet ? 16 : 12,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (_isLoading) ...[
-                  SizedBox(
-                    width: isTablet ? 28 : 20,
-                    height: isTablet ? 28 : 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2.5,
-                      valueColor: AlwaysStoppedAnimation<Color>(primaryBlue),
-                    ),
-                  ),
-                  SizedBox(width: isTablet ? 16 : 12),
-                ] else ...[
-                  // Contenedor neumórfico para el ícono
-                  Container(
-                    padding: EdgeInsets.all(isTablet ? 12 : 10),
-                    decoration: BoxDecoration(
-                      color: primaryBlue.withOpacity(0.08),
-                      borderRadius: BorderRadius.circular(isTablet ? 14 : 12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: neumorphicDark.withOpacity(0.1),
-                          blurRadius: 8,
-                          offset: const Offset(2, 2),
-                        ),
-                        BoxShadow(
-                          color: neumorphicLight.withOpacity(0.2),
-                          blurRadius: 8,
-                          offset: const Offset(-2, -2),
-                        ),
-                      ],
-                    ),
-                    child: Image.asset(
-                      'assets/images/google_logo.png',
-                      height: isTablet ? 32 : 24,
-                      width: isTablet ? 32 : 24,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Icon(
-                          Icons.shopping_bag_outlined,
-                          size: isTablet ? 32 : 24,
-                          color: primaryBlue,
-                        );
-                      },
-                    ),
-                  ),
-                  SizedBox(width: isTablet ? 16 : 12),
-                ],
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        _isLoading ? 'INICIANDO...' : 'COMENZAR COMPRAS',
-                        style: TextStyle(
-                          fontSize: isTablet ? 16 : 14,
-                          fontWeight: FontWeight.w800,
-                          color: primaryBlue,
-                          letterSpacing: 0.8,
-                          height: 1.1,
-                        ),
+                    return Text(
+                      _loginError!,
+                      style: TextStyle(
+                        fontSize: responsiveFontSize,
+                        color: const Color(0xFFDC2626),
+                        fontWeight: FontWeight.w500,
                       ),
-                      if (!_isLoading) ...[
-                        const SizedBox(height: 2),
-                        Text(
-                          'Con Google',
-                          style: TextStyle(
-                            fontSize: isTablet ? 12 : 10,
-                            fontWeight: FontWeight.w500,
-                            color: primaryBlue.withOpacity(0.7),
-                            letterSpacing: 0.3,
-                            height: 1.0,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
+                      textAlign: TextAlign.center,
+                    );
+                  },
                 ),
-              ],
+              ),
+              const SizedBox(height: 24),
+            ],
+
+            // Texto de términos
+            Builder(
+              builder: (context) {
+                final textScaleFactor = MediaQuery.of(context).textScaleFactor;
+                double baseFontSize = 14.0;
+                double responsiveFontSize = baseFontSize * textScaleFactor;
+
+                return Text(
+                  'Al continuar aceptas nuestros términos de servicio y política de privacidad',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: responsiveFontSize,
+                    color: const Color(0xFF64748B),
+                    height: 1.4,
+                  ),
+                );
+              },
             ),
-          ),
+          ],
         ),
       ),
     );
+  }
+}
+
+// Clase para pintar el patrón sutil
+class SubtlePatternPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = const Color(0xFFE2E8F0).withOpacity(0.3)
+      ..style = PaintingStyle.fill;
+
+    // Dibujar puntos sutiles
+    for (int i = 0; i < 100; i++) {
+      final x = (i * 73) % size.width;
+      final y = (i * 97) % size.height;
+
+      canvas.drawCircle(Offset(x, y), 1, paint);
+    }
   }
 
-  Widget _buildTrustIndicator(String emoji, String number, String label,
-      {bool isTablet = false}) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      padding: EdgeInsets.symmetric(
-        horizontal: isTablet ? 16 : 12,
-        vertical: isTablet ? 12 : 8,
-      ),
-      decoration: BoxDecoration(
-        color: glassBackground.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(isTablet ? 16 : 12),
-        border: Border.all(
-          color: lightBackground.withOpacity(0.2),
-          width: 1,
-        ),
-        // Efecto glassmorphism sutil
-        boxShadow: [
-          BoxShadow(
-            color: neumorphicDark.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(2, 2),
-          ),
-          BoxShadow(
-            color: neumorphicLight.withOpacity(0.15),
-            blurRadius: 8,
-            offset: const Offset(-2, -2),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Contenedor neumórfico para el emoji
-          Container(
-            padding: EdgeInsets.all(isTablet ? 8 : 6),
-            decoration: BoxDecoration(
-              color: secondaryGold.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(isTablet ? 12 : 8),
-              boxShadow: [
-                BoxShadow(
-                  color: neumorphicDark.withOpacity(0.08),
-                  blurRadius: 6,
-                  offset: const Offset(1, 1),
-                ),
-                BoxShadow(
-                  color: neumorphicLight.withOpacity(0.12),
-                  blurRadius: 6,
-                  offset: const Offset(-1, -1),
-                ),
-              ],
-            ),
-            child: Text(
-              emoji,
-              style: TextStyle(fontSize: isTablet ? 28 : 20),
-            ),
-          ),
-          SizedBox(height: isTablet ? 8 : 6),
-          Text(
-            number,
-            style: TextStyle(
-              color: secondaryGold,
-              fontSize: isTablet ? 20 : 16,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 0.5,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            label,
-            style: TextStyle(
-              color: lightBackground.withOpacity(0.9),
-              fontSize: isTablet ? 12 : 10,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.3,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

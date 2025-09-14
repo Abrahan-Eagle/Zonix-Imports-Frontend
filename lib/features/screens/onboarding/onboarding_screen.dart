@@ -13,16 +13,18 @@ import 'package:provider/provider.dart';
 import 'package:zonix/features/utils/user_provider.dart';
 import 'dart:ui';
 
-// Paleta de colores Material You vibrante (2025)
+// Paleta de colores profesional (2025) - Inspirado en Alibaba/AliExpress/Amazon
 class ZonixColors {
-  static const Color seedColor =
-      Color(0xFF6750A4); // Púrpura vibrante como base
-  static const Color darkBlue = Color(0xFF0C2D57); // Azul Oscuro (Principal)
-  static const Color goldenYellow =
-      Color(0xFFFFB400); // Amarillo Dorado (Secundario)
-  static const Color brightBlue = Color(0xFF1E90FF); // Azul Brillante (Soporte)
-  static const Color pureWhite = Color(0xFFFFFFFF); // Blanco Puro (Neutral)
-  static const Color lightGray = Color(0xFFE5E5E5); // Gris Claro (Soporte)
+  static const Color primaryBlue = Color(0xFF1E40AF); // Azul profesional
+  static const Color secondaryBlue = Color(0xFF3B82F6); // Azul secundario
+  static const Color accentBlue = Color(0xFF60A5FA); // Azul de acento
+  static const Color darkGray = Color(0xFF1E293B); // Gris oscuro
+  static const Color mediumGray = Color(0xFF64748B); // Gris medio
+  static const Color lightGray = Color(0xFFF1F5F9); // Gris claro
+  static const Color white = Color(0xFFFFFFFF); // Blanco
+  static const Color successGreen = Color(0xFF10B981); // Verde éxito
+  static const Color warningOrange = Color(0xFFF59E0B); // Naranja advertencia
+  static const Color errorRed = Color(0xFFEF4444); // Rojo error
 
   // Colores adicionales para efectos modernos
   static const Color glassBackground = Color(0x1AFFFFFF);
@@ -213,16 +215,8 @@ class OnboardingScreenState extends State<OnboardingScreen>
               right: 0,
               child: SafeArea(
                 child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.transparent,
-                        ZonixColors.darkBlue.withOpacity(0.8),
-                        ZonixColors.darkBlue.withOpacity(0.95),
-                      ],
-                    ),
+                  decoration: const BoxDecoration(
+                    color: Colors.transparent,
                   ),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
@@ -246,9 +240,9 @@ class OnboardingScreenState extends State<OnboardingScreen>
                                 effect: ExpandingDotsEffect(
                                   dotHeight: 8,
                                   dotWidth: 8,
-                                  activeDotColor: ZonixColors.goldenYellow,
+                                  activeDotColor: ZonixColors.primaryBlue,
                                   dotColor:
-                                      ZonixColors.pureWhite.withOpacity(0.3),
+                                      ZonixColors.mediumGray.withOpacity(0.3),
                                   spacing: 12,
                                   expansionFactor: 4,
                                   radius: 16,
@@ -313,7 +307,7 @@ class OnboardingScreenState extends State<OnboardingScreen>
                   color: ZonixColors.glassBackground.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: ZonixColors.pureWhite.withOpacity(0.3),
+                    color: ZonixColors.mediumGray.withOpacity(0.2),
                     width: 1,
                   ),
                   boxShadow: [
@@ -337,7 +331,7 @@ class OnboardingScreenState extends State<OnboardingScreen>
                     child: Text(
                       text,
                       style: TextStyle(
-                        color: ZonixColors.pureWhite,
+                        color: ZonixColors.darkGray,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         letterSpacing: 0.5,
@@ -364,7 +358,7 @@ class OnboardingScreenState extends State<OnboardingScreen>
             width: 64,
             height: 64,
             decoration: BoxDecoration(
-              color: ZonixColors.goldenYellow,
+              color: ZonixColors.white,
               borderRadius: BorderRadius.circular(20),
               // Efecto neumórfico prominente
               boxShadow: [
@@ -380,7 +374,7 @@ class OnboardingScreenState extends State<OnboardingScreen>
                 ),
                 // Sombra de elevación adicional
                 BoxShadow(
-                  color: ZonixColors.goldenYellow.withOpacity(0.4),
+                  color: ZonixColors.primaryBlue.withOpacity(0.2),
                   blurRadius: 20,
                   offset: const Offset(0, 8),
                   spreadRadius: 0,
@@ -393,15 +387,15 @@ class OnboardingScreenState extends State<OnboardingScreen>
               child: InkWell(
                 onTap: _handleNext,
                 borderRadius: BorderRadius.circular(20),
-                splashColor: ZonixColors.darkBlue.withOpacity(0.1),
-                highlightColor: ZonixColors.darkBlue.withOpacity(0.05),
+                splashColor: ZonixColors.primaryBlue.withOpacity(0.1),
+                highlightColor: ZonixColors.primaryBlue.withOpacity(0.05),
                 child: Center(
                   child: _isLoading
                       ? SizedBox(
                           width: 24,
                           height: 24,
                           child: CircularProgressIndicator(
-                            color: ZonixColors.darkBlue,
+                            color: ZonixColors.primaryBlue,
                             strokeWidth: 2.5,
                           ),
                         )
@@ -409,7 +403,7 @@ class OnboardingScreenState extends State<OnboardingScreen>
                           _currentPage == onboardingPages.length - 1
                               ? Icons.check_rounded
                               : Icons.arrow_forward_rounded,
-                          color: ZonixColors.darkBlue,
+                          color: ZonixColors.primaryBlue,
                           size: 28,
                         ),
                 ),
@@ -427,193 +421,86 @@ class WelcomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            ZonixColors.darkBlue, // Azul oscuro arriba
-            Color(0xFF1A3A5C), // Azul medio
-            Color(0xFF2A4A6C), // Azul más claro abajo
-          ],
-          stops: [0.0, 0.6, 1.0],
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth >= 600;
+
+    return Scaffold(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              ZonixColors.lightGray,
+              ZonixColors.white,
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              if (isTablet) {
+                return _buildTabletLayout(constraints);
+              } else {
+                return _buildMobileLayout(constraints);
+              }
+            },
+          ),
         ),
       ),
-      child: SafeArea(
-        child: Stack(
+    );
+  }
+
+  Widget _buildMobileLayout(BoxConstraints constraints) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Spacer(flex: 1),
+
+          // Logo profesional
+          _buildProfessionalLogo(),
+          const SizedBox(height: 32),
+
+          // Título principal
+          _buildMainTitle(),
+          const SizedBox(height: 12),
+
+          // Subtítulo
+          _buildSubtitle(),
+          const SizedBox(height: 40),
+
+          // Características destacadas
+          _buildFeatures(),
+          const SizedBox(height: 40),
+
+          // Estadísticas
+          _buildStats(),
+
+          const Spacer(flex: 1),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTabletLayout(BoxConstraints constraints) {
+    return Center(
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 1200),
+        padding: const EdgeInsets.all(48),
+        child: Row(
           children: [
-            // Imagen de fondo con overlay
-            Positioned.fill(
-              child: Container(
-                decoration: BoxDecoration(
-                  image: const DecorationImage(
-                    image: AssetImage('assets/onboarding/onboardingPage1.png'),
-                    fit: BoxFit.cover,
-                  ),
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      ZonixColors.darkBlue.withOpacity(0.7),
-                      ZonixColors.darkBlue.withOpacity(0.4),
-                      ZonixColors.darkBlue.withOpacity(0.8),
-                    ],
-                    stops: const [0.0, 0.5, 1.0],
-                  ),
-                ),
-              ),
+            // Sección izquierda - Información
+            Expanded(
+              flex: 1,
+              child: _buildTabletInfoSection(),
             ),
-
-            // Contenido principal
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Espaciado superior flexible
-                  const Spacer(flex: 2),
-
-                  // Logo/Brand Zonix Imports
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: ZonixColors.pureWhite.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: ZonixColors.goldenYellow.withOpacity(0.3),
-                        width: 2,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: ZonixColors.goldenYellow.withOpacity(0.2),
-                          blurRadius: 20,
-                          spreadRadius: 2,
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        // Icono de caja/importación
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: ZonixColors.goldenYellow,
-                            borderRadius: BorderRadius.circular(15),
-                            boxShadow: [
-                              BoxShadow(
-                                color:
-                                    ZonixColors.goldenYellow.withOpacity(0.4),
-                                blurRadius: 15,
-                                offset: const Offset(0, 5),
-                              ),
-                            ],
-                          ),
-                          child: const Icon(
-                            Icons.inventory_2_outlined,
-                            size: 40,
-                            color: ZonixColors.darkBlue,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'ZONIX',
-                          style: Theme.of(context)
-                              .textTheme
-                              .headlineLarge
-                              ?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 32,
-                                color: ZonixColors.pureWhite,
-                                letterSpacing: 2,
-                              ),
-                        ),
-                        Text(
-                          'IMPORTS',
-                          style: Theme.of(context)
-                              .textTheme
-                              .headlineMedium
-                              ?.copyWith(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 18,
-                                color: ZonixColors.goldenYellow,
-                                letterSpacing: 1,
-                              ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 40),
-
-                  // Mensaje de bienvenida
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 16),
-                    decoration: BoxDecoration(
-                      color: ZonixColors.pureWhite.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: ZonixColors.brightBlue.withOpacity(0.3),
-                        width: 1,
-                      ),
-                    ),
-                    child: Text(
-                      '¡Bienvenido a Zonix Imports!\nDonde lo que imaginas, lo traemos hasta tus manos.',
-                      textAlign: TextAlign.center,
-                      style:
-                          Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 20,
-                                color: ZonixColors.pureWhite,
-                                height: 1.4,
-                              ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 36),
-
-                  // Elementos de confianza
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 20, horizontal: 16),
-                    decoration: BoxDecoration(
-                      color: ZonixColors.pureWhite.withOpacity(0.05),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: ZonixColors.lightGray.withOpacity(0.2),
-                        width: 1,
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        _buildTrustElement('📦', 'Importación\nGlobal'),
-                        _buildTrustElement('⚡', 'Entrega\nRápida'),
-                        _buildTrustElement('🛡️', 'Confianza\nTotal'),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 32),
-
-                  // Descripción adicional
-                  Text(
-                    'Conectamos el mundo con Venezuela\n🌍 Tu puerta de entrada a productos únicos',
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: ZonixColors.pureWhite.withOpacity(0.8),
-                          fontSize: 16,
-                          height: 1.5,
-                          fontWeight: FontWeight.w400,
-                        ),
-                  ),
-
-                  // Espaciado inferior flexible
-                  const Spacer(flex: 2),
-                ],
-              ),
+            const SizedBox(width: 48),
+            // Sección derecha - Visual
+            Expanded(
+              flex: 1,
+              child: _buildTabletVisualSection(),
             ),
           ],
         ),
@@ -621,37 +508,391 @@ class WelcomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildTrustElement(String emoji, String text) {
+  Widget _buildProfessionalLogo() {
+    return Center(
+      child: Container(
+        width: 120,
+        height: 120,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: ZonixColors.primaryBlue.withOpacity(0.1),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: Image.asset(
+            'assets/images/logo_login.png',
+            fit: BoxFit.contain,
+            errorBuilder: (context, error, stackTrace) {
+              return Container(
+                decoration: BoxDecoration(
+                  color: ZonixColors.primaryBlue,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Icon(
+                  Icons.inventory_2_outlined,
+                  color: Colors.white,
+                  size: 60,
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMainTitle() {
+    return Builder(
+      builder: (context) {
+        final screenWidth = MediaQuery.of(context).size.width;
+        final textScaleFactor = MediaQuery.of(context).textScaleFactor;
+        final isTablet = screenWidth >= 600;
+
+        // Tamaño responsive basado en el dispositivo y escala de texto
+        double baseFontSize = isTablet ? 48.0 : 32.0;
+        double responsiveFontSize = baseFontSize * textScaleFactor;
+
+        return Text(
+          '¡Bienvenido a Zonix!',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: responsiveFontSize,
+            fontWeight: FontWeight.w700,
+            color: ZonixColors.darkGray,
+            letterSpacing: -0.5,
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildSubtitle() {
+    return Builder(
+      builder: (context) {
+        final screenWidth = MediaQuery.of(context).size.width;
+        final textScaleFactor = MediaQuery.of(context).textScaleFactor;
+        final isTablet = screenWidth >= 600;
+
+        // Tamaño responsive basado en el dispositivo y escala de texto
+        double baseFontSize = isTablet ? 20.0 : 16.0;
+        double responsiveFontSize = baseFontSize * textScaleFactor;
+
+        return Text(
+          'Tu puerta de entrada a productos premium desde Estados Unidos.',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: responsiveFontSize,
+            fontWeight: FontWeight.w400,
+            color: ZonixColors.mediumGray,
+            height: 1.5,
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildFeatures() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        _buildFeatureItem(Icons.public, 'Global'),
+        _buildFeatureItem(Icons.verified, 'Confiable'),
+        _buildFeatureItem(Icons.flash_on, 'Rápido'),
+      ],
+    );
+  }
+
+  Widget _buildFeatureItem(IconData icon, String label) {
+    return Builder(
+      builder: (context) {
+        final screenWidth = MediaQuery.of(context).size.width;
+        final textScaleFactor = MediaQuery.of(context).textScaleFactor;
+        final isTablet = screenWidth >= 600;
+
+        // Tamaños responsive basados en el dispositivo y escala de texto
+        double containerSize = isTablet ? 56.0 : 48.0;
+        double iconSize = isTablet ? 28.0 : 24.0;
+        double baseFontSize = isTablet ? 14.0 : 12.0;
+        double responsiveFontSize = baseFontSize * textScaleFactor;
+
+        return Column(
+          children: [
+            Container(
+              width: containerSize,
+              height: containerSize,
+              decoration: BoxDecoration(
+                color: ZonixColors.lightGray,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: ZonixColors.mediumGray.withOpacity(0.2),
+                  width: 1,
+                ),
+              ),
+              child: Icon(
+                icon,
+                color: ZonixColors.primaryBlue,
+                size: iconSize,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: responsiveFontSize,
+                fontWeight: FontWeight.w500,
+                color: ZonixColors.mediumGray,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildStats() {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: ZonixColors.pureWhite.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(15),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF000000).withOpacity(0.05),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
         border: Border.all(
-          color: ZonixColors.goldenYellow.withOpacity(0.3),
+          color: ZonixColors.lightGray,
           width: 1,
         ),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Text(
-            emoji,
-            style: const TextStyle(fontSize: 28),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            text,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: ZonixColors.pureWhite,
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              height: 1.2,
+          _buildStatItem('50+', 'Países'),
+          _buildStatItem('10K+', 'Productos'),
+          _buildStatItem('4.8', 'Rating'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatItem(String value, String label) {
+    return Builder(
+      builder: (context) {
+        final screenWidth = MediaQuery.of(context).size.width;
+        final textScaleFactor = MediaQuery.of(context).textScaleFactor;
+        final isTablet = screenWidth >= 600;
+
+        // Tamaños responsive basados en el dispositivo y escala de texto
+        double valueFontSize = isTablet ? 24.0 : 20.0;
+        double labelFontSize = isTablet ? 14.0 : 12.0;
+        double responsiveValueFontSize = valueFontSize * textScaleFactor;
+        double responsiveLabelFontSize = labelFontSize * textScaleFactor;
+
+        return Column(
+          children: [
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: responsiveValueFontSize,
+                fontWeight: FontWeight.w700,
+                color: ZonixColors.primaryBlue,
+              ),
             ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: responsiveLabelFontSize,
+                fontWeight: FontWeight.w500,
+                color: ZonixColors.mediumGray,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildTabletInfoSection() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Logo
+        Container(
+          width: 150,
+          height: 150,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: ZonixColors.primaryBlue.withOpacity(0.1),
+                blurRadius: 30,
+                offset: const Offset(0, 12),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: Image.asset(
+              'assets/images/logo_login.png',
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  decoration: BoxDecoration(
+                    color: ZonixColors.primaryBlue,
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  child: const Icon(
+                    Icons.inventory_2_outlined,
+                    color: Colors.white,
+                    size: 80,
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+        const SizedBox(height: 40),
+
+        // Título
+        Builder(
+          builder: (context) {
+            final textScaleFactor = MediaQuery.of(context).textScaleFactor;
+            double baseFontSize = 48.0;
+            double responsiveFontSize = baseFontSize * textScaleFactor;
+
+            return Text(
+              '¡Bienvenido a Zonix!',
+              style: TextStyle(
+                fontSize: responsiveFontSize,
+                fontWeight: FontWeight.w700,
+                color: ZonixColors.darkGray,
+                letterSpacing: -1,
+              ),
+            );
+          },
+        ),
+        const SizedBox(height: 16),
+
+        // Subtítulo
+        Builder(
+          builder: (context) {
+            final textScaleFactor = MediaQuery.of(context).textScaleFactor;
+            double baseFontSize = 20.0;
+            double responsiveFontSize = baseFontSize * textScaleFactor;
+
+            return Text(
+              'Tu puerta de entrada a productos premium desde Estados Unidos.',
+              style: TextStyle(
+                fontSize: responsiveFontSize,
+                fontWeight: FontWeight.w400,
+                color: ZonixColors.mediumGray,
+                height: 1.5,
+              ),
+            );
+          },
+        ),
+        const SizedBox(height: 40),
+
+        // Características
+        _buildTabletFeatures(),
+      ],
+    );
+  }
+
+  Widget _buildTabletVisualSection() {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: ZonixColors.primaryBlue.withOpacity(0.1),
+            blurRadius: 30,
+            offset: const Offset(0, 12),
           ),
         ],
       ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: Image.asset(
+          'assets/onboarding/onboardingPage1.png',
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return Container(
+              decoration: BoxDecoration(
+                color: ZonixColors.lightGray,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: const Icon(
+                Icons.inventory_2_outlined,
+                color: ZonixColors.primaryBlue,
+                size: 100,
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTabletFeatures() {
+    return Column(
+      children: [
+        _buildTabletFeatureItem(Icons.public, 'Productos globales'),
+        const SizedBox(height: 16),
+        _buildTabletFeatureItem(Icons.verified, 'Calidad garantizada'),
+        const SizedBox(height: 16),
+        _buildTabletFeatureItem(Icons.flash_on, 'Entrega rápida'),
+      ],
+    );
+  }
+
+  Widget _buildTabletFeatureItem(IconData icon, String text) {
+    return Builder(
+      builder: (context) {
+        final textScaleFactor = MediaQuery.of(context).textScaleFactor;
+        double baseFontSize = 16.0;
+        double responsiveFontSize = baseFontSize * textScaleFactor;
+        double iconSize = 20 * textScaleFactor;
+        double containerSize = 40 * textScaleFactor;
+
+        return Row(
+          children: [
+            Container(
+              width: containerSize,
+              height: containerSize,
+              decoration: BoxDecoration(
+                color: ZonixColors.primaryBlue.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(
+                icon,
+                color: ZonixColors.primaryBlue,
+                size: iconSize,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Text(
+              text,
+              style: TextStyle(
+                fontSize: responsiveFontSize,
+                fontWeight: FontWeight.w500,
+                color: ZonixColors.darkGray,
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
