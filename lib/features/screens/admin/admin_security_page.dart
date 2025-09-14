@@ -1,5 +1,24 @@
 import 'package:flutter/material.dart';
 
+// Paleta de colores profesional
+class ZonixColors {
+  static const Color primaryBlue = Color(0xFF1E40AF); // Azul profesional
+  static const Color secondaryBlue = Color(0xFF3B82F6); // Azul secundario
+  static const Color accentBlue = Color(0xFF60A5FA); // Azul de acento
+  static const Color darkGray = Color(0xFF1E293B); // Gris oscuro
+  static const Color mediumGray = Color(0xFF64748B); // Gris medio
+  static const Color lightGray = Color(0xFFF1F5F9); // Gris claro
+  static const Color white = Color(0xFFFFFFFF); // Blanco
+  static const Color successGreen = Color(0xFF10B981); // Verde éxito
+  static const Color warningOrange = Color(0xFFF59E0B); // Naranja advertencia
+  static const Color errorRed = Color(0xFFEF4444); // Rojo error
+  
+  // Colores para efectos modernos
+  static const Color glassBackground = Color(0x1AFFFFFF); // Fondo glassmorphism
+  static const Color neumorphicLight = Color(0xFFFFFFFF); // Neumorfismo claro
+  static const Color neumorphicDark = Color(0xFFE0E0E0); // Neumorfismo oscuro
+}
+
 class AdminSecurityPage extends StatefulWidget {
   const AdminSecurityPage({super.key});
 
@@ -16,10 +35,29 @@ class _AdminSecurityPageState extends State<AdminSecurityPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Scaffold(
+      backgroundColor: isDark ? ZonixColors.darkGray : ZonixColors.lightGray,
       appBar: AppBar(
-        title: const Text('Seguridad del Sistema'),
-        backgroundColor: Colors.red[700],
+        title: Builder(
+          builder: (context) {
+            final screenWidth = MediaQuery.of(context).size.width;
+            final isTablet = screenWidth > 600;
+            final fontSize = isTablet ? 24.0 : 20.0;
+            
+            return Text(
+              'Seguridad del Sistema',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+                fontSize: fontSize,
+                letterSpacing: 0.5,
+              ),
+            );
+          },
+        ),
+        backgroundColor: isDark ? ZonixColors.darkGray : ZonixColors.primaryBlue,
         foregroundColor: Colors.white,
         elevation: 0,
         actions: [
@@ -88,8 +126,11 @@ class _AdminSecurityPageState extends State<AdminSecurityPage> {
   }
 
   Widget _buildSecurityOverviewCard() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Card(
       elevation: 2,
+      color: isDark ? ZonixColors.darkGray : ZonixColors.white,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -97,15 +138,15 @@ class _AdminSecurityPageState extends State<AdminSecurityPage> {
             Row(
               children: [
                 Expanded(
-                  child: _buildSecurityMetric('Nivel de Seguridad', 'Alto', Colors.green, Icons.shield),
+                  child: _buildSecurityMetric('Nivel de Seguridad', 'Alto', ZonixColors.successGreen, Icons.shield),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: _buildSecurityMetric('Intentos de Acceso', '3', Colors.orange, Icons.warning),
+                  child: _buildSecurityMetric('Intentos de Acceso', '3', ZonixColors.warningOrange, Icons.warning),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: _buildSecurityMetric('Sesiones Activas', '45', Colors.blue, Icons.people),
+                  child: _buildSecurityMetric('Sesiones Activas', '45', ZonixColors.primaryBlue, Icons.people),
                 ),
               ],
             ),
@@ -113,17 +154,17 @@ class _AdminSecurityPageState extends State<AdminSecurityPage> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.green[50],
+                color: ZonixColors.successGreen.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
                 children: [
-                  Icon(Icons.check_circle, color: Colors.green[700]),
+                  Icon(Icons.check_circle, color: ZonixColors.successGreen),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       'Sistema seguro. Último escaneo: Hace 2 horas',
-                      style: TextStyle(color: Colors.green[700], fontWeight: FontWeight.bold),
+                      style: TextStyle(color: ZonixColors.successGreen, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ],
@@ -147,70 +188,111 @@ class _AdminSecurityPageState extends State<AdminSecurityPage> {
         Text(
           title,
           textAlign: TextAlign.center,
-          style: TextStyle(color: Colors.grey[600], fontSize: 12),
+          style: TextStyle(color: ZonixColors.mediumGray, fontSize: 12),
         ),
       ],
     );
   }
 
   Widget _buildSecuritySettingsCard() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Card(
       elevation: 2,
+      color: isDark ? ZonixColors.darkGray : ZonixColors.white,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             SwitchListTile(
-              title: const Text('Autenticación de Dos Factores'),
-              subtitle: const Text('Requerir 2FA para todos los usuarios'),
+              title: Text(
+                'Autenticación de Dos Factores',
+                style: TextStyle(color: isDark ? ZonixColors.white : ZonixColors.darkGray),
+              ),
+              subtitle: Text(
+                'Requerir 2FA para todos los usuarios',
+                style: TextStyle(color: ZonixColors.mediumGray),
+              ),
               value: _twoFactorEnabled,
               onChanged: (value) {
                 setState(() {
                   _twoFactorEnabled = value;
                 });
               },
-              activeColor: Colors.red[700],
+              activeColor: ZonixColors.primaryBlue,
             ),
             SwitchListTile(
-              title: const Text('Notificaciones de Login'),
-              subtitle: const Text('Alertar sobre inicios de sesión'),
+              title: Text(
+                'Notificaciones de Login',
+                style: TextStyle(color: isDark ? ZonixColors.white : ZonixColors.darkGray),
+              ),
+              subtitle: Text(
+                'Alertar sobre inicios de sesión',
+                style: TextStyle(color: ZonixColors.mediumGray),
+              ),
               value: _loginNotifications,
               onChanged: (value) {
                 setState(() {
                   _loginNotifications = value;
                 });
               },
-              activeColor: Colors.red[700],
+              activeColor: ZonixColors.primaryBlue,
             ),
             SwitchListTile(
-              title: const Text('Alertas de Actividad Sospechosa'),
-              subtitle: const Text('Detectar comportamientos anómalos'),
+              title: Text(
+                'Alertas de Actividad Sospechosa',
+                style: TextStyle(color: isDark ? ZonixColors.white : ZonixColors.darkGray),
+              ),
+              subtitle: Text(
+                'Detectar comportamientos anómalos',
+                style: TextStyle(color: ZonixColors.mediumGray),
+              ),
               value: _suspiciousActivityAlerts,
               onChanged: (value) {
                 setState(() {
                   _suspiciousActivityAlerts = value;
                 });
               },
-              activeColor: Colors.red[700],
+              activeColor: ZonixColors.primaryBlue,
             ),
             SwitchListTile(
-              title: const Text('Bloqueo Automático'),
-              subtitle: const Text('Bloquear sesiones inactivas'),
+              title: Text(
+                'Bloqueo Automático',
+                style: TextStyle(color: isDark ? ZonixColors.white : ZonixColors.darkGray),
+              ),
+              subtitle: Text(
+                'Bloquear sesiones inactivas',
+                style: TextStyle(color: ZonixColors.mediumGray),
+              ),
               value: _autoLockEnabled,
               onChanged: (value) {
                 setState(() {
                   _autoLockEnabled = value;
                 });
               },
-              activeColor: Colors.red[700],
+              activeColor: ZonixColors.primaryBlue,
             ),
             ListTile(
-              title: const Text('Tiempo de Sesión'),
-              subtitle: Text('$_sessionTimeout minutos'),
+              title: Text(
+                'Tiempo de Sesión',
+                style: TextStyle(color: isDark ? ZonixColors.white : ZonixColors.darkGray),
+              ),
+              subtitle: Text(
+                '$_sessionTimeout minutos',
+                style: TextStyle(color: ZonixColors.mediumGray),
+              ),
               trailing: DropdownButton<int>(
                 value: _sessionTimeout,
+                style: TextStyle(color: isDark ? ZonixColors.white : ZonixColors.darkGray),
+                dropdownColor: isDark ? ZonixColors.darkGray : ZonixColors.white,
                 items: [15, 30, 60, 120].map((time) {
-                  return DropdownMenuItem(value: time, child: Text('$time min'));
+                  return DropdownMenuItem(
+                    value: time,
+                    child: Text(
+                      '$time min',
+                      style: TextStyle(color: isDark ? ZonixColors.white : ZonixColors.darkGray),
+                    ),
+                  );
                 }).toList(),
                 onChanged: (value) {
                   setState(() {
@@ -230,7 +312,8 @@ class _AdminSecurityPageState extends State<AdminSecurityPage> {
                     icon: const Icon(Icons.lock),
                     label: const Text('Política de Contraseñas'),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.red[700],
+                      foregroundColor: ZonixColors.primaryBlue,
+                      side: BorderSide(color: ZonixColors.primaryBlue),
                     ),
                   ),
                 ),
@@ -243,7 +326,7 @@ class _AdminSecurityPageState extends State<AdminSecurityPage> {
                     icon: const Icon(Icons.save),
                     label: const Text('Guardar'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red[700],
+                      backgroundColor: ZonixColors.primaryBlue,
                       foregroundColor: Colors.white,
                     ),
                   ),
