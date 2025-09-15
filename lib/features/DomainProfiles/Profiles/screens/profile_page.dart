@@ -187,19 +187,49 @@ class ProfilePagex extends StatelessWidget {
                 child: CircleAvatar(
                   radius: 55,
                   backgroundColor: AppColors.grayLight,
-                  child: profile.photo != null && profile.photo!.isNotEmpty && !profile.photo!.contains('URL de foto no disponible')
-                      ? ClipOval(
+                  child: () {
+                    logger.i('🔍 Verificando imagen del perfil:');
+                    logger.i('   - photo: ${profile.photo}');
+                    logger.i('   - photo != null: ${profile.photo != null}');
+                    logger.i('   - photo.isNotEmpty: ${profile.photo?.isNotEmpty}');
+                    logger.i('   - contiene placeholder: ${profile.photo?.contains('URL de foto no disponible')}');
+                    
+                    if (profile.photo != null && profile.photo!.isNotEmpty && !profile.photo!.contains('URL de foto no disponible')) {
+                      logger.i('✅ Mostrando imagen del perfil: ${profile.photo}');
+                      return ClipOval(
                           child: Image.network(
                             profile.photo!,
                             width: 110,
                             height: 110,
                             fit: BoxFit.cover,
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return Container(
+                                width: 110,
+                                height: 110,
+                                decoration: BoxDecoration(
+                                  color: AppColors.grayLight,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Center(
+                                  child: CircularProgressIndicator(
+                                    color: AppColors.blue,
+                                    strokeWidth: 2,
+                                  ),
+                                ),
+                              );
+                            },
                             errorBuilder: (context, error, stackTrace) {
+                              logger.e('Error cargando imagen del perfil: $error');
                               return const Icon(Icons.person, color: AppColors.blue, size: 50);
                             },
                           ),
-                        )
-                      : const Icon(Icons.person, color: AppColors.blue, size: 50),
+                        );
+                    } else {
+                      logger.w('❌ Usando icono placeholder');
+                      return const Icon(Icons.person, color: AppColors.blue, size: 50);
+                    }
+                  }(),
                 ),
               ),
             ),
