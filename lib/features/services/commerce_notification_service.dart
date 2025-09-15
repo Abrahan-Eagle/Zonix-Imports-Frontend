@@ -3,12 +3,13 @@ import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:logger/logger.dart';
-import 'websocket_service.dart';
+// WebSocket functionality removed for MVP
 import 'package:zonix/helpers/env_helper.dart';
 import '../../helpers/auth_helper.dart';
 
 class CommerceNotificationService {
-  static final CommerceNotificationService _instance = CommerceNotificationService._internal();
+  static final CommerceNotificationService _instance =
+      CommerceNotificationService._internal();
   factory CommerceNotificationService() => _instance;
   CommerceNotificationService._internal();
 
@@ -24,7 +25,8 @@ class CommerceNotificationService {
 
   // Getters
   bool get isConnected => _isConnected;
-  Stream<List<Map<String, dynamic>>>? get notificationsStream => _notificationsController?.stream;
+  Stream<List<Map<String, dynamic>>>? get notificationsStream =>
+      _notificationsController?.stream;
   List<Map<String, dynamic>> get notifications => _notifications;
 
   // Obtener todas las notificaciones del comercio
@@ -47,8 +49,9 @@ class CommerceNotificationService {
       if (sortOrder != null) queryParams['sort_order'] = sortOrder;
       if (perPage != null) queryParams['per_page'] = perPage.toString();
 
-      final uri = Uri.parse('$baseUrl/commerce/notifications').replace(queryParameters: queryParams);
-      
+      final uri = Uri.parse('$baseUrl/commerce/notifications')
+          .replace(queryParameters: queryParams);
+
       final response = await http.get(
         uri,
         headers: headers,
@@ -65,7 +68,8 @@ class CommerceNotificationService {
         return [];
       } else {
         // Si el endpoint no existe, retornar datos mock
-        _logger.w('Endpoint de notificaciones no disponible (${response.statusCode}), usando datos mock');
+        _logger.w(
+            'Endpoint de notificaciones no disponible (${response.statusCode}), usando datos mock');
         return _getMockNotifications();
       }
     } catch (e) {
@@ -84,15 +88,18 @@ class CommerceNotificationService {
         'title': 'Nuevo pedido recibido',
         'message': 'Pedido #ORD-001 recibido por \$25.00',
         'read_at': null,
-        'created_at': DateTime.now().subtract(Duration(minutes: 5)).toIso8601String(),
+        'created_at':
+            DateTime.now().subtract(Duration(minutes: 5)).toIso8601String(),
       },
       {
         'id': 2,
         'type': 'payment',
         'title': 'Pago confirmado',
         'message': 'Pago confirmado para pedido #ORD-002',
-        'read_at': DateTime.now().subtract(Duration(minutes: 2)).toIso8601String(),
-        'created_at': DateTime.now().subtract(Duration(minutes: 10)).toIso8601String(),
+        'read_at':
+            DateTime.now().subtract(Duration(minutes: 2)).toIso8601String(),
+        'created_at':
+            DateTime.now().subtract(Duration(minutes: 10)).toIso8601String(),
       },
       {
         'id': 3,
@@ -100,7 +107,8 @@ class CommerceNotificationService {
         'title': 'Pedido en camino',
         'message': 'Pedido #ORD-003 está siendo entregado',
         'read_at': null,
-        'created_at': DateTime.now().subtract(Duration(minutes: 15)).toIso8601String(),
+        'created_at':
+            DateTime.now().subtract(Duration(minutes: 15)).toIso8601String(),
       },
     ];
   }
@@ -121,7 +129,8 @@ class CommerceNotificationService {
         final data = jsonDecode(response.body);
         return data['data'] ?? data;
       } else {
-        throw Exception('Error al obtener notificación: ${response.statusCode}');
+        throw Exception(
+            'Error al obtener notificación: ${response.statusCode}');
       }
     } catch (e) {
       _logger.e('Error en getNotification: $e');
@@ -176,7 +185,8 @@ class CommerceNotificationService {
         }
         _notificationsController?.add(_notifications);
       } else {
-        throw Exception('Error al marcar todas como leídas: ${response.statusCode}');
+        throw Exception(
+            'Error al marcar todas como leídas: ${response.statusCode}');
       }
     } catch (e) {
       _logger.e('Error en markAllAsRead: $e');
@@ -201,7 +211,8 @@ class CommerceNotificationService {
         _notifications.removeWhere((n) => n['id'] == id);
         _notificationsController?.add(_notifications);
       } else {
-        throw Exception('Error al eliminar notificación: ${response.statusCode}');
+        throw Exception(
+            'Error al eliminar notificación: ${response.statusCode}');
       }
     } catch (e) {
       _logger.e('Error en deleteNotification: $e');
@@ -226,7 +237,8 @@ class CommerceNotificationService {
         return data['data'] ?? {};
       } else {
         // Si el endpoint no existe, retornar datos mock
-        _logger.w('Endpoint de estadísticas no disponible (${response.statusCode}), usando datos mock');
+        _logger.w(
+            'Endpoint de estadísticas no disponible (${response.statusCode}), usando datos mock');
         return _getMockNotificationStats();
       }
     } catch (e) {
@@ -254,19 +266,10 @@ class CommerceNotificationService {
 
     try {
       _commerceId = commerceId;
-      _notificationsController = StreamController<List<Map<String, dynamic>>>.broadcast();
+      _notificationsController =
+          StreamController<List<Map<String, dynamic>>>.broadcast();
 
-      // Conectar WebSocket
-      await WebSocketService().connect();
-      
-      // Suscribirse a canales de comercio
-      await WebSocketService().subscribeToCommerce(commerceId);
-      await WebSocketService().subscribeToPrivateChannel('user.$commerceId');
-
-      // Escuchar mensajes
-      _wsSubscription = WebSocketService().messageStream?.listen((event) {
-        _handleWebSocketMessage(event);
-      });
+      // WebSocket functionality removed for MVP
 
       _isConnected = true;
       _logger.i('WebSocket conectado para notificaciones de comercio');
@@ -317,7 +320,7 @@ class CommerceNotificationService {
 
     _notifications.insert(0, notification);
     _notificationsController?.add(_notifications);
-    
+
     _logger.i('Nueva notificación recibida: ${data['title']}');
   }
 
@@ -326,7 +329,8 @@ class CommerceNotificationService {
     final notification = {
       'id': DateTime.now().millisecondsSinceEpoch,
       'title': 'Nueva Orden Recibida',
-      'body': 'Has recibido una nueva orden #${data['id']} por \$${data['total']?.toStringAsFixed(2)}',
+      'body':
+          'Has recibido una nueva orden #${data['id']} por \$${data['total']?.toStringAsFixed(2)}',
       'type': 'order',
       'data': data,
       'read_at': null,
@@ -335,7 +339,7 @@ class CommerceNotificationService {
 
     _notifications.insert(0, notification);
     _notificationsController?.add(_notifications);
-    
+
     _logger.i('Nueva orden recibida: #${data['id']}');
   }
 
@@ -354,8 +358,9 @@ class CommerceNotificationService {
 
     _notifications.insert(0, notification);
     _notificationsController?.add(_notifications);
-    
-    _logger.i('Estado de orden actualizado: #${data['order_id']} -> ${data['new_status']}');
+
+    _logger.i(
+        'Estado de orden actualizado: #${data['order_id']} -> ${data['new_status']}');
   }
 
   // Manejar validación de pago
@@ -364,7 +369,7 @@ class CommerceNotificationService {
     final notification = {
       'id': DateTime.now().millisecondsSinceEpoch,
       'title': isValid ? 'Pago Validado' : 'Pago Rechazado',
-      'body': isValid 
+      'body': isValid
           ? 'El pago de la orden #${data['order_id']} ha sido validado'
           : 'El pago de la orden #${data['order_id']} ha sido rechazado',
       'type': 'payment',
@@ -375,8 +380,9 @@ class CommerceNotificationService {
 
     _notifications.insert(0, notification);
     _notificationsController?.add(_notifications);
-    
-    _logger.i('Pago ${isValid ? 'validado' : 'rechazado'}: #${data['order_id']}');
+
+    _logger
+        .i('Pago ${isValid ? 'validado' : 'rechazado'}: #${data['order_id']}');
   }
 
   // Manejar solicitud de delivery
@@ -393,20 +399,28 @@ class CommerceNotificationService {
 
     _notifications.insert(0, notification);
     _notificationsController?.add(_notifications);
-    
+
     _logger.i('Solicitud de delivery: #${data['order_id']}');
   }
 
   String _getStatusText(String status) {
     switch (status) {
-      case 'pending_payment': return 'Pendiente de Pago';
-      case 'paid': return 'Pagado';
-      case 'preparing': return 'En Preparación';
-      case 'ready': return 'Listo';
-      case 'on_way': return 'En Camino';
-      case 'delivered': return 'Entregado';
-      case 'cancelled': return 'Cancelado';
-      default: return 'Desconocido';
+      case 'pending_payment':
+        return 'Pendiente de Pago';
+      case 'paid':
+        return 'Pagado';
+      case 'preparing':
+        return 'En Preparación';
+      case 'ready':
+        return 'Listo';
+      case 'on_way':
+        return 'En Camino';
+      case 'delivered':
+        return 'Entregado';
+      case 'cancelled':
+        return 'Cancelado';
+      default:
+        return 'Desconocido';
     }
   }
 
@@ -435,7 +449,7 @@ class CommerceNotificationService {
   Future<void> disconnect() async {
     try {
       _wsSubscription?.cancel();
-      WebSocketService().disconnect();
+      // WebSocket disconnect removed for MVP
       _notificationsController?.close();
       _isConnected = false;
       _logger.i('WebSocket desconectado');
@@ -450,4 +464,4 @@ class CommerceNotificationService {
     _notificationsController?.close();
     _isConnected = false;
   }
-} 
+}

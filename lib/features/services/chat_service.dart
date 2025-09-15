@@ -5,7 +5,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'websocket_service.dart';
+// WebSocket functionality removed for MVP
 
 class ChatService extends ChangeNotifier {
   final ApiService _apiService = ApiService();
@@ -13,7 +13,7 @@ class ChatService extends ChangeNotifier {
   final String baseUrl = const bool.fromEnvironment('dart.vm.product')
       ? dotenv.env['API_URL_PROD']!
       : dotenv.env['API_URL_LOCAL']!;
-  final WebSocketService _webSocketService = WebSocketService();
+  // WebSocket service removed for MVP
   StreamController<Map<String, dynamic>>? _messageController;
   Timer? _typingTimer;
   

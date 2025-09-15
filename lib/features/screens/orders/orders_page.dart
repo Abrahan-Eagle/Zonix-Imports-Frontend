@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zonix/models/order.dart';
 import 'package:zonix/features/services/order_service.dart';
-import 'package:zonix/features/services/websocket_service.dart';
 import 'package:zonix/features/utils/user_provider.dart';
 import 'package:zonix/helpers/env_helper.dart';
 import 'package:zonix/helpers/auth_helper.dart';
@@ -21,14 +20,13 @@ class _OrdersPageState extends State<OrdersPage> {
   List<Order> _orders = [];
   bool _isLoading = true;
   String? _error;
-  WebSocketService? _webSocketService;
   StreamSubscription? _webSocketSubscription;
 
   @override
   void initState() {
     super.initState();
     _loadOrders();
-    _initializeWebSocket();
+    // WebSocket initialization removed for MVP
   }
 
   @override
@@ -65,55 +63,9 @@ class _OrdersPageState extends State<OrdersPage> {
     }
   }
 
-  Future<void> _initializeWebSocket() async {
-    if (!EnvHelper.enableWebsockets) return;
+  // WebSocket functionality removed for MVP simplification
 
-    try {
-      _webSocketService = WebSocketService();
-      await _webSocketService!.connect();
-      
-      final userProvider = Provider.of<UserProvider>(context, listen: false);
-      final user = userProvider.user;
-      
-      if (user != null) {
-        // Suscribirse a actualizaciones de órdenes del usuario
-        await _webSocketService!.subscribeToChannel('orders.user.${user['id']}');
-        
-        _webSocketSubscription = _webSocketService!.messageStream?.listen((message) {
-          _handleWebSocketMessage(message);
-        });
-      }
-    } catch (e) {
-      print('Error inicializando WebSocket: $e');
-    }
-  }
 
-  void _handleWebSocketMessage(Map<String, dynamic> message) {
-    final type = message['type'];
-    
-    switch (type) {
-      case 'order_status_changed':
-      case 'order_created':
-      case 'payment_validated':
-        // Recargar órdenes cuando hay cambios
-        _loadOrders();
-        break;
-      case 'delivery_location_updated':
-        // Actualizar ubicación del delivery si está en la página de tracking
-        _updateDeliveryLocation(message);
-        break;
-    }
-  }
-
-  void _updateDeliveryLocation(Map<String, dynamic> message) {
-    final orderId = message['order_id'];
-    final latitude = message['latitude'];
-    final longitude = message['longitude'];
-    final estimatedArrival = message['estimated_arrival'];
-    
-    // Aquí podrías actualizar el estado de tracking si estás en esa página
-    print('Ubicación actualizada para orden $orderId: $latitude, $longitude');
-  }
 
   @override
   Widget build(BuildContext context) {

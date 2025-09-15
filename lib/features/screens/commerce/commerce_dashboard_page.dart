@@ -5,7 +5,7 @@ import '../../../models/commerce_product.dart';
 import '../../../models/commerce_order.dart';
 import 'package:zonix/features/services/notification_service.dart';
 import '../../../services/commerce_profile_service.dart';
-import 'package:zonix/features/services/websocket_service.dart';
+// WebSocket functionality removed for MVP
 import 'dart:async';
 import '../../../models/commerce_profile.dart';
 
@@ -111,26 +111,7 @@ class _CommerceDashboardPageState extends State<CommerceDashboardPage> {
       final profile = await _profileService.fetchProfile();
       _commerceId = profile.id;
       setState(() { _profile = profile; });
-      await WebSocketService().connect();
-      await WebSocketService().subscribeToCommerce(_commerceId!);
-      _wsSubscription = WebSocketService().messageStream?.listen((event) {
-        if (event['type'] == 'order_created' || event['type'] == 'order_status_changed' || event['type'] == 'payment_validated') {
-          _loadNotificationCount();
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Nueva notificación: ${event['type']}')),
-            );
-          }
-        }
-        if (event['type'] == 'notification') {
-          _loadNotificationCount();
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Notificación: ${event['data']['title'] ?? ''}')),
-            );
-          }
-        }
-      });
+      // WebSocket functionality removed for MVP
     } catch (e) {
       // Ignorar errores de conexión para no bloquear el dashboard
     }

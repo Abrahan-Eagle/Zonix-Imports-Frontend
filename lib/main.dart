@@ -354,49 +354,24 @@ import 'package:zonix/features/services/cart_service.dart';
 import 'package:zonix/features/services/order_service.dart';
 import 'package:zonix/features/screens/orders/commerce_orders_page.dart';
 import 'package:zonix/features/services/commerce_service.dart';
-import 'package:zonix/features/services/delivery_service.dart';
-import 'package:zonix/features/services/transport_service.dart';
-import 'package:zonix/features/services/affiliate_service.dart';
-import 'package:zonix/features/services/admin_service.dart';
 import 'package:zonix/features/services/notification_service.dart';
 import 'package:zonix/features/services/location_service.dart';
 import 'package:zonix/features/services/payment_service.dart';
 import 'package:zonix/features/services/chat_service.dart';
-import 'package:zonix/features/services/analytics_service.dart';
 import 'package:zonix/features/screens/commerce/commerce_dashboard_page.dart';
 import 'package:zonix/features/screens/commerce/commerce_inventory_page.dart';
 import 'package:zonix/features/screens/commerce/commerce_reports_page.dart';
-import 'package:zonix/features/screens/delivery/delivery_orders_page.dart';
-import 'package:zonix/features/screens/delivery/delivery_history_page.dart';
-import 'package:zonix/features/screens/delivery/delivery_routes_page.dart';
-import 'package:zonix/features/screens/delivery/delivery_earnings_page.dart';
-import 'package:zonix/features/screens/transport/transport_fleet_page.dart';
-import 'package:zonix/features/screens/transport/transport_orders_page.dart';
-import 'package:zonix/features/screens/transport/transport_analytics_page.dart';
-import 'package:zonix/features/screens/transport/transport_settings_page.dart';
-import 'package:zonix/features/screens/affiliate/affiliate_dashboard_page.dart';
-import 'package:zonix/features/screens/affiliate/affiliate_commissions_page.dart';
-import 'package:zonix/features/screens/affiliate/affiliate_support_page.dart';
-import 'package:zonix/features/screens/affiliate/affiliate_statistics_page.dart';
-import 'package:zonix/features/screens/admin/admin_dashboard_page.dart';
-import 'package:zonix/features/screens/admin/admin_users_page.dart';
-import 'package:zonix/features/screens/admin/admin_security_page.dart';
-import 'package:zonix/features/screens/admin/admin_analytics_page.dart';
-
-import 'package:zonix/features/services/websocket_service.dart';
 import 'package:zonix/features/screens/commerce/commerce_notifications_page.dart';
 import 'package:zonix/features/screens/commerce/commerce_profile_page.dart';
 
 /*
- * ZONIX EATS - Aplicación Multi-Rol
+ * ZONIX IMPORTS - Aplicación E-commerce MVP
  * 
- * Niveles de usuario:
+ * Niveles de usuario (MVP):
  * 0 - Comprador: Productos, Carrito, Mis Órdenes, Restaurantes
  * 1 - Tiendas/Comercio: Dashboard, Inventario, Órdenes, Reportes
- * 2 - Delivery: Entregas, Historial, Rutas, Ganancias
- * 3 - Agencia de Transporte: Flota, Conductores, Rutas, Métricas
- * 4 - Afiliado a Delivery: Afiliaciones, Comisiones, Soporte, Estadísticas
- * 5 - Administrador: Panel Admin, Usuarios, Seguridad, Sistema
+ * 
+ * Funcionalidades avanzadas eliminadas para enfocarse en el MVP core
  */
 
 const FlutterSecureStorage _storage = FlutterSecureStorage();
@@ -443,17 +418,10 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (_) => CartService()),
         ChangeNotifierProvider(create: (_) => OrderService()),
         ChangeNotifierProvider(create: (_) => CommerceService()),
-        ChangeNotifierProvider(create: (_) => DeliveryService()),
-        ChangeNotifierProvider(create: (_) => TransportService()),
-        ChangeNotifierProvider(create: (_) => AffiliateService()),
-        ChangeNotifierProvider(create: (_) => AdminService()),
         ChangeNotifierProvider(create: (_) => NotificationService()),
         ChangeNotifierProvider(create: (_) => LocationService()),
         ChangeNotifierProvider(create: (_) => PaymentService()),
         ChangeNotifierProvider(create: (_) => ChatService()),
-        ChangeNotifierProvider(create: (_) => AnalyticsService()),
-        // WebSocket Service como singleton
-        Provider<WebSocketService>.value(value: WebSocketService()),
       ],
       child: MyApp(isIntegrationTest: isIntegrationTest),
     ),
@@ -1100,69 +1068,7 @@ class MainRouterState extends State<MainRouter> {
                   }
                 }
 
-                // Nivel 2: Delivery
-                if (_selectedLevel == 2) {
-                  switch (_bottomNavIndex) {
-                    case 0:
-                      return DeliveryOrdersPage(); // Entregas
-                    case 1:
-                      return const DeliveryHistoryPage(); // Historial
-                    case 2:
-                      return const DeliveryRoutesPage(); // Rutas
-                    case 3:
-                      return const DeliveryEarningsPage(); // Ganancias
-                    default:
-                      return DeliveryOrdersPage();
-                  }
-                }
-
-                // Nivel 3: Agencia de Transporte
-                if (_selectedLevel == 3) {
-                  switch (_bottomNavIndex) {
-                    case 0:
-                      return TransportFleetPage(); // Flota
-                    case 1:
-                      return const TransportOrdersPage(); // Gestión de Pedidos
-                    case 2:
-                      return const TransportAnalyticsPage(); // Analíticas
-                    case 3:
-                      return const TransportSettingsPage(); // Configuración
-                    default:
-                      return TransportFleetPage();
-                  }
-                }
-
-                // Nivel 4: Afiliado a Delivery
-                if (_selectedLevel == 4) {
-                  switch (_bottomNavIndex) {
-                    case 0:
-                      return AffiliateDashboardPage(); // Dashboard
-                    case 1:
-                      return const AffiliateCommissionsPage(); // Comisiones
-                    case 2:
-                      return const AffiliateSupportPage(); // Soporte
-                    case 3:
-                      return const AffiliateStatisticsPage(); // Estadísticas
-                    default:
-                      return AffiliateDashboardPage();
-                  }
-                }
-
-                // Nivel 5: Administrador
-                if (_selectedLevel == 5) {
-                  switch (_bottomNavIndex) {
-                    case 0:
-                      return AdminDashboardPage(); // Panel Admin
-                    case 1:
-                      return const AdminUsersPage(); // Usuarios
-                    case 2:
-                      return const AdminSecurityPage(); // Seguridad
-                    case 3:
-                      return const AdminAnalyticsPage(); // Sistema/Analíticas
-                    default:
-                      return AdminDashboardPage();
-                  }
-                }
+                // Niveles avanzados eliminados - Solo MVP con niveles 0 y 1
 
                 // Si no se cumplen ninguna de las condiciones anteriores, puedes manejar un caso por defecto.
                 return const Center(
