@@ -221,6 +221,25 @@ class ProfilePagex extends StatelessWidget {
                             },
                             errorBuilder: (context, error, stackTrace) {
                               logger.e('Error cargando imagen del perfil: $error');
+                              logger.i('🔄 Intentando usar imagen de Google como fallback...');
+                              
+                              // Intentar usar la imagen de Google como fallback
+                              if (profile.user?.profilePic != null && profile.user!.profilePic!.isNotEmpty) {
+                                logger.i('✅ Usando imagen de Google: ${profile.user!.profilePic}');
+                                return ClipOval(
+                                  child: Image.network(
+                                    profile.user!.profilePic!,
+                                    width: 110,
+                                    height: 110,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      logger.e('Error también con imagen de Google: $error');
+                                      return const Icon(Icons.person, color: AppColors.blue, size: 50);
+                                    },
+                                  ),
+                                );
+                              }
+                              
                               return const Icon(Icons.person, color: AppColors.blue, size: 50);
                             },
                           ),
