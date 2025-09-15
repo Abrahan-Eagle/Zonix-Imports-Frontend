@@ -51,20 +51,26 @@ class ProfileService {
     
     try {
       // Primero intentamos con el endpoint específico
+      final url = '$baseUrl/api/profiles/user/$userId';
+      logger.i('Intentando endpoint específico: $url');
       final response = await http.get(
-        Uri.parse('$baseUrl/api/profiles/user/$userId'),
+        Uri.parse(url),
         headers: {'Authorization': 'Bearer $token'},
       );
+        
+      logger.i('Response status: ${response.statusCode}');
+      logger.i('Response body: ${response.body}');
         
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         logger.i('Perfil encontrado: $data');
         return Profile.fromJson(data);
       } else if (response.statusCode == 404) {
-        logger.w('No se encontró perfil para el usuario: $userId');
-        return null;
+        logger.w('Endpoint específico retorna 404, intentando con todos los perfiles');
+        // Si el endpoint específico no funciona, usamos el de todos los perfiles
+        return await _getProfileFromAllProfiles(userId);
       } else {
-        logger.w('Endpoint específico no disponible, intentando con todos los perfiles');
+        logger.w('Endpoint específico retorna ${response.statusCode}, intentando con todos los perfiles');
         // Si el endpoint específico no funciona, usamos el de todos los perfiles
         return await _getProfileFromAllProfiles(userId);
       }
@@ -79,10 +85,16 @@ class ProfileService {
   Future<Profile?> _getProfileFromAllProfiles(int userId) async {
     try {
       final token = await _getToken();
+      final url = '$baseUrl/api/profiles';
+      logger.i('Intentando obtener todos los perfiles desde: $url');
+      
       final response = await http.get(
-        Uri.parse('$baseUrl/api/profiles'),
+        Uri.parse(url),
         headers: {'Authorization': 'Bearer $token'},
       );
+
+      logger.i('Response status para todos los perfiles: ${response.statusCode}');
+      logger.i('Response body para todos los perfiles: ${response.body}');
 
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
@@ -90,13 +102,15 @@ class ProfileService {
         
         // Buscar el perfil que coincida con el user_id
         for (var profileData in data) {
+          logger.i('Revisando perfil: user_id=${profileData['user_id']}, buscando: $userId');
           if (profileData['user_id'] == userId) {
-            logger.i('Perfil encontrado en lista: $profileData');
+            logger.i('✅ Perfil encontrado en lista: $profileData');
             return Profile.fromJson(profileData);
           }
         }
         
-        logger.w('No se encontró perfil para el usuario: $userId');
+        logger.w('❌ No se encontró perfil para el usuario: $userId en ${data.length} perfiles');
+        logger.i('Perfiles disponibles: ${data.map((p) => 'user_id: ${p['user_id']}').join(', ')}');
         return null;
       } else {
         logger.e('Error al obtener perfiles: ${response.statusCode} - ${response.body}');
