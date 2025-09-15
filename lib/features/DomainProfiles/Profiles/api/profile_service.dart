@@ -44,6 +44,70 @@ class ProfileService {
     }
   }
 
+  // Recupera un perfil por user_id.
+  Future<Profile?> getProfileByUserId(int userId) async {
+    logger.i('Buscando perfil por user_id: $userId');
+    final token = await _getToken();
+    
+    try {
+      // Primero intentamos con el endpoint específico
+      final response = await http.get(
+        Uri.parse('$baseUrl/api/profiles/user/$userId'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+        
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        logger.i('Perfil encontrado: $data');
+        return Profile.fromJson(data);
+      } else if (response.statusCode == 404) {
+        logger.w('No se encontró perfil para el usuario: $userId');
+        return null;
+      } else {
+        logger.w('Endpoint específico no disponible, intentando con todos los perfiles');
+        // Si el endpoint específico no funciona, usamos el de todos los perfiles
+        return await _getProfileFromAllProfiles(userId);
+      }
+    } catch (e) {
+      logger.w('Error con endpoint específico, intentando con todos los perfiles: $e');
+      // Si hay error, intentamos con todos los perfiles
+      return await _getProfileFromAllProfiles(userId);
+    }
+  }
+
+  // Método auxiliar para buscar perfil en la lista de todos los perfiles
+  Future<Profile?> _getProfileFromAllProfiles(int userId) async {
+    try {
+      final token = await _getToken();
+      final response = await http.get(
+        Uri.parse('$baseUrl/api/profiles'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        logger.i('Perfiles obtenidos: ${data.length}');
+        
+        // Buscar el perfil que coincida con el user_id
+        for (var profileData in data) {
+          if (profileData['user_id'] == userId) {
+            logger.i('Perfil encontrado en lista: $profileData');
+            return Profile.fromJson(profileData);
+          }
+        }
+        
+        logger.w('No se encontró perfil para el usuario: $userId');
+        return null;
+      } else {
+        logger.e('Error al obtener perfiles: ${response.statusCode} - ${response.body}');
+        throw Exception('Error al obtener los perfiles: ${response.body}');
+      }
+    } catch (e) {
+      logger.e('Error en _getProfileFromAllProfiles: $e');
+      rethrow;
+    }
+  }
+
   // Recupera todos los perfiles.
   Future<List<Profile>> getAllProfiles() async {
     final token = await _getToken();
@@ -70,9 +134,9 @@ Future<void> createProfile(Profile profile, int userId, {File? imageFile}) async
       ..headers['Authorization'] = 'Bearer $token'
       ..headers['Accept'] = 'application/json'
       ..fields['firstName'] = profile.firstName
-      ..fields['middleName'] = profile.middleName ?? '' 
+      ..fields['middleName'] = profile.middleName
       ..fields['lastName'] = profile.lastName
-      ..fields['secondLastName'] = profile.secondLastName ?? ''
+      ..fields['secondLastName'] = profile.secondLastName
       ..fields['date_of_birth'] = profile.dateOfBirth
       ..fields['maritalStatus'] = profile.maritalStatus
       ..fields['sex'] = profile.sex
@@ -118,9 +182,9 @@ Future<void> createProfile(Profile profile, int userId, {File? imageFile}) async
         ..headers['Authorization'] = 'Bearer $token'
         ..headers['Accept'] = 'application/json'
         ..fields['firstName'] = profile.firstName
-        ..fields['middleName'] = profile.middleName ?? '' 
+        ..fields['middleName'] = profile.middleName
         ..fields['lastName'] = profile.lastName
-        ..fields['secondLastName'] = profile.secondLastName ?? ''
+        ..fields['secondLastName'] = profile.secondLastName
         ..fields['date_of_birth'] = profile.dateOfBirth
         ..fields['maritalStatus'] = profile.maritalStatus
         ..fields['sex'] = profile.sex;

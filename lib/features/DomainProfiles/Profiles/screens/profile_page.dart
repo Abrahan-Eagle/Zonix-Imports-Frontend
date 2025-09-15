@@ -22,8 +22,10 @@ class ProfileModel with ChangeNotifier {
     notifyListeners();
 
     try {
-      _profile = await ProfileService().getProfileById(userId);
+      _profile = await ProfileService().getProfileByUserId(userId);
+      logger.i('Perfil cargado: $_profile');
     } catch (e) {
+      logger.e('Error cargando perfil: $e');
       _profile = null;
     } finally {
       _isLoading = false;
