@@ -1,193 +1,84 @@
-# .cursorrules
-
 rules:
   - type: project
     value: |
-      Proyecto: MVP de e-commerce multi-modal para Venezuela.
-      Visión: Plataforma que permite a empresas y personas vender productos con distintas modalidades:
-      - Venta al detal
-      - Venta al mayor
-      - Pre-order (contado o abonos)
-      - Referidos (links con comisión)
-      - Dropshipping interno (vender con stock de otro)
-      
-      Roles principales:
-      - Comprador (por defecto al registrarse)
-      - Vendedor (puede publicar productos, gestionar inventario, usar referidos y dropshipping)
-      - Administrador (gestiona usuarios, pedidos, disputas y productos)
+      Proyecto: MVP de e-commerce multi-modal (Frontend Flutter) alineado con el Backend Laravel 10.
+      Visión: Catálogo público, carrito, checkout, pagos (API y manuales), gestión de productos del vendedor y pedidos.
 
-      Pagos: descentralizados → cada vendedor define qué métodos acepta.
-      Métodos disponibles en MVP: Stripe, PayPal, Pago Móvil, Zelle, Binance Pay/USDT.
-      Flujo API: Stripe/PayPal/Binance (webhooks).
-      Flujo manual: Pago Móvil/Zelle (comprobante).
-      La plataforma no custodia fondos, solo registra pedidos y comisiones.
-
-      Alcance MVP:
-      - App móvil en Flutter (APK en Android)
-      - Backend en Laravel 10 + MySQL 8
-      - Autenticación con Google OAuth2
-      - Publicación de productos con todas las modalidades (detal, mayor, pre-order, referidos, dropshipping)
-      - Carrito y checkout con validaciones
-      - Gestión de pedidos y estados (pendiente → pagado → enviado → entregado)
-      - Inventario con movimientos y alertas
-      - Panel mínimo de administración (usuarios, productos, pedidos, disputas)
-      - Notificaciones internas y por correo
-      - KPIs: API ≤2s (data pequeña), ≤4s (data grande), uptime 99.9%, 98% operatividad pagos.
-
-      Fuera de alcance MVP (fase 2):
-      - Web Angular
-      - IA de recomendaciones
-      - Marketplace internacional (multi-país)
-      - Programas avanzados de fidelización
-      - Integraciones múltiples de logística y pagos
+      Roles principales (UI):
+      - Visitante: catálogo público (solo lectura)
+      - Comprador: login con Google, carrito, checkout, pedidos, notificaciones
+      - Vendedor: publicación de productos, inventario básico, gestión de pedidos
+      - Admin (mínimo): vistas básicas (puede resolverse en backend web)
 
   - type: coding
     value: |
-      Estándares y convenciones:
-      - General:
-        - Commits convencionales: tipo(scope): resumen (feat, fix, refactor, docs, chore)
-        - Revisiones pequeñas con checklist y pruebas locales
-        - Mantener tiempos API (pequeñas ≤2s, grandes ≤4s) y paginación por defecto
-      - PHP (Laravel 10):
-        - PSR-12 coding style
-        - Eloquent ORM para DB (evitar SQL crudo)
-        - Validación con FormRequest
-        - Controllers delgados, Services para lógica de negocio
-        - Policies/Middleware para roles y permisos
-        - Migraciones versionadas
-        - Variables sensibles en .env
-        - Laravel Sanctum para autenticación en APIs
-        - Rutas API bajo prefijo /api y recursos con paginación
-        - Webhooks idempotentes (clave secreta del proveedor + firma)
-        - Manejo de errores: usar códigos HTTP correctos y mensajes consistentes
-      - Flutter (Dart 3.x):
-        - Arquitectura MVVM
-        - Provider para manejo de estado (o Riverpod si se adopta)
-        - Separación en /models, /screens, /widgets, /services
-        - Servicios de API centralizados en /services
-        - Validaciones de formularios en UI y manejo de errores visible
-        - Timeouts HTTP y reintentos básicos en servicios
-        - Navegación declarativa y rutas tipeadas cuando sea posible
-        - Estándar de errores desde API: { message, errors?, code }
-        - En `services`: mapear errores por campo para formularios
-        - COMPILACIÓN EXCLUSIVA ANDROID: Solo usar dispositivos Android físicos
-        - Comandos de compilación:
-          * Desarrollo: `flutter run -d 192.168.27.10:5555`
-          * Producción: `flutter run --release -d 192.168.27.10:5555`
-        - PROHIBIDO: No compilar para Chrome, Linux, Web o emuladores
-        - Solo dispositivos Android físicos conectados por red o USB
-      - DB (MySQL 8):
-        - Índices en campos de búsqueda
-        - Relaciones con claves foráneas
-        - Campos created_at, updated_at en todas las tablas
-        - Paginación obligatoria en listados grandes
-        - Constraints e integridad referencial; soft deletes cuando aplique
-      - Seguridad:
-        - HTTPS (TLS 1.2 o superior)
-        - OAuth2 (Google)
-        - Sanitización de inputs
-        - Protección contra SQLi/XSS/CSRF
-        - Autenticación 2FA → fase 2
-        - Secrets en .env y no en repositorio
-        - Logs sin datos sensibles
-      - Rendimiento:
-        - Respuesta API ≤2s en consultas pequeñas
-        - ≤4s en listados grandes (con paginación)
-        - Cache básico para datos estáticos (categorías)
-        - Lazy loading en imágenes y productos
-        - N+1 queries: usar eager loading (with) cuando aplique
+      Estándares y convenciones (Frontend Flutter):
+      - Flutter/Dart 3.x. Respetar analysis_options.yaml
+      - Arquitectura: MVVM + Provider (o Riverpod si se migra), servicios HTTP en lib/services
+      - Código: nombres descriptivos, evitar abreviaturas, manejo explícito de errores
+      - UI: componentes reutilizables; loading y error states consistentes
+      - Estado: Provider centralizado por feature; no lógica de negocio en widgets puros
+      - Red: timeouts razonables, reintentos básicos, headers `{ Authorization: Bearer <token> }`
+      - Seguridad: tokens en flutter_secure_storage; sin logs de PII/tokens
+      - Internacionalización: preparada (post-MVP si no está)
 
-  - type: data_model
+  - type: api_contract
     value: |
-      Tablas principales:
-      - usuarios (id, nombre, email, rol, rif?, banco?, direccion?, created_at…)
-      - productos (id, vendedor_id, nombre, descripcion, modalidad, precio_base, stock, min_mayor?, precio_mayor?, preorden_entrega?, video_url?)
-      - imagenes_producto (id, producto_id, url)
-      - pedidos (id, comprador_id, vendedor_id, total, modalidad, estado, created_at…)
-      - items_pedido (id, pedido_id, producto_id, cantidad, precio_unitario, subtotal)
-      - pagos (id, pedido_id, metodo, monto, estado, referencia, comprobante_url?, created_at)
-      - inventario_movimientos (id, producto_id, tipo, cantidad, motivo, created_at)
-      - referidos (id, producto_id, referidor_id, porcentaje, link, activo)
-      - notificaciones (id, usuario_id, tipo, mensaje, leido, created_at)
+      Endpoints mínimos consumidos (prefijo /api del backend):
+      - Auth:
+        - POST /auth/google
+        - GET /me
+        - PUT /me/role
+      - Productos/Catálogo:
+        - GET /products?filters...
+        - CRUD /products (vendedor)
+        - POST /products/{id}/images
+      - Carrito/Checkout:
+        - POST /cart, GET /cart, PUT /cart/{item}, DELETE /cart/{item}
+        - POST /checkout
+      - Pagos:
+        - GET /payments/methods
+        - POST /payments/stripe|paypal|binance
+        - POST /payments/comprobante
+        - POST /webhooks/{provider}
+      - Pedidos/Tracking:
+        - GET /orders
+        - GET /seller/orders
+        - PUT /seller/orders/{id}/status
+        - GET /orders/{id}/tracking
+      - Notificaciones:
+        - GET /notifications
+        - PUT /notifications/{id}/read
 
-  - type: api_endpoints
-    value: |
-      Endpoints mínimos:
-      - POST /auth/google → login con OAuth2
-      - GET /me → perfil actual
-      - PUT /me/rol → cambio a vendedor
-      - CRUD /productos → publicación y gestión
-      - GET /productos?filtros… → catálogo
-      - POST /carrito → agregar producto
-      - DELETE /carrito/{item} → eliminar del carrito
-      - POST /checkout → crear pedido
-      - POST /pagos/stripe|paypal|binance → intentos de pago
-      - POST /webhooks/{proveedor} → confirmación de pago
-      - POST /pagos/comprobante → pago manual (Pago Móvil/Zelle)
-      - GET /pedidos (del comprador)
-      - GET /vendedor/pedidos
-      - PUT /vendedor/pedidos/{id}/estado
-      - GET /notificaciones
-
-  - type: contribution
-    value: |
-      Guía de contribución (Cursor):
-      - Mantener consistencia con este archivo y con README
-      - Antes de editar, revisar lints y pruebas: `flutter test` en móvil; `php artisan test` en backend
-      - PRs deben incluir: objetivo, cambios, screenshots (UI), pruebas manuales realizadas
-      - Convención de ramas: `feat/*`, `fix/*`, `chore/*`, `docs/*`
-      - No introducir dependencias sin justificar tamaño/seguridad
-
-  - type: compilation
-    value: |
-      REGLAS DE COMPILACIÓN FLUTTER - SOLO ANDROID:
-      
-      DISPOSITIVOS PERMITIDOS:
-      - Solo dispositivos Android físicos
-      - IP fija: 192.168.27.10:5555
-      - Conexión por red ADB o USB
-      
-      COMANDOS DE COMPILACIÓN:
-      - Desarrollo: flutter run -d 192.168.27.10:5555
-      - Producción: flutter run --release -d 192.168.27.10:5555
-      - Build APK: flutter build apk --release
-      - Build APK Debug: flutter build apk --debug
-      
-      PROHIBIDO ABSOLUTAMENTE:
-      - NO compilar para Chrome (web)
-      - NO compilar para Linux (desktop)
-      - NO usar emuladores
-      - NO usar flutter run sin especificar dispositivo
-      
-      VERIFICACIÓN DE DISPOSITIVO:
-      - Verificar conexión: adb devices
-      - Conectar por red: adb connect 192.168.27.10:5555
-      - Verificar Flutter: flutter devices
-      
-      CONFIGURACIÓN REQUERIDA:
-      - Dispositivo Android con depuración USB habilitada
-      - IP estática 192.168.27.10 en el dispositivo
-      - Puerto 5555 abierto para ADB
-      - Flutter configurado para Android
+      Contrato:
+      - Autenticación: Authorization: Bearer <token> (Sanctum)
+      - Paginación: ?page=N&per_page=M → { data, meta: { current_page, per_page, total } }
+      - Errores: { message, errors?, code }
+      - Fechas: ISO 8601 (UTC)
 
   - type: tasks
     value: |
-      Roadmap del MVP (4 semanas):
-      - Semana 1:
-        * Infraestructura (VPS, DB, proyecto Laravel, proyecto Flutter)
-        * Migraciones base
-        * Login con Google OAuth2
-      - Semana 2:
-        * API de productos
-        * Catálogo con filtros y paginación
-        * Carrito y Checkout
-        * Flujo de pedidos (comprador)
-      - Semana 3:
-        * Publicación de productos (todas las modalidades)
-        * Inventario del vendedor
-        * Gestión de pedidos por el vendedor
-        * Pre-order con abonos
-      - Semana 4:
-        * Panel de administración mínimo
-        * QA y pruebas de carga
-        * Deploy backend y publicación APK
+      MVP Frontend (alineado):
+      - Auth Google + perfil básico
+      - Catálogo con modalidades (detal, mayor, pre-order, referidos, dropshipping)
+      - Carrito + Checkout
+      - Pagos (API y manuales)
+      - Pedidos (lista/detalle/seguimiento)
+      - Notificaciones (lista + marcar leídas)
+      - Módulo vendedor mínimo (CRUD productos + inventario básico)
+
+  - type: contribution
+    value: |
+      Contribución:
+      - Commits convencionales (feat, fix, refactor, docs, chore)
+      - PRs pequeñas con checklist; ejecutar `flutter test`
+      - No exponer secretos; variables en config/env
+
+  - type: integration
+    value: |
+      Integración con Backend:
+      - `API_BASE_URL` apuntando a `/api`
+      - CORS habilitado en backend para la app
+      - Tokens: guardar/renovar; cerrar sesión limpia
+      - Manejo de errores unificado y mapeo de `errors` a formularios
+ 

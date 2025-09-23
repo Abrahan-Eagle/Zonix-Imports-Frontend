@@ -2,13 +2,15 @@
 
 Aplicación móvil Flutter para el MVP de e‑commerce multi‑modal en Venezuela: venta al detal y al mayor, pre‑order con abonos, referidos y dropshipping interno. Pagos descentralizados por vendedor (Stripe, PayPal, Pago Móvil, Zelle, Binance Pay/USDT).
 
-### 1) Alcance del MVP
+### 1) Alcance del MVP (alineado con Backend)
 - Flutter app (APK Android)
-- Backend Laravel 10 + MySQL 8 (VPS)
-- Login con Google OAuth2
-- Catálogo, carrito y checkout
-- Pagos API (Stripe/PayPal/Binance) y no‑API (Pago Móvil/Zelle)
-- Panel admin mínimo (backend o módulo móvil)
+- Backend Laravel 10 + MySQL 8
+- Autenticación: Google OAuth2 + Sanctum (token Bearer)
+- Catálogo de productos con modalidades: detal, mayorista, pre‑order, referidos y dropshipping interno
+- Carrito, checkout y creación de pedidos
+- Pagos: API (Stripe/PayPal/Binance) y manuales (Pago Móvil/Zelle) vía comprobante
+- Notificaciones internas (lista) y por correo (backend)
+- Panel mínimo de vendedor (móvil) para productos e inventario básico
 
 Fuera de alcance (post‑MVP): web Angular, IA recomendaciones, multi‑país, fidelización avanzada, múltiples integraciones logísticas.
 
@@ -33,8 +35,8 @@ Requisitos: Flutter 3.x, Dart 3.x
 1. Instalar dependencias: `flutter pub get`
 2. Configurar variables en `lib/services/config.dart` o `.env` móvil si aplica
    - `API_BASE_URL` (por ejemplo, http://10.0.2.2:8000/api)
-   - `OAUTH_GOOGLE_CLIENT_ID` (si aplica en móvil)
-   - `FIREBASE_xxx` (si se usan notificaciones)
+   - `OAUTH_GOOGLE_CLIENT_ID`
+   - `FIREBASE_xxx` (si se usan notificaciones push)
 3. Ejecutar: `flutter run -d android`
 
 ### 4) Arquitectura y estándares (Flutter)
@@ -43,17 +45,34 @@ Requisitos: Flutter 3.x, Dart 3.x
 - Internacionalización simple (post‑MVP)
 - Lint: respetar `analysis_options.yaml`
 
-### 5) Endpoints backend consumidos (mínimos)
-- POST `/auth/google`
-- GET `/me`
-- PUT `/me/rol`
-- CRUD `/productos` y `GET /productos?filtros...`
-- POST `/carrito`, DELETE `/carrito/{item}`
-- POST `/checkout`
-- POST `/pagos/{proveedor}` y POST `/webhooks/{proveedor}`
-- POST `/pagos/comprobante`
-- GET `/pedidos`, GET `/vendedor/pedidos`, PUT `/vendedor/pedidos/{id}/estado`
-- GET `/notificaciones`
+### 5) Endpoints backend consumidos (MVP)
+- Autenticación
+  - POST `/auth/google`
+  - GET `/me`
+  - PUT `/me/role`
+- Catálogo y Productos
+  - GET `/products?filters...`
+  - CRUD `/products` (solo vendedor)
+  - POST `/products/{id}/images` (subida de imágenes)
+- Carrito y Checkout
+  - POST `/cart`
+  - GET `/cart`
+  - PUT `/cart/{item}`
+  - DELETE `/cart/{item}`
+  - POST `/checkout`
+- Pagos
+  - GET `/payments/methods`
+  - POST `/payments/stripe|paypal|binance`
+  - POST `/payments/comprobante` (Pago Móvil/Zelle)
+  - POST `/webhooks/{provider}` (confirmaciones)
+- Pedidos
+  - GET `/orders` (comprador)
+  - GET `/seller/orders` (vendedor)
+  - PUT `/seller/orders/{id}/status`
+  - GET `/orders/{id}/tracking`
+- Notificaciones
+  - GET `/notifications`
+  - PUT `/notifications/{id}/read`
 
 Ejemplo de consumo (Dart, simplificado):
 ```dart
@@ -116,11 +135,12 @@ if (res.ok) {
 - Tiempos API: ≤2s/≤4s
 - 99.9% uptime; 98% pagos operativos
 
-### 10) Roadmap (4 semanas)
-- S1: Infra + Auth
-- S2: Comprador (catálogo, carrito, checkout)
-- S3: Vendedor (publicación, inventario, pedidos, pre‑order)
-- S4: Admin + QA + Deploy + APK
+### 10) Roadmap de funcionalidades
+- Infra + Auth (login con Google, perfil)
+- Comprador (catálogo, carrito, checkout)
+- Pagos (API y manuales)
+- Vendedor (publicación, inventario, pedidos, pre‑order)
+- Admin mínimo + QA + APK
 
 ### 11) Desarrollo y contribución
 - Commits convencionales: `tipo(scope): resumen` (feat, fix, refactor, docs, chore)
@@ -139,13 +159,13 @@ if (res.ok) {
 - Cumplimiento legal → Términos/Políticas; KYC básico a vendedores
 - Rendimiento → paginación, índices y caché básico
 
-### 14) Integración con Backend
-- `API_BASE_URL`: debe apuntar a `/api` del backend (p. ej., `http://10.0.2.2:8000/api`).
-- Autenticación: enviar `Authorization: Bearer <token>` (Sanctum token).
-- CORS: el backend debe permitir el origen de la app; usar `FRONTEND_URL` en `.env` backend.
-- Paginación: usar `?page=N&per_page=M`; backend responde `{ data, meta: { current_page, per_page, total } }`.
-- Errores: el backend responde `{ message, errors?, code }`; mapear `errors` a campos en formularios.
-- Fechas: ISO 8601 UTC; convertir a zona local en UI.
-- Moneda: valores en decimales; mostrar en VES/USDT según contexto.
+### 14) Integración con Backend (contrato de API)
+- `API_BASE_URL` debe apuntar a `/api` (p. ej., `http://10.0.2.2:8000/api`).
+- Autenticación: `Authorization: Bearer <token>` (Sanctum).
+- CORS: habilitar origen móvil en backend (`FRONTEND_URL`).
+- Paginación: `?page=N&per_page=M` → `{ data, meta: { current_page, per_page, total } }`.
+- Errores: `{ message, errors?, code }`; mapear `errors` a campos.
+- Fechas: ISO 8601 UTC; convertir a zona local.
+- Moneda: decimales; mostrar VES/USDT según contexto.
 
 
