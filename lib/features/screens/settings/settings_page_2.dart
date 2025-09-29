@@ -8,25 +8,24 @@ import 'package:zonix/features/utils/user_provider.dart';
 import 'package:zonix/features/DomainProfiles/Profiles/screens/profile_page.dart';
 import 'package:zonix/features/screens/auth/sign_in_screen.dart';
 import 'package:zonix/features/DomainProfiles/Addresses/screens/adresse_list_screen.dart';
-import 'package:zonix/features/screens/about/about_page.dart';
-import 'package:zonix/features/screens/help/help_and_faq_page.dart';
 import 'package:zonix/features/DomainProfiles/Profiles/api/profile_service.dart';
-import 'package:zonix/features/screens/notifications/notifications_page.dart';
+// import 'package:zonix/features/screens/about/about_page.dart';
+// import 'package:zonix/features/screens/help/help_and_faq_page.dart';
+// import 'package:zonix/features/screens/notifications/notifications_page.dart';
 // Importaciones para funcionalidades avanzadas
-import 'package:zonix/features/DomainProfiles/Profiles/screens/activity_history_page.dart';
-import 'package:zonix/features/DomainProfiles/Profiles/screens/data_export_page.dart';
-import 'package:zonix/features/DomainProfiles/Profiles/screens/privacy_settings_page.dart';
-import 'package:zonix/features/screens/account_deletion_page.dart';
+// import 'package:zonix/features/DomainProfiles/Profiles/screens/activity_history_page.dart';
+// import 'package:zonix/features/DomainProfiles/Profiles/screens/data_export_page.dart';
+// import 'package:zonix/features/DomainProfiles/Profiles/screens/privacy_settings_page.dart';
+// import 'package:zonix/features/screens/account_deletion_page.dart';
 // Removed app_colors import - using professional color palette
 
-import 'package:zonix/features/screens/settings/commerce_data_page.dart';
-import 'package:zonix/features/screens/settings/commerce_payment_page.dart';
-import 'package:zonix/features/screens/settings/commerce_schedule_page.dart';
-import 'package:zonix/features/screens/settings/commerce_open_page.dart';
-import 'package:zonix/features/screens/commerce/commerce_promotions_page.dart';
-import 'package:zonix/features/screens/commerce/commerce_zones_page.dart';
-import 'package:zonix/features/screens/commerce/commerce_notifications_page.dart';
-
+// import 'package:zonix/features/screens/settings/commerce_data_page.dart';
+// import 'package:zonix/features/screens/settings/commerce_payment_page.dart';
+// import 'package:zonix/features/screens/settings/commerce_schedule_page.dart';
+// import 'package:zonix/features/screens/settings/commerce_open_page.dart';
+// import 'package:zonix/features/screens/commerce/commerce_promotions_page.dart';
+// import 'package:zonix/features/screens/commerce/commerce_zones_page.dart';
+// import 'package:zonix/features/screens/commerce/commerce_notifications_page.dart';
 
 // Configuración del logger
 final logger = Logger();
@@ -43,14 +42,12 @@ class ZonixColors {
   static const Color successGreen = Color(0xFF10B981); // Verde éxito
   static const Color warningOrange = Color(0xFFF59E0B); // Naranja advertencia
   static const Color errorRed = Color(0xFFEF4444); // Rojo error
-  
+
   // Colores adicionales para efectos modernos
   static const Color glassBackground = Color(0x1AFFFFFF);
   static const Color neumorphicLight = Color(0xFFFFFFFF);
   static const Color neumorphicDark = Color(0xFFE0E0E0);
 }
-
-
 
 class SettingsPage2 extends StatefulWidget {
   const SettingsPage2({super.key});
@@ -58,7 +55,6 @@ class SettingsPage2 extends StatefulWidget {
   @override
   State<SettingsPage2> createState() => _SettingsPage2State();
 }
-
 
 class _SettingsPage2State extends State<SettingsPage2> {
   dynamic _profile;
@@ -98,45 +94,44 @@ class _SettingsPage2State extends State<SettingsPage2> {
   // }
 
   Future<void> _loadProfile() async {
-  setState(() {
-    _loading = true;
-    _error = null;
-  });
-  try {
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final userDetails = await userProvider.getUserDetails();
-    
-    // More flexible ID handling
-    final id = userDetails['userId'];
-    if (id == null) {
-      throw Exception('No se pudo obtener el ID del usuario');
-    }
-    
-    // Convert to int if necessary
-    final userId = id is int ? id : int.tryParse(id.toString());
-    if (userId == null) {
-      throw Exception('El ID del usuario no es válido: $id');
-    }
-    
-    _email = userDetails['users']['email'];
-    _profile = await ProfileService().getProfileById(userId);
-    
-    // Log success as info, not error
-    logger.i('Perfil cargado correctamente: $_profile');
-    
-  } catch (e) {
-    // logger.e('Error al cargar el perfil', error: e, stackTrace: stackTrace);
     setState(() {
-      // _error = 'Error al cargar el perfil: ${e.toString()}';
+      _loading = true;
+      _error = null;
     });
-  } finally {
-    if (mounted) {
+    try {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      final userDetails = await userProvider.getUserDetails();
+
+      // More flexible ID handling
+      final id = userDetails['userId'];
+      if (id == null) {
+        throw Exception('No se pudo obtener el ID del usuario');
+      }
+
+      // Convert to int if necessary
+      final userId = id is int ? id : int.tryParse(id.toString());
+      if (userId == null) {
+        throw Exception('El ID del usuario no es válido: $id');
+      }
+
+      _email = userDetails['users']['email'];
+      _profile = await ProfileService().getProfileById(userId);
+
+      // Log success as info, not error
+      logger.i('Perfil cargado correctamente: $_profile');
+    } catch (e) {
+      // logger.e('Error al cargar el perfil', error: e, stackTrace: stackTrace);
       setState(() {
-        _loading = false;
+        // _error = 'Error al cargar el perfil: ${e.toString()}';
       });
+    } finally {
+      if (mounted) {
+        setState(() {
+          _loading = false;
+        });
+      }
     }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -175,7 +170,7 @@ class _SettingsPage2State extends State<SettingsPage2> {
                 final screenWidth = MediaQuery.of(context).size.width;
                 final isTablet = screenWidth > 600;
                 final fontSize = isTablet ? 24.0 : 20.0;
-                
+
                 return Text(
                   "Configuraciones",
                   style: TextStyle(
@@ -206,7 +201,8 @@ class _SettingsPage2State extends State<SettingsPage2> {
                         : ZonixColors.white,
                     elevation: 8,
                     shadowColor: ZonixColors.primaryBlue.withOpacity(0.15),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24)),
                     child: Padding(
                       padding: const EdgeInsets.all(24),
                       child: Row(
@@ -214,9 +210,11 @@ class _SettingsPage2State extends State<SettingsPage2> {
                           CircleAvatar(
                             radius: 36,
                             backgroundImage: _getProfileImage(_profile?.photo),
-                            backgroundColor: ZonixColors.primaryBlue.withOpacity(0.15),
+                            backgroundColor:
+                                ZonixColors.primaryBlue.withOpacity(0.15),
                             child: (_profile?.photo == null)
-                                ? const Icon(Icons.person, color: Colors.white, size: 40)
+                                ? const Icon(Icons.person,
+                                    color: Colors.white, size: 40)
                                 : null,
                           ),
                           const SizedBox(width: 18),
@@ -229,7 +227,8 @@ class _SettingsPage2State extends State<SettingsPage2> {
                                   style: TextStyle(
                                     fontWeight: FontWeight.w700,
                                     fontSize: 22,
-                                    color: Theme.of(context).brightness == Brightness.dark
+                                    color: Theme.of(context).brightness ==
+                                            Brightness.dark
                                         ? ZonixColors.white
                                         : ZonixColors.darkGray,
                                     letterSpacing: 0.5,
@@ -270,7 +269,8 @@ class _SettingsPage2State extends State<SettingsPage2> {
                         : ZonixColors.white,
                     elevation: 6,
                     shadowColor: ZonixColors.primaryBlue.withOpacity(0.1),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16)),
                     child: Column(
                       children: [
                         _buildListTile(
@@ -282,7 +282,8 @@ class _SettingsPage2State extends State<SettingsPage2> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => ProfilePagex(userId: userProvider.userId),
+                                builder: (context) =>
+                                    ProfilePagex(userId: userProvider.userId),
                               ),
                             );
                           },
@@ -296,7 +297,8 @@ class _SettingsPage2State extends State<SettingsPage2> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => DocumentListScreen(userId: userProvider.userId),
+                                builder: (context) => DocumentListScreen(
+                                    userId: userProvider.userId),
                               ),
                             );
                           },
@@ -310,7 +312,8 @@ class _SettingsPage2State extends State<SettingsPage2> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => AddressPage(userId: userProvider.userId),
+                                builder: (context) =>
+                                    AddressPage(userId: userProvider.userId),
                               ),
                             );
                           },
@@ -324,12 +327,12 @@ class _SettingsPage2State extends State<SettingsPage2> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => PhoneScreen(userId: userProvider.userId),
+                                builder: (context) =>
+                                    PhoneScreen(userId: userProvider.userId),
                               ),
                             );
                           },
                         ),
-
                       ],
                     ),
                   ),
@@ -352,111 +355,17 @@ class _SettingsPage2State extends State<SettingsPage2> {
                           : ZonixColors.white,
                       elevation: 6,
                       shadowColor: ZonixColors.primaryBlue.withOpacity(0.1),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                      child: Column(
-                        children: [
-                          _buildListTile(
-                            context,
-                            icon: Icons.store,
-                            color: ZonixColors.primaryBlue,
-                            title: "Datos del comercio",
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const CommerceDataPage(),
-                                ),
-                              );
-                            },
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16)),
+                      child: const Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Gestión del comercio (próximamente)',
+                            style: TextStyle(fontWeight: FontWeight.w600),
                           ),
-                          _buildListTile(
-                            context,
-                            icon: Icons.payment,
-                            color: ZonixColors.successGreen,
-                            title: "Datos de pago móvil",
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const CommercePaymentPage(),
-                                ),
-                              );
-                            },
-                          ),
-                          _buildListTile(
-                            context,
-                            icon: Icons.schedule,
-                            color: ZonixColors.warningOrange,
-                            title: "Horario de atención",
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const CommerceSchedulePage(),
-                                ),
-                              );
-                            },
-                          ),
-                          _buildListTile(
-                            context,
-                            icon: Icons.toggle_on,
-                            color: ZonixColors.errorRed,
-                            title: "Estado abierto/cerrado",
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const CommerceOpenPage(),
-                                ),
-                              );
-                            },
-                          ),
-
-
-                          _buildListTile(
-                            context,
-                            icon: Icons.local_offer,
-                            color: ZonixColors.errorRed,
-                            title: "Promociones/Cupones",
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const CommercePromotionsPage(),
-                                ),
-                              );
-                            },
-                          ),
-
-                          _buildListTile(
-                            context,
-                            icon: Icons.map,
-                            color: ZonixColors.mediumGray,
-                            title: "Zonas/costos de delivery",
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const CommerceZonesPage(),
-                                ),
-                              );
-                            },
-                          ),
-                          _buildListTile(
-                            context,
-                            icon: Icons.notifications,
-                            color: ZonixColors.warningOrange,
-                            title: "Notificaciones y alertas",
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const CommerceNotificationsPage(),
-                                ),
-                              );
-                            },
-                          ),
-                        ],
+                        ),
                       ),
                     ),
                   ],
@@ -479,69 +388,14 @@ class _SettingsPage2State extends State<SettingsPage2> {
                         : ZonixColors.white,
                     elevation: 2,
                     shadowColor: ZonixColors.primaryBlue.withOpacity(0.1),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
                     child: Column(
                       children: [
-                        _buildListTile(
-                          context,
-                          icon: Icons.history,
-                          color: ZonixColors.primaryBlue,
-                          title: "Historial de Actividad",
-                          subtitle: "Revisa todas tus actividades en la aplicación",
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const ActivityHistoryPage(),
-                              ),
-                            );
-                          },
-                        ),
-                        _buildListTile(
-                          context,
-                          icon: Icons.download,
-                          color: ZonixColors.successGreen,
-                          title: "Exportar Datos",
-                          subtitle: "Descarga una copia de todos tus datos personales",
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const DataExportPage(),
-                              ),
-                            );
-                          },
-                        ),
-                        _buildListTile(
-                          context,
-                          icon: Icons.privacy_tip,
-                          color: ZonixColors.warningOrange,
-                          title: "Configuración de Privacidad",
-                          subtitle: "Controla cómo se utilizan y comparten tus datos",
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const PrivacySettingsPage(),
-                              ),
-                            );
-                          },
-                        ),
-                        _buildListTile(
-                          context,
-                          icon: Icons.delete_forever,
-                          color: ZonixColors.errorRed,
-                          title: "Eliminación de Cuenta",
-                          subtitle: "Solicitar eliminación permanente de tu cuenta",
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const AccountDeletionPage(),
-                              ),
-                            );
-                          },
-                        ),
+                        // Historial (próximamente)
+                        // Exportar datos (próximamente)
+                        // Privacidad (próximamente)
+                        // Eliminación de cuenta (próximamente)
                       ],
                     ),
                   ),
@@ -564,51 +418,13 @@ class _SettingsPage2State extends State<SettingsPage2> {
                         : ZonixColors.white,
                     elevation: 2,
                     shadowColor: ZonixColors.primaryBlue.withOpacity(0.1),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
                     child: Column(
                       children: [
-                        _buildListTile(
-                          context,
-                          icon: Icons.notifications_none_rounded,
-                          color: ZonixColors.primaryBlue,
-                          title: "Notificaciones",
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const NotificationsPage(),
-                              ),
-                            );
-                          },
-                        ),
-                        _buildListTile(
-                          context,
-                          icon: Icons.help_outline_rounded,
-                          color: ZonixColors.secondaryBlue,
-                          title: "Ayuda y Comentarios",
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const HelpAndFAQPage(),
-                              ),
-                            );
-                          },
-                        ),
-                        _buildListTile(
-                          context,
-                          icon: Icons.info_outline_rounded,
-                          color: ZonixColors.mediumGray,
-                          title: "Acerca de",
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const MyApp(),
-                              ),
-                            );
-                          },
-                        ),
+                        // Notificaciones (próximamente)
+                        // Ayuda (próximamente)
+                        // Acerca de (próximamente)
                       ],
                     ),
                   ),
@@ -666,7 +482,12 @@ class _SettingsPage2State extends State<SettingsPage2> {
     );
   }
 
-  Widget _buildListTile(BuildContext context, {required IconData icon, required Color color, required String title, String? subtitle, required VoidCallback onTap}) {
+  Widget _buildListTile(BuildContext context,
+      {required IconData icon,
+      required Color color,
+      required String title,
+      String? subtitle,
+      required VoidCallback onTap}) {
     return ListTile(
       leading: CircleAvatar(
         backgroundColor: color.withOpacity(0.15),
@@ -674,7 +495,7 @@ class _SettingsPage2State extends State<SettingsPage2> {
         radius: 20,
       ),
       title: Text(
-        title, 
+        title,
         style: TextStyle(
           fontWeight: FontWeight.w600,
           color: Theme.of(context).brightness == Brightness.dark
@@ -685,18 +506,20 @@ class _SettingsPage2State extends State<SettingsPage2> {
         overflow: TextOverflow.ellipsis,
         maxLines: 1,
       ),
-      subtitle: subtitle != null ? Text(
-        subtitle,
-        style: TextStyle(
-          color: ZonixColors.mediumGray,
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
-        ),
-        overflow: TextOverflow.ellipsis,
-        maxLines: 2,
-      ) : null,
+      subtitle: subtitle != null
+          ? Text(
+              subtitle,
+              style: TextStyle(
+                color: ZonixColors.mediumGray,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 2,
+            )
+          : null,
       trailing: Icon(
-        Icons.chevron_right, 
+        Icons.chevron_right,
         color: ZonixColors.mediumGray,
         size: 20,
       ),
@@ -705,22 +528,22 @@ class _SettingsPage2State extends State<SettingsPage2> {
     );
   }
 
+  ImageProvider<Object> _getProfileImage(String? profilePhoto) {
+    if (profilePhoto != null && profilePhoto.isNotEmpty) {
+      // Detectar URLs de placeholder y evitarlas
+      if (profilePhoto.contains('via.placeholder.com') ||
+          profilePhoto.contains('placeholder.com') ||
+          profilePhoto.contains('placehold.it')) {
+        logger.w(
+            'Detectada URL de placeholder, usando imagen local: $profilePhoto');
+        return const AssetImage('assets/default_avatar.png');
+      }
 
-ImageProvider<Object> _getProfileImage(String? profilePhoto) {
-  if (profilePhoto != null && profilePhoto.isNotEmpty) {
-    // Detectar URLs de placeholder y evitarlas
-    if (profilePhoto.contains('via.placeholder.com') || 
-        profilePhoto.contains('placeholder.com') ||
-        profilePhoto.contains('placehold.it')) {
-      logger.w('Detectada URL de placeholder, usando imagen local: $profilePhoto');
-      return const AssetImage('assets/default_avatar.png');
+      logger.i('Usando foto del perfil: $profilePhoto');
+      return NetworkImage(profilePhoto);
     }
-    
-    logger.i('Usando foto del perfil: $profilePhoto');
-    return NetworkImage(profilePhoto); 
-  }
 
-  logger.w('Usando imagen predeterminada');
-  return const AssetImage('assets/default_avatar.png'); 
-}
+    logger.w('Usando imagen predeterminada');
+    return const AssetImage('assets/default_avatar.png');
+  }
 }

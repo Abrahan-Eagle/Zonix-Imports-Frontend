@@ -44,6 +44,8 @@ class OnboardingService {
         // Manejo de éxito
         debugPrint("Onboarding completado con éxito.");
         logger.i("Onboarding completado con éxito.");
+        // Persistir localmente el estado de onboarding
+        await _storage.write(key: 'userCompletedOnboarding', value: '1');
       } else {
         // Manejo de error
         logger.e(

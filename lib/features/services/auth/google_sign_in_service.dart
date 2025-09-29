@@ -32,7 +32,8 @@ class GoogleSignInService {
 
       // Guardar tokens de Google
       if (accessToken != null) {
-        await AuthUtils.saveToken(accessToken, 3600); // Ajusta el tiempo de expiración
+        await AuthUtils.saveToken(
+            accessToken, 3600); // Ajusta el tiempo de expiración
       }
       if (idToken != null) {
         await _storage.write(key: 'google_idToken', value: idToken);
@@ -59,17 +60,41 @@ class GoogleSignInService {
         final response = await _apiService.sendTokenToBackend(processedResult);
 
         if (response.statusCode == 200) {
-          final data = jsonDecode(response.body);
-          await AuthUtils.saveToken(data['token'], data['expires_in']); // Guardar el token devuelto por el backend
-          await _storage.write(key: 'role', value: data['user']['role']); // Guardar el rol
-          logger.i('Token guardado correctamente con su expiración.');
-          return user; // Retorna el usuario autenticado
+          // Estructura flexible: puede venir como {success, data:{user, token}} o {user, token}
+          final Map<String, dynamic> responseData = jsonDecode(response.body);
+
+          String? token;
+          String? role;
+          if (responseData.containsKey('data')) {
+            final data = responseData['data'] as Map<String, dynamic>;
+            token = data['token']?.toString();
+            role = (data['user'] as Map<String, dynamic>?)?['role']?.toString();
+          } else {
+            token = responseData['token']?.toString();
+            role = (responseData['user'] as Map<String, dynamic>?)?['role']
+                ?.toString();
+          }
+
+          if (token != null && token.isNotEmpty) {
+            // Guardar token y rol de manera segura (sin expires_in si no viene)
+            await _storage.write(key: 'token', value: token);
+            if (role != null) {
+              await _storage.write(key: 'role', value: role);
+            }
+            logger.i('Token y rol guardados correctamente.');
+            return user; // Retorna el usuario autenticado
+          } else {
+            logger.e('Respuesta sin token válida');
+            return null;
+          }
         } else {
-          logger.e('Error al enviar el token al backend: ${response.statusCode}');
+          logger
+              .e('Error al enviar el token al backend: ${response.statusCode}');
           return null; // Retorna null si hay error al enviar el token al backend
         }
       } else {
-        logger.e('Error al obtener los datos del perfil: ${profileResponse.statusCode}');
+        logger.e(
+            'Error al obtener los datos del perfil: ${profileResponse.statusCode}');
         return null; // Retorna null si no se pueden obtener los datos del perfil
       }
     } catch (error) {
@@ -112,12 +137,11 @@ class GoogleSignInService {
     if (currentUser != null) {
       logger.i('Usuario autenticado automáticamente: ${currentUser.email}');
     } else {
-      logger.i('No se detectó ningún usuario autenticado. Requiere inicio de sesión.');
+      logger.i(
+          'No se detectó ningún usuario autenticado. Requiere inicio de sesión.');
     }
   }
 }
-
-
 
 // import 'dart:convert';
 // import 'package:google_sign_in/google_sign_in.dart';

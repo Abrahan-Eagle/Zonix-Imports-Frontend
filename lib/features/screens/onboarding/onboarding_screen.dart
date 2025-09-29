@@ -8,6 +8,7 @@ import 'onboarding_page4.dart';
 import 'onboarding_page5.dart';
 import 'onboarding_page6.dart';
 import 'onboarding_service.dart';
+import 'package:zonix/features/utils/auth_utils.dart';
 import 'package:zonix/main.dart';
 import 'package:provider/provider.dart';
 import 'package:zonix/features/utils/user_provider.dart';
