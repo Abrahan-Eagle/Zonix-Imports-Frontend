@@ -6,17 +6,42 @@ Aplicación móvil de Zonix Imports desarrollada en Flutter. Proporciona una int
 
 ## 🏗️ Arquitectura
 
+**Clean Architecture + Feature-First + Provider Pattern**
+
 ```
 lib/
-├── config/              # Configuración de la app
-├── features/            # Funcionalidades principales
-│   ├── screens/         # Pantallas de la app
-│   ├── services/        # Servicios de API y WebSocket
-│   ├── utils/           # Utilidades específicas
-│   └── DomainProfiles/  # Gestión de perfiles
-├── helpers/             # Helpers generales
-├── models/              # Modelos de datos
-└── main.dart           # Punto de entrada
+├── core/                       # ✅ Núcleo de la aplicación
+│   ├── config/                # ✅ Configuración global
+│   │   ├── app_config.dart    # ✅ URLs, constantes
+│   │   ├── theme.dart         # ✅ Tema y colores
+│   │   └── routes.dart        # ✅ Rutas de navegación
+│   ├── constants/             # ✅ Constantes globales
+│   ├── utils/                 # ✅ Utilidades globales
+│   └── services/              # ✅ Servicios base
+│
+├── shared/                     # ✅ Componentes compartidos
+│   ├── widgets/               # ✅ Widgets comunes
+│   ├── models/                # ✅ Modelos base
+│   └── providers/             # ✅ Providers compartidos
+│
+├── features/                   # ✅ Módulos por funcionalidad
+│   ├── auth/                  # ✅ Módulo autenticación
+│   │   ├── data/              # ✅ Capa de datos
+│   │   ├── domain/            # ✅ Lógica de negocio
+│   │   └── presentation/      # ✅ Capa de presentación
+│   ├── products/              # ✅ Módulo productos
+│   ├── cart/                  # ✅ Módulo carrito
+│   ├── orders/                # ✅ Módulo órdenes
+│   ├── commerce/              # ✅ Módulo comercio (vendedor)
+│   ├── payments/              # ✅ Módulo pagos
+│   └── profile/               # ✅ Módulo perfil
+│
+├── app/                       # ✅ Configuración de la app
+│   ├── app.dart              # ✅ Widget principal
+│   ├── app_module.dart       # ✅ Inyección de dependencias
+│   └── app_routes.dart       # ✅ Configuración de rutas
+│
+└── main.dart                 # ✅ Punto de entrada
 ```
 
 ## 🚀 Instalación
@@ -82,41 +107,134 @@ flutter run
 
 ## 🏗️ Estructura Detallada
 
-### Configuración
+### 🎯 Patrones de Arquitectura
+
+**Clean Architecture + Feature-First + Provider Pattern**
+
+Cada feature sigue la estructura de Clean Architecture:
+
 ```
-lib/config/
-├── app_config.dart      # URLs y configuración general
-├── theme.dart           # Tema de la aplicación
-└── constants.dart       # Constantes globales
+features/[feature_name]/
+├── data/                    # ✅ Capa de Datos
+│   ├── models/             # ✅ Modelos de datos
+│   ├── repositories/       # ✅ Implementación de repositorios
+│   └── datasources/        # ✅ Fuentes de datos (API, Local)
+├── domain/                  # ✅ Capa de Dominio
+│   ├── entities/           # ✅ Entidades de negocio
+│   ├── repositories/       # ✅ Interfaces de repositorios
+│   └── usecases/           # ✅ Casos de uso
+└── presentation/            # ✅ Capa de Presentación
+    ├── providers/          # ✅ Providers (Estado)
+    ├── widgets/            # ✅ Widgets específicos
+    └── screens/            # ✅ Pantallas
 ```
 
-### Features
-```
-lib/features/
-├── screens/             # Pantallas principales
-│   ├── auth/           # Autenticación
-│   ├── products/       # Productos
-│   ├── cart/           # Carrito
-│   ├── orders/         # Órdenes
-│   └── profile/        # Perfil
-├── services/           # Servicios de API
-│   ├── auth_service.dart
-│   ├── product_service.dart
-│   └── order_service.dart
-└── utils/              # Utilidades
-    ├── image_utils.dart
-    ├── location_utils.dart
-    └── validation_utils.dart
+### 🔄 Patrones de Desarrollo
+
+**Repository Pattern:**
+```dart
+// domain/repositories/product_repository.dart
+abstract class ProductRepository {
+  Future<List<Product>> getProducts();
+  Future<Product> getProductById(int id);
+  Future<void> createProduct(Product product);
+}
+
+// data/repositories/product_repository_impl.dart
+class ProductRepositoryImpl implements ProductRepository {
+  final ProductApiService _apiService;
+  
+  ProductRepositoryImpl(this._apiService);
+  
+  @override
+  Future<List<Product>> getProducts() async {
+    return await _apiService.fetchProducts();
+  }
+}
 ```
 
-### Modelos
+**UseCase Pattern:**
+```dart
+// domain/usecases/get_products_usecase.dart
+class GetProductsUseCase {
+  final ProductRepository _repository;
+  
+  GetProductsUseCase(this._repository);
+  
+  Future<List<Product>> execute() async {
+    return await _repository.getProducts();
+  }
+}
 ```
-lib/models/
-├── user.dart           # Modelo de usuario
-├── product.dart        # Modelo de producto
-├── order.dart          # Modelo de orden
-└── cart_item.dart      # Modelo de item del carrito
+
+**Provider Pattern:**
+```dart
+// presentation/providers/product_provider.dart
+class ProductProvider extends ChangeNotifier {
+  final GetProductsUseCase _getProductsUseCase;
+  
+  List<Product> _products = [];
+  bool _isLoading = false;
+  String? _error;
+  
+  List<Product> get products => _products;
+  bool get isLoading => _isLoading;
+  String? get error => _error;
+  
+  Future<void> loadProducts() async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+    
+    try {
+      _products = await _getProductsUseCase.execute();
+    } catch (e) {
+      _error = e.toString();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+}
 ```
+
+### 📱 Widget Composition
+
+**Widgets Reutilizables en `shared/widgets/`:**
+```dart
+// shared/widgets/buttons/primary_button.dart
+class PrimaryButton extends StatelessWidget {
+  final String text;
+  final VoidCallback? onPressed;
+  final bool isLoading;
+  
+  const PrimaryButton({
+    Key? key,
+    required this.text,
+    this.onPressed,
+    this.isLoading = false,
+  }) : super(key: key);
+  
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: isLoading ? null : onPressed,
+      child: isLoading 
+        ? const CircularProgressIndicator()
+        : Text(text),
+    );
+  }
+}
+```
+
+### 🎨 UI/UX Guidelines
+
+- **Material Design 3** como base
+- **Responsive Design** para móvil y tablet
+- **Loading States** consistentes en toda la app
+- **Error Handling** con snackbars informativos
+- **Navegación fluida** con transiciones suaves
+- **Tema personalizado** con colores de marca Zonix
 
 ## 🔧 Servicios Principales
 

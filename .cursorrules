@@ -10,17 +10,150 @@ rules:
       - Vendedor: publicación de productos, inventario básico, gestión de pedidos
       - Admin (mínimo): vistas básicas (puede resolverse en backend web)
 
+  - type: architecture
+    value: |
+      Estructura de Directorios (Clean Architecture + Feature-First):
+      
+      lib/
+      ├── core/                       # ✅ Núcleo de la aplicación
+      │   ├── config/                # ✅ Configuración global
+      │   │   ├── app_config.dart    # ✅ URLs, constantes
+      │   │   ├── theme.dart         # ✅ Tema y colores
+      │   │   └── routes.dart        # ✅ Rutas de navegación
+      │   ├── constants/             # ✅ Constantes globales
+      │   │   ├── app_constants.dart # ✅ Constantes de app
+      │   │   ├── api_constants.dart # ✅ Constantes de API
+      │   │   └── ui_constants.dart  # ✅ Constantes de UI
+      │   ├── utils/                 # ✅ Utilidades globales
+      │   │   ├── validators.dart    # ✅ Validaciones
+      │   │   ├── formatters.dart    # ✅ Formateo de datos
+      │   │   ├── helpers.dart       # ✅ Helpers generales
+      │   │   └── extensions.dart    # ✅ Extensiones de Dart
+      │   └── services/              # ✅ Servicios base
+      │       ├── api_service.dart   # ✅ Cliente HTTP base
+      │       ├── storage_service.dart # ✅ Servicio de almacenamiento
+      │       └── notification_service.dart # ✅ Notificaciones
+      │
+      ├── shared/                     # ✅ Componentes compartidos
+      │   ├── widgets/               # ✅ Widgets comunes
+      │   │   ├── buttons/           # ✅ Botones reutilizables
+      │   │   ├── inputs/            # ✅ Campos de entrada
+      │   │   ├── cards/             # ✅ Tarjetas
+      │   │   ├── dialogs/           # ✅ Diálogos y modales
+      │   │   ├── loaders/           # ✅ Indicadores de carga
+      │   │   └── app_bar/           # ✅ AppBars personalizados
+      │   ├── models/                # ✅ Modelos base
+      │   │   ├── base_model.dart    # ✅ Modelo base
+      │   │   ├── api_response.dart  # ✅ Respuesta de API
+      │   │   └── pagination.dart    # ✅ Paginación
+      │   └── providers/             # ✅ Providers compartidos
+      │       ├── theme_provider.dart # ✅ Provider de tema
+      │       └── app_state_provider.dart # ✅ Estado global
+      │
+      ├── features/                   # ✅ Módulos por funcionalidad
+      │   ├── auth/                  # ✅ Módulo autenticación
+      │   │   ├── data/              # ✅ Capa de datos
+      │   │   │   ├── models/        # ✅ User, Profile, etc.
+      │   │   │   ├── repositories/  # ✅ AuthRepository
+      │   │   │   └── datasources/   # ✅ AuthApiService
+      │   │   ├── domain/            # ✅ Lógica de negocio
+      │   │   │   ├── entities/      # ✅ Entidades de dominio
+      │   │   │   ├── repositories/  # ✅ Interfaces de repositorio
+      │   │   │   └── usecases/      # ✅ Casos de uso
+      │   │   ├── presentation/      # ✅ Capa de presentación
+      │   │   │   ├── providers/     # ✅ AuthProvider
+      │   │   │   ├── widgets/       # ✅ LoginForm, etc.
+      │   │   │   └── screens/       # ✅ LoginPage, etc.
+      │   │   └── auth_module.dart   # ✅ Módulo de inyección
+      │   │
+      │   ├── products/              # ✅ Módulo productos
+      │   │   ├── data/
+      │   │   │   ├── models/        # ✅ Product, Category, etc.
+      │   │   │   ├── repositories/  # ✅ ProductRepository
+      │   │   │   └── datasources/   # ✅ ProductApiService
+      │   │   ├── domain/
+      │   │   │   ├── entities/      # ✅ Entidades de producto
+      │   │   │   ├── repositories/  # ✅ Interfaces
+      │   │   │   └── usecases/      # ✅ GetProducts, CreateProduct, etc.
+      │   │   ├── presentation/
+      │   │   │   ├── providers/     # ✅ ProductProvider
+      │   │   │   ├── widgets/       # ✅ ProductCard, etc.
+      │   │   │   └── screens/       # ✅ ProductsPage, etc.
+      │   │   └── products_module.dart
+      │   │
+      │   ├── cart/                  # ✅ Módulo carrito
+      │   │   ├── data/models/       # ✅ CartItem, Cart
+      │   │   ├── domain/usecases/   # ✅ AddToCart, RemoveFromCart
+      │   │   ├── presentation/
+      │   │   │   ├── providers/     # ✅ CartProvider
+      │   │   │   ├── widgets/       # ✅ CartItemWidget
+      │   │   │   └── screens/       # ✅ CartPage
+      │   │   └── cart_module.dart
+      │   │
+      │   ├── orders/                # ✅ Módulo órdenes
+      │   │   ├── data/models/       # ✅ Order, OrderItem
+      │   │   ├── domain/usecases/   # ✅ CreateOrder, GetOrders
+      │   │   ├── presentation/
+      │   │   │   ├── providers/     # ✅ OrderProvider
+      │   │   │   ├── widgets/       # ✅ OrderCard
+      │   │   │   └── screens/       # ✅ OrdersPage, OrderDetailPage
+      │   │   └── orders_module.dart
+      │   │
+      │   ├── commerce/              # ✅ Módulo comercio (vendedor)
+      │   │   ├── data/models/       # ✅ Seller, Commerce
+      │   │   ├── domain/usecases/   # ✅ ManageProducts, ViewSales
+      │   │   ├── presentation/
+      │   │   │   ├── providers/     # ✅ CommerceProvider
+      │   │   │   ├── widgets/       # ✅ ProductForm
+      │   │   │   └── screens/       # ✅ CommerceDashboard
+      │   │   └── commerce_module.dart
+      │   │
+      │   ├── payments/              # ✅ Módulo pagos
+      │   │   ├── data/models/       # ✅ Payment, PaymentMethod
+      │   │   ├── domain/usecases/   # ✅ ProcessPayment
+      │   │   ├── presentation/
+      │   │   │   ├── providers/     # ✅ PaymentProvider
+      │   │   │   ├── widgets/       # ✅ PaymentForm
+      │   │   │   └── screens/       # ✅ PaymentPage
+      │   │   └── payments_module.dart
+      │   │
+      │   └── profile/               # ✅ Módulo perfil
+      │       ├── data/models/       # ✅ Profile, Address, Document
+      │       ├── domain/usecases/   # ✅ UpdateProfile, ManageAddresses
+      │       ├── presentation/
+      │       │   ├── providers/     # ✅ ProfileProvider
+      │       │   ├── widgets/       # ✅ ProfileForm
+      │       │   └── screens/       # ✅ ProfilePage, SettingsPage
+      │       └── profile_module.dart
+      │
+      ├── app/                       # ✅ Configuración de la app
+      │   ├── app.dart              # ✅ Widget principal
+      │   ├── app_module.dart       # ✅ Inyección de dependencias
+      │   └── app_routes.dart       # ✅ Configuración de rutas
+      │
+      └── main.dart                 # ✅ Punto de entrada
+
   - type: coding
     value: |
       Estándares y convenciones (Frontend Flutter):
       - Flutter/Dart 3.x. Respetar analysis_options.yaml
-      - Arquitectura: MVVM + Provider (o Riverpod si se migra), servicios HTTP en lib/services
+      - Arquitectura: Clean Architecture + Feature-First + Provider
+      - Patrón: Repository + UseCase + Provider
       - Código: nombres descriptivos, evitar abreviaturas, manejo explícito de errores
       - UI: componentes reutilizables; loading y error states consistentes
       - Estado: Provider centralizado por feature; no lógica de negocio en widgets puros
       - Red: timeouts razonables, reintentos básicos, headers `{ Authorization: Bearer <token> }`
       - Seguridad: tokens en flutter_secure_storage; sin logs de PII/tokens
       - Internacionalización: preparada (post-MVP si no está)
+      
+      Convenciones de nomenclatura:
+      - Archivos: snake_case (user_profile_page.dart)
+      - Clases: PascalCase (UserProfilePage)
+      - Variables: camelCase (userName)
+      - Constantes: UPPER_SNAKE_CASE (API_BASE_URL)
+      - Providers: [Feature]Provider (AuthProvider, CartProvider)
+      - Models: [Entity]Model (UserModel, ProductModel)
+      - Services: [Feature]Service (AuthService, ProductService)
 
   - type: api_contract
     value: |
@@ -81,4 +214,108 @@ rules:
       - CORS habilitado en backend para la app
       - Tokens: guardar/renovar; cerrar sesión limpia
       - Manejo de errores unificado y mapeo de `errors` a formularios
- 
+
+  - type: patterns
+    value: |
+      Patrones de Desarrollo Recomendados:
+      
+      📁 Estructura por Feature:
+      - Cada feature es un módulo independiente
+      - Capas separadas: data/domain/presentation
+      - Inyección de dependencias por módulo
+      
+      🔄 Provider Pattern:
+      - Un Provider por feature principal
+      - Estados: loading, success, error
+      - Métodos: async/await con try-catch
+      - NotifyListeners() para actualizar UI
+      
+      🏗️ Repository Pattern:
+      - Interface en domain/repositories/
+      - Implementación en data/repositories/
+      - Abstrae fuentes de datos (API, Local)
+      
+      🎯 UseCase Pattern:
+      - Un UseCase por acción de negocio
+      - Lógica de negocio centralizada
+      - Fácil testing y mantenimiento
+      
+      📱 Widget Composition:
+      - Widgets pequeños y reutilizables
+      - Separación de lógica y presentación
+      - Custom widgets en shared/widgets/
+      
+      🎨 UI/UX Guidelines:
+      - Material Design 3
+      - Responsive design (móvil/tablet)
+      - Loading states consistentes
+      - Error handling con snackbars
+      - Navegación fluida con transiciones
+      
+      🧪 Testing Strategy:
+      - Unit tests para UseCases
+      - Widget tests para componentes
+      - Integration tests para flujos completos
+      - Mock de dependencias externas
+      
+      📊 State Management:
+      - Provider para estado local
+      - SharedPreferences para persistencia
+      - flutter_secure_storage para tokens
+      - Cache inteligente con TTL
+      
+      🔒 Security Best Practices:
+      - Validación de inputs en frontend
+      - Sanitización de datos
+      - Tokens seguros (no en logs)
+      - Certificados SSL en producción
+
+  - type: development_workflow
+    value: |
+      Flujo de Desarrollo:
+      
+      1. 🎯 Planificación:
+         - Definir feature en GitHub Issues
+         - Crear branch desde main
+         - Seguir estructura de directorios
+      
+      2. 🏗️ Desarrollo:
+         - Crear modelos de datos primero
+         - Implementar repositorios y UseCases
+         - Desarrollar Providers
+         - Crear widgets y pantallas
+         - Escribir tests
+      
+      3. 🧪 Testing:
+         - Unit tests: flutter test
+         - Widget tests: flutter test
+         - Integration tests: flutter drive
+         - Coverage: flutter test --coverage
+      
+      4. 📱 Build & Deploy:
+         - Debug: flutter run -d <device_ip>:5555
+         - Release: flutter build apk --release
+         - Testing en dispositivo físico
+      
+      5. 🔄 Code Review:
+         - Pull Request con descripción clara
+         - Checklist de revisión
+         - Approval de al menos 1 reviewer
+         - Merge a main después de approval
+      
+      6. 📦 Release:
+         - Tag de versión semántica
+         - Changelog actualizado
+         - Deploy a producción
+      
+      📋 Checklist de PR:
+      - [ ] Código sigue convenciones de nomenclatura
+      - [ ] Tests pasan (flutter test)
+      - [ ] No hay warnings de linter
+      - [ ] Funcionalidad probada en dispositivo
+      - [ ] Documentación actualizada si es necesario
+      - [ ] Performance optimizada
+      - [ ] Memory leaks revisados
+      - [ ] Responsive design verificado
+      - [ ] Error handling implementado
+      - [ ] Loading states incluidos
