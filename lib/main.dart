@@ -23,8 +23,8 @@ import 'package:zonix/features/DomainProfiles/Profiles/api/profile_service.dart'
  * ZONIX IMPORTS - Aplicación E-commerce MVP
  * 
  * Niveles de usuario (MVP):
- * 0 - Comprador: Productos, Carrito, Mis Órdenes, Restaurantes
- * 1 - Tiendas/Comercio: Dashboard, Inventario, Órdenes, Reportes
+ * 0 - Comprador: Productos, Carrito, Checkout, Pedidos
+ * 1 - Vendedor: Productos, Inventario, Pedidos, Perfil
  * 
  * Funcionalidades avanzadas eliminadas para enfocarse en el MVP core
  */
@@ -332,86 +332,6 @@ class MainRouterState extends State<MainRouter> {
           ),
         ];
         break;
-      case 2: // Delivery
-        items = [
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.delivery_dining),
-            label: 'Entregas',
-          ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.history),
-            label: 'Historial',
-          ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.location_on),
-            label: 'Rutas',
-          ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.account_balance_wallet),
-            label: 'Ganancias',
-          ),
-        ];
-        break;
-      case 3: // Agencia de Transporte
-        items = [
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.local_shipping),
-            label: 'Flota',
-          ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.assignment),
-            label: 'Pedidos',
-          ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.analytics),
-            label: 'Analíticas',
-          ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Configuración',
-          ),
-        ];
-        break;
-      case 4: // Afiliado a Delivery
-        items = [
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard),
-            label: 'Dashboard',
-          ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.percent),
-            label: 'Comisiones',
-          ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.support_agent),
-            label: 'Soporte',
-          ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.analytics),
-            label: 'Estadísticas',
-          ),
-        ];
-        break;
-      case 5: // Administrador
-        items = [
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.admin_panel_settings),
-            label: 'Panel Admin',
-          ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.people_outline),
-            label: 'Usuarios',
-          ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.security),
-            label: 'Seguridad',
-          ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.settings_system_daydream),
-            label: 'Sistema',
-          ),
-        ];
-        break;
       default:
         items = [
           const BottomNavigationBarItem(
@@ -419,8 +339,8 @@ class MainRouterState extends State<MainRouter> {
             label: 'Inicio',
           ),
           const BottomNavigationBarItem(
-            icon: Icon(Icons.help),
-            label: 'Ayuda',
+            icon: Icon(Icons.person),
+            label: 'Perfil',
           ),
         ];
     }
@@ -666,8 +586,6 @@ class MainRouterState extends State<MainRouter> {
                 logger.i('Role fetched: $role');
 
                 // if (_selectedLevel == 0) {
-                //   if (_bottomNavIndex == 0) return const HelpAndFAQPage();
-                //   if (_bottomNavIndex == 1) return const HelpAndFAQPage();
                 //   if (_bottomNavIndex == 2 && role == 'sales_admin') return const TicketScannerScreen();
                 //   if (_bottomNavIndex == 3 && role == 'sales_admin') return const CheckScannerScreen();
                 //   if (_bottomNavIndex == 2 && role == 'dispatcher') return const DispatcherScreen();
@@ -722,11 +640,7 @@ class MainRouterState extends State<MainRouter> {
         type: ExpandableFabType.up,
         children: [
           _createLevelButton(0, Icons.shopping_bag, 'Comprador'),
-          _createLevelButton(1, Icons.storefront, 'Tiendas'),
-          _createLevelButton(2, Icons.delivery_dining, 'Delivery'),
-          _createLevelButton(3, Icons.local_shipping, 'Agencia de Transporte'),
-          _createLevelButton(4, Icons.handshake, 'Afiliado a Delivery'),
-          _createLevelButton(5, Icons.admin_panel_settings, 'Administrador'),
+          _createLevelButton(1, Icons.storefront, 'Vendedor'),
         ],
       ),
       bottomNavigationBar: Container(

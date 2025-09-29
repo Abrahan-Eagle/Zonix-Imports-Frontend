@@ -741,12 +741,14 @@ class SignInScreenState extends State<SignInScreen>
           ),
         ),
         const SizedBox(width: 16),
-        Text(
-          text,
-          style: TextStyle(
-            fontSize: responsiveFontSize,
-            fontWeight: FontWeight.w500,
-            color: const Color(0xFF1E293B),
+        Flexible(
+          child: Text(
+            text,
+            style: TextStyle(
+              fontSize: responsiveFontSize,
+              fontWeight: FontWeight.w500,
+              color: const Color(0xFF1E293B),
+            ),
           ),
         ),
       ],

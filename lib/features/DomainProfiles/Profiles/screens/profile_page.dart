@@ -90,7 +90,8 @@ class ProfilePagex extends StatelessWidget {
                   pinned: true,
                   backgroundColor: AppColors.scaffoldBg(context),
                   flexibleSpace: FlexibleSpaceBar(
-                    background: _buildHeader(context, profileModel.profile!, isDark),
+                    background:
+                        _buildHeader(context, profileModel.profile!, isDark),
                   ),
                   leading: IconButton(
                     icon: const Icon(Icons.arrow_back),
@@ -101,11 +102,12 @@ class ProfilePagex extends StatelessWidget {
                     IconButton(
                       icon: const Icon(Icons.edit),
                       color: AppColors.primaryText(context),
-                      onPressed: () => _navigateToEditOrCreatePage(context, profileModel.profile!),
+                      onPressed: () => _navigateToEditOrCreatePage(
+                          context, profileModel.profile!),
                     ),
                   ],
                 ),
-                
+
                 // Contenido del perfil
                 SliverToBoxAdapter(
                   child: Padding(
@@ -115,27 +117,22 @@ class ProfilePagex extends StatelessWidget {
                         // Información personal
                         _buildPersonalInfoCard(context, profileModel.profile!),
                         const SizedBox(height: 16),
-                        
+
                         // Información de contacto
                         _buildContactInfoCard(context, profileModel.profile!),
                         const SizedBox(height: 16),
-                        
+
                         // Información de negocio (si aplica)
                         if (_hasBusinessInfo(profileModel.profile!))
-                          _buildBusinessInfoCard(context, profileModel.profile!),
+                          _buildBusinessInfoCard(
+                              context, profileModel.profile!),
                         if (_hasBusinessInfo(profileModel.profile!))
                           const SizedBox(height: 16),
-                        
-                        // Información de delivery (si aplica)
-                        if (_hasDeliveryInfo(profileModel.profile!))
-                          _buildDeliveryInfoCard(context, profileModel.profile!),
-                        if (_hasDeliveryInfo(profileModel.profile!))
-                          const SizedBox(height: 16),
-                        
+
                         // Estado del perfil
                         _buildProfileStatusCard(context, profileModel.profile!),
                         const SizedBox(height: 16),
-                        
+
                         // Botón de editar perfil
                         _buildEditProfileButton(context, profileModel.profile!),
                         const SizedBox(height: 20),
@@ -191,62 +188,75 @@ class ProfilePagex extends StatelessWidget {
                     logger.i('🔍 Verificando imagen del perfil:');
                     logger.i('   - photo: ${profile.photo}');
                     logger.i('   - photo != null: ${profile.photo != null}');
-                    logger.i('   - photo.isNotEmpty: ${profile.photo?.isNotEmpty}');
-                    logger.i('   - contiene placeholder: ${profile.photo?.contains('URL de foto no disponible')}');
-                    
-                    if (profile.photo != null && profile.photo!.isNotEmpty && !profile.photo!.contains('URL de foto no disponible')) {
-                      logger.i('✅ Mostrando imagen del perfil: ${profile.photo}');
+                    logger.i(
+                        '   - photo.isNotEmpty: ${profile.photo?.isNotEmpty}');
+                    logger.i(
+                        '   - contiene placeholder: ${profile.photo?.contains('URL de foto no disponible')}');
+
+                    if (profile.photo != null &&
+                        profile.photo!.isNotEmpty &&
+                        !profile.photo!.contains('URL de foto no disponible')) {
+                      logger
+                          .i('✅ Mostrando imagen del perfil: ${profile.photo}');
                       return ClipOval(
-                          child: Image.network(
-                            profile.photo!,
-                            width: 110,
-                            height: 110,
-                            fit: BoxFit.cover,
-                            loadingBuilder: (context, child, loadingProgress) {
-                              if (loadingProgress == null) return child;
-                              return Container(
-                                width: 110,
-                                height: 110,
-                                decoration: BoxDecoration(
-                                  color: AppColors.grayLight,
-                                  shape: BoxShape.circle,
+                        child: Image.network(
+                          profile.photo!,
+                          width: 110,
+                          height: 110,
+                          fit: BoxFit.cover,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Container(
+                              width: 110,
+                              height: 110,
+                              decoration: BoxDecoration(
+                                color: AppColors.grayLight,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Center(
+                                child: CircularProgressIndicator(
+                                  color: AppColors.blue,
+                                  strokeWidth: 2,
                                 ),
-                                child: const Center(
-                                  child: CircularProgressIndicator(
-                                    color: AppColors.blue,
-                                    strokeWidth: 2,
-                                  ),
+                              ),
+                            );
+                          },
+                          errorBuilder: (context, error, stackTrace) {
+                            logger
+                                .e('Error cargando imagen del perfil: $error');
+                            logger.i(
+                                '🔄 Intentando usar imagen de Google como fallback...');
+
+                            // Intentar usar la imagen de Google como fallback
+                            if (profile.user?.profilePic != null &&
+                                profile.user!.profilePic!.isNotEmpty) {
+                              logger.i(
+                                  '✅ Usando imagen de Google: ${profile.user!.profilePic}');
+                              return ClipOval(
+                                child: Image.network(
+                                  profile.user!.profilePic!,
+                                  width: 110,
+                                  height: 110,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    logger.e(
+                                        'Error también con imagen de Google: $error');
+                                    return const Icon(Icons.person,
+                                        color: AppColors.blue, size: 50);
+                                  },
                                 ),
                               );
-                            },
-                            errorBuilder: (context, error, stackTrace) {
-                              logger.e('Error cargando imagen del perfil: $error');
-                              logger.i('🔄 Intentando usar imagen de Google como fallback...');
-                              
-                              // Intentar usar la imagen de Google como fallback
-                              if (profile.user?.profilePic != null && profile.user!.profilePic!.isNotEmpty) {
-                                logger.i('✅ Usando imagen de Google: ${profile.user!.profilePic}');
-                                return ClipOval(
-                                  child: Image.network(
-                                    profile.user!.profilePic!,
-                                    width: 110,
-                                    height: 110,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      logger.e('Error también con imagen de Google: $error');
-                                      return const Icon(Icons.person, color: AppColors.blue, size: 50);
-                                    },
-                                  ),
-                                );
-                              }
-                              
-                              return const Icon(Icons.person, color: AppColors.blue, size: 50);
-                            },
-                          ),
-                        );
+                            }
+
+                            return const Icon(Icons.person,
+                                color: AppColors.blue, size: 50);
+                          },
+                        ),
+                      );
                     } else {
                       logger.w('❌ Usando icono placeholder');
-                      return const Icon(Icons.person, color: AppColors.blue, size: 50);
+                      return const Icon(Icons.person,
+                          color: AppColors.blue, size: 50);
                     }
                   }(),
                 ),
@@ -293,7 +303,7 @@ class ProfilePagex extends StatelessWidget {
   Widget _buildPersonalInfoCard(BuildContext context, Profile profile) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 4),
       decoration: BoxDecoration(
@@ -301,7 +311,9 @@ class ProfilePagex extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: isDark ? Colors.black.withOpacity(0.3) : Colors.grey.withOpacity(0.1),
+            color: isDark
+                ? Colors.black.withOpacity(0.3)
+                : Colors.grey.withOpacity(0.1),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -339,15 +351,26 @@ class ProfilePagex extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 20),
-            _buildInfoRow(context, 'Nombre', profile.firstName, Icons.person_outline),
+            _buildInfoRow(
+                context, 'Nombre', profile.firstName, Icons.person_outline),
             if (profile.middleName != null && profile.middleName!.isNotEmpty)
-              _buildInfoRow(context, 'Segundo Nombre', profile.middleName!, Icons.person_outline),
-            _buildInfoRow(context, 'Apellido', profile.lastName, Icons.person_outline),
-            if (profile.secondLastName != null && profile.secondLastName!.isNotEmpty)
-              _buildInfoRow(context, 'Segundo Apellido', profile.secondLastName!, Icons.person_outline),
-            _buildInfoRow(context, 'Fecha de Nacimiento', _formatDate(profile.dateOfBirth), Icons.calendar_today),
-            _buildInfoRow(context, 'Estado Civil', _translateMaritalStatus(profile.maritalStatus ?? 'N/A'), Icons.favorite),
-            _buildInfoRow(context, 'Sexo', _translateSex(profile.sex), Icons.wc),
+              _buildInfoRow(context, 'Segundo Nombre', profile.middleName!,
+                  Icons.person_outline),
+            _buildInfoRow(
+                context, 'Apellido', profile.lastName, Icons.person_outline),
+            if (profile.secondLastName != null &&
+                profile.secondLastName!.isNotEmpty)
+              _buildInfoRow(context, 'Segundo Apellido',
+                  profile.secondLastName!, Icons.person_outline),
+            _buildInfoRow(context, 'Fecha de Nacimiento',
+                _formatDate(profile.dateOfBirth), Icons.calendar_today),
+            _buildInfoRow(
+                context,
+                'Estado Civil',
+                _translateMaritalStatus(profile.maritalStatus ?? 'N/A'),
+                Icons.favorite),
+            _buildInfoRow(
+                context, 'Sexo', _translateSex(profile.sex), Icons.wc),
           ],
         ),
       ),
@@ -357,7 +380,7 @@ class ProfilePagex extends StatelessWidget {
   Widget _buildContactInfoCard(BuildContext context, Profile profile) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 4),
       decoration: BoxDecoration(
@@ -365,7 +388,9 @@ class ProfilePagex extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: isDark ? Colors.black.withOpacity(0.3) : Colors.grey.withOpacity(0.1),
+            color: isDark
+                ? Colors.black.withOpacity(0.3)
+                : Colors.grey.withOpacity(0.1),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -403,8 +428,10 @@ class ProfilePagex extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 20),
-            _buildInfoRow(context, 'Teléfono', profile.phone ?? 'No especificado', Icons.phone),
-            _buildInfoRow(context, 'Dirección', profile.address ?? 'No especificada', Icons.location_on),
+            _buildInfoRow(context, 'Teléfono',
+                profile.phone ?? 'No especificado', Icons.phone),
+            _buildInfoRow(context, 'Dirección',
+                profile.address ?? 'No especificada', Icons.location_on),
           ],
         ),
       ),
@@ -448,59 +475,16 @@ class ProfilePagex extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 20),
-            if (profile.businessName != null && profile.businessName!.isNotEmpty)
-              _buildInfoRow(context, 'Nombre del Negocio', profile.businessName!, Icons.store),
-            if (profile.businessType != null && profile.businessType!.isNotEmpty)
-              _buildInfoRow(context, 'Tipo de Negocio', profile.businessType!, Icons.category),
+            if (profile.businessName != null &&
+                profile.businessName!.isNotEmpty)
+              _buildInfoRow(context, 'Nombre del Negocio',
+                  profile.businessName!, Icons.store),
+            if (profile.businessType != null &&
+                profile.businessType!.isNotEmpty)
+              _buildInfoRow(context, 'Tipo de Negocio', profile.businessType!,
+                  Icons.category),
             if (profile.taxId != null && profile.taxId!.isNotEmpty)
               _buildInfoRow(context, 'RFC', profile.taxId!, Icons.receipt),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDeliveryInfoCard(BuildContext context, Profile profile) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Card(
-      color: AppColors.cardBg(context),
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: AppColors.purple.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(
-                    Icons.delivery_dining,
-                    color: AppColors.purple,
-                    size: 24,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  'Información de Delivery',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primaryText(context),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            if (profile.vehicleType != null && profile.vehicleType!.isNotEmpty)
-              _buildInfoRow(context, 'Tipo de Vehículo', profile.vehicleType!, Icons.two_wheeler),
-            if (profile.licenseNumber != null && profile.licenseNumber!.isNotEmpty)
-              _buildInfoRow(context, 'Número de Licencia', profile.licenseNumber!, Icons.card_membership),
           ],
         ),
       ),
@@ -523,7 +507,8 @@ class ProfilePagex extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: _getStatusColor(profile.status).withOpacity(isDark ? 0.15 : 0.08),
+                    color: _getStatusColor(profile.status)
+                        .withOpacity(isDark ? 0.15 : 0.08),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
@@ -544,17 +529,19 @@ class ProfilePagex extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 20),
-            _buildInfoRow(context, 'Estado', _translateStatus(profile.status), Icons.info),
+            _buildInfoRow(context, 'Estado', _translateStatus(profile.status),
+                Icons.info),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildInfoRow(BuildContext context, String label, String value, IconData icon) {
+  Widget _buildInfoRow(
+      BuildContext context, String label, String value, IconData icon) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -635,13 +622,8 @@ class ProfilePagex extends StatelessWidget {
 
   bool _hasBusinessInfo(Profile profile) {
     return (profile.businessName != null && profile.businessName!.isNotEmpty) ||
-           (profile.businessType != null && profile.businessType!.isNotEmpty) ||
-           (profile.taxId != null && profile.taxId!.isNotEmpty);
-  }
-
-  bool _hasDeliveryInfo(Profile profile) {
-    return (profile.vehicleType != null && profile.vehicleType!.isNotEmpty) ||
-           (profile.licenseNumber != null && profile.licenseNumber!.isNotEmpty);
+        (profile.businessType != null && profile.businessType!.isNotEmpty) ||
+        (profile.taxId != null && profile.taxId!.isNotEmpty);
   }
 
   String _translateMaritalStatus(String status) {
@@ -702,7 +684,7 @@ class ProfilePagex extends StatelessWidget {
     if (date == null || date.isEmpty) {
       return 'N/A';
     }
-    
+
     final DateFormat format = DateFormat('dd-MM-yyyy');
     try {
       final DateTime parsedDate = DateTime.parse(date);
@@ -718,8 +700,8 @@ class ProfilePagex extends StatelessWidget {
     );
 
     Navigator.push(context, route).then((_) {
-      Provider.of<ProfileModel>(context, listen: false).loadProfile(profile.userId);
+      Provider.of<ProfileModel>(context, listen: false)
+          .loadProfile(profile.userId);
     });
   }
-
 }

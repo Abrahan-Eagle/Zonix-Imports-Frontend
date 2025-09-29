@@ -34,26 +34,16 @@ dependencies:
   url_launcher: ^6.3.1
   mobile_scanner: ^7.0.1
   image: ^4.3.0
+  package_info_plus: ^8.1.0
+  google_fonts: ^6.2.1
+  camera: ^0.11.0+2
+  path_provider: ^2.1.5
   geolocator: ^14.0.2
   webview_flutter: ^4.10.0
-  flutter_typeahead: ^5.2.0
   smooth_page_indicator: ^1.2.0+3
-  about: ^2.2.0
-  package_info_plus: ^8.1.0
-  qr_flutter: ^4.1.0
-  google_mlkit_image_labeling: ^0.14.1
-  google_mlkit_face_detection: ^0.13.1
-  google_mlkit_barcode_scanning: ^0.14.1
-  google_mlkit_text_recognition: ^0.15.0
-  google_fonts: ^6.2.1
-  google_mlkit_commons: ^0.11.0
-  camera: ^0.11.0+2
   google_mlkit_document_scanner: ^0.4.0
-  flutter_pdfview: ^1.4.1+1
-  printing: ^5.13.4
-  pdf: ^3.11.1
-  path_provider: ^2.1.5
-  qr: ^3.0.2
+  google_mlkit_face_detection: ^0.13.1
+  google_mlkit_commons: ^0.11.0
   shimmer: ^3.0.0
   
 
@@ -103,9 +93,6 @@ flutter:
     - assets/images/2.png
     - assets/images/logo_login.png
     - assets/images/logo_login2.png
-    - assets/onboarding/onboarding_eats_familia.png
-    - assets/onboarding/onboarding_eats.png
-    - assets/onboarding/onboarding_eats2.png 
     - assets/onboarding/onboardingPage1.png
     - assets/onboarding/onboardingPage2.png  # Temporalmente comentado - imagen no existe
     - assets/onboarding/onboardingPage3.png

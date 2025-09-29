@@ -95,13 +95,13 @@ class _LoginScreenState extends State<LoginScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Icon(
-                Icons.restaurant,
+                Icons.storefront,
                 size: 100,
-                color: Colors.orange,
+                color: Color(0xFF1E40AF),
               ),
               const SizedBox(height: 32),
               const Text(
-                'Zonix Eats',
+                'Zonix Imports',
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
@@ -121,7 +121,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   if (value == null || value.isEmpty) {
                     return 'Por favor ingrese su email';
                   }
-                  if (!RegExp(r'^[\w\.-]+@[\w\.-]+\.\w{2,4}$').hasMatch(value)) {
+                  if (!RegExp(r'^[\w\.-]+@[\w\.-]+\.\w{2,4}$')
+                      .hasMatch(value)) {
                     return 'Ingrese un email válido';
                   }
                   if (value.length > 100) {
@@ -179,4 +180,4 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
-} 
+}

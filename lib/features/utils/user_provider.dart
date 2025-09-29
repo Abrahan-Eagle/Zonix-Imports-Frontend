@@ -20,7 +20,6 @@ class UserProvider with ChangeNotifier {
   bool _profileCreated = false;
   bool _adresseCreated = false;
   bool _documentCreated = false;
-  bool _gasCylindersCreated = false;
   bool _phoneCreated = false;
   bool _emailCreated = false;
 
@@ -36,7 +35,6 @@ class UserProvider with ChangeNotifier {
   bool get profileCreated => _profileCreated;
   bool get adresseCreated => _adresseCreated;
   bool get documentCreated => _documentCreated;
-  bool get gasCylindersCreated => _gasCylindersCreated;
   bool get phoneCreated => _phoneCreated;
   bool get emailCreated => _emailCreated;
   String get userName => _userName;
@@ -45,16 +43,16 @@ class UserProvider with ChangeNotifier {
   int get userId => _userId;
   String get userGoogleId => _userGoogleId;
   String get userRole => _role;
-  
+
   // Getter para obtener el usuario completo
   Map<String, dynamic> get user => {
-    'id': _userId,
-    'name': _userName,
-    'email': _userEmail,
-    'photo_url': _userPhotoUrl,
-    'google_id': _userGoogleId,
-    'role': _role,
-  };
+        'id': _userId,
+        'name': _userName,
+        'email': _userEmail,
+        'photo_url': _userPhotoUrl,
+        'google_id': _userGoogleId,
+        'role': _role,
+      };
 
   // Setter para actualizar el estado de creación de perfil
   void setProfileCreated(bool value) {
@@ -72,12 +70,6 @@ class UserProvider with ChangeNotifier {
   void setDocumentCreated(bool value) {
     _documentCreated = value;
     _storage.write(key: 'documentCreated', value: value.toString());
-    notifyListeners();
-  }
-
-  void setGasCylindersCreated(bool value) {
-    _gasCylindersCreated = value;
-    _storage.write(key: 'gasCylindersCreated', value: value.toString());
     notifyListeners();
   }
 
@@ -119,8 +111,8 @@ class UserProvider with ChangeNotifier {
       _userGoogleId = await AuthUtils.getUserGoogleId() ?? '';
       _profileCreated = (await _storage.read(key: 'profileCreated')) == 'true';
       _adresseCreated = (await _storage.read(key: 'adresseCreated')) == 'true';
-      _documentCreated = (await _storage.read(key: 'documentCreated')) == 'true';
-      _gasCylindersCreated = (await _storage.read(key: 'gasCylindersCreated')) == 'true';
+      _documentCreated =
+          (await _storage.read(key: 'documentCreated')) == 'true';
       _phoneCreated = (await _storage.read(key: 'phoneCreated')) == 'true';
       _emailCreated = (await _storage.read(key: 'emailCreated')) == 'true';
     } catch (e) {
@@ -147,30 +139,32 @@ class UserProvider with ChangeNotifier {
 
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
-        
+
         // Manejar el formato de respuesta del backend {success: true, data: {...}}
         Map<String, dynamic> userDetails;
-        if (responseData.containsKey('success') && responseData.containsKey('data')) {
+        if (responseData.containsKey('success') &&
+            responseData.containsKey('data')) {
           if (responseData['success'] == true) {
             userDetails = responseData['data'];
           } else {
-            throw Exception(responseData['message'] ?? 'Error al obtener detalles del usuario');
+            throw Exception(responseData['message'] ??
+                'Error al obtener detalles del usuario');
           }
         } else {
           // Fallback para respuestas sin formato estándar
           userDetails = responseData;
         }
-        
+
         _userGoogleId = userDetails['google_id'] ?? '';
         _userId = userDetails['id'] ?? 0;
         _role = userDetails['role'] ?? '';
-        
+
         logger.i('User details: $userDetails');
         logger.i('User role: $_role');
         return {
-          'users': userDetails, 
-          'role': _role, 
-          'userId': _userId, 
+          'users': userDetails,
+          'role': _role,
+          'userId': _userId,
           'userGoogleId': _userGoogleId
         };
       } else {
@@ -207,7 +201,8 @@ class UserProvider with ChangeNotifier {
   }
 
   // Actualiza la información del usuario en memoria
-  void _updateUserInfo({required String name, required String email, required String photoUrl}) {
+  void _updateUserInfo(
+      {required String name, required String email, required String photoUrl}) {
     _userName = name;
     _userEmail = email;
     _userPhotoUrl = photoUrl;
@@ -231,7 +226,6 @@ class UserProvider with ChangeNotifier {
     _profileCreated = false;
     _adresseCreated = false;
     _documentCreated = false;
-    _gasCylindersCreated = false;
     _phoneCreated = false;
     _emailCreated = false;
     _userName = '';
@@ -244,7 +238,6 @@ class UserProvider with ChangeNotifier {
     await _storage.delete(key: 'profileCreated');
     await _storage.delete(key: 'adresseCreated');
     await _storage.delete(key: 'documentCreated');
-    await _storage.delete(key: 'gasCylindersCreated');
     await _storage.delete(key: 'phoneCreated');
     await _storage.delete(key: 'emailCreated');
     await _storage.delete(key: 'token');

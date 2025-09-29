@@ -6,14 +6,14 @@ class UserInfo {
   String name;
   String email;
   String? profilePic;
-  
+
   UserInfo({
     required this.id,
     required this.name,
     required this.email,
     this.profilePic,
   });
-  
+
   factory UserInfo.fromJson(Map<String, dynamic> json) {
     return UserInfo(
       id: json['id'],
@@ -38,16 +38,12 @@ class Profile {
   String status; // Estado del perfil
   String? phone; // Teléfono
   String? address; // Dirección
-  
+
   // Campos específicos para comercios
   String? businessName; // Nombre del negocio
   String? businessType; // Tipo de negocio
   String? taxId; // RFC
-  
-  // Campos específicos para delivery
-  String? vehicleType; // Tipo de vehículo
-  String? licenseNumber; // Número de licencia
-  
+
   // Información del usuario asociado
   UserInfo? user;
 
@@ -69,8 +65,6 @@ class Profile {
     this.businessName,
     this.businessType,
     this.taxId,
-    this.vehicleType,
-    this.licenseNumber,
     this.user,
   });
 
@@ -92,8 +86,6 @@ class Profile {
       businessName: json['business_name'],
       businessType: json['business_type'],
       taxId: json['tax_id'],
-      vehicleType: json['vehicle_type'],
-      licenseNumber: json['license_number'],
       user: json['user'] != null ? UserInfo.fromJson(json['user']) : null,
     );
   }
@@ -116,8 +108,6 @@ class Profile {
       'business_name': businessName,
       'business_type': businessType,
       'tax_id': taxId,
-      'vehicle_type': vehicleType,
-      'license_number': licenseNumber,
     };
   }
 
@@ -139,8 +129,6 @@ class Profile {
     String? businessName,
     String? businessType,
     String? taxId,
-    String? vehicleType,
-    String? licenseNumber,
     UserInfo? user,
   }) {
     return Profile(
@@ -160,8 +148,6 @@ class Profile {
       businessName: businessName ?? this.businessName,
       businessType: businessType ?? this.businessType,
       taxId: taxId ?? this.taxId,
-      vehicleType: vehicleType ?? this.vehicleType,
-      licenseNumber: licenseNumber ?? this.licenseNumber,
       user: user ?? this.user,
     );
   }

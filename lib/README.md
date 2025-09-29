@@ -1,8 +1,8 @@
-# Zonix Eats Frontend - Flutter App
+# Zonix Imports Frontend - Flutter App
 
 ## 📋 Descripción
 
-Aplicación móvil de Zonix Eats desarrollada en Flutter. Proporciona una interfaz completa para clientes, comercios y repartidores con funcionalidades en tiempo real.
+Aplicación móvil de Zonix Imports desarrollada en Flutter. Proporciona una interfaz completa para clientes y vendedores con funcionalidades de e-commerce multi-modal.
 
 ## 🏗️ Arquitectura
 
@@ -39,7 +39,6 @@ flutter pub get
 // lib/config/app_config.dart
 class AppConfig {
   static const String baseUrl = 'http://192.168.0.101:8000/api';
-  static const String echoServerUrl = 'http://192.168.0.101:6001';
 }
 ```
 
@@ -56,10 +55,10 @@ flutter run
 - Persistencia de sesión
 - Logout seguro
 
-### 🏪 Restaurantes y Productos
-- Lista de restaurantes
-- Detalles de restaurante
-- Catálogo de productos
+### 🏪 Catálogo y Productos
+- Lista de productos
+- Detalles de producto
+- Catálogo multi-modal (detal, mayor, pre-order, referidos, dropshipping)
 - Búsqueda y filtros
 - Imágenes con fallback
 
@@ -73,39 +72,13 @@ flutter run
 ### 📦 Órdenes
 - Crear nueva orden
 - Ver historial de pedidos
-- Seguimiento en tiempo real
 - Cancelar órdenes
 - Estados de pedido
 
-### ⭐ Reviews y Calificaciones
-- Calificar productos
-- Ver reseñas
-- Editar reseñas
-- Sistema de estrellas
+### 📍 Direcciones
+- Gestión de direcciones de entrega
+- Validación de ubicaciones
 
-### 💬 Chat en Tiempo Real
-- Mensajería instantánea
-- Notificaciones push
-- Indicador de escritura
-- Historial de mensajes
-
-### 🔔 Notificaciones
-- Notificaciones push
-- Notificaciones en tiempo real
-- Marcar como leídas
-- Configuración de notificaciones
-
-### 📍 Geolocalización
-- Obtener ubicación actual
-- Calcular rutas
-- Lugares cercanos
-- Zonas de entrega
-
-### ❤️ Favoritos
-- Agregar restaurantes favoritos
-- Ver lista de favoritos
-- Remover favoritos
-- Sincronización con backend
 
 ## 🏗️ Estructura Detallada
 
@@ -125,14 +98,11 @@ lib/features/
 │   ├── products/       # Productos
 │   ├── cart/           # Carrito
 │   ├── orders/         # Órdenes
-│   ├── profile/        # Perfil
-│   └── notifications/  # Notificaciones
+│   └── profile/        # Perfil
 ├── services/           # Servicios de API
 │   ├── auth_service.dart
 │   ├── product_service.dart
-│   ├── order_service.dart
-│   ├── websocket_service.dart
-│   └── notification_service.dart
+│   └── order_service.dart
 └── utils/              # Utilidades
     ├── image_utils.dart
     ├── location_utils.dart
@@ -145,8 +115,7 @@ lib/models/
 ├── user.dart           # Modelo de usuario
 ├── product.dart        # Modelo de producto
 ├── order.dart          # Modelo de orden
-├── cart_item.dart      # Modelo de item del carrito
-└── notification.dart   # Modelo de notificación
+└── cart_item.dart      # Modelo de item del carrito
 ```
 
 ## 🔧 Servicios Principales
@@ -166,7 +135,7 @@ class AuthService {
 class ProductService {
   Future<List<Product>> fetchProducts();
   Future<Product> fetchProductDetails(int id);
-  Future<List<Product>> fetchProductsByRestaurant(int restaurantId);
+  Future<List<Product>> fetchProductsBySeller(int sellerId);
 }
 ```
 
@@ -180,24 +149,6 @@ class OrderService {
 }
 ```
 
-### WebSocketService
-```dart
-class WebSocketService {
-  Future<void> connect();
-  Future<void> disconnect();
-  Stream<Map<String, dynamic>> get messageStream;
-  Future<void> sendMessage(String message);
-}
-```
-
-### NotificationService
-```dart
-class NotificationService {
-  Future<List<Notification>> fetchNotifications();
-  Future<void> markAsRead(int id);
-  Future<void> deleteNotification(int id);
-}
-```
 
 ## 🎨 UI/UX Components
 
@@ -247,7 +198,6 @@ class AppTheme {
 ### Gestión de Estado
 - **Provider**: Para estado global
 - **SharedPreferences**: Para persistencia local
-- **Streams**: Para comunicación en tiempo real
 
 ### Ejemplo de Provider
 ```dart
@@ -435,9 +385,9 @@ try {
    - Verificar que el backend esté corriendo
    - Revisar configuración de red
 
-2. **Error de WebSocket**
-   - Verificar que Echo Server esté corriendo
-   - Revisar configuración de URLs
+2. **Error de red**
+   - Verificar configuración de URLs
+   - Revisar conectividad
    - Verificar autenticación
 
 3. **Error de imágenes**
@@ -457,11 +407,8 @@ flutter logs
 ## 📈 Roadmap
 
 ### Próximas Funcionalidades
-- [ ] Push notifications nativas
 - [ ] Pagos con tarjeta
-- [ ] Mapa interactivo
 - [ ] Modo offline
-- [ ] Analytics
 - [ ] Tests de integración
 
 ### Mejoras Técnicas

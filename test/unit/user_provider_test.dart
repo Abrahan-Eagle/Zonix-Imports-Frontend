@@ -34,7 +34,6 @@ void main() {
       expect(userProvider.profileCreated, isA<bool>());
       expect(userProvider.adresseCreated, isA<bool>());
       expect(userProvider.documentCreated, isA<bool>());
-      expect(userProvider.gasCylindersCreated, isA<bool>());
       expect(userProvider.phoneCreated, isA<bool>());
       expect(userProvider.emailCreated, isA<bool>());
     });

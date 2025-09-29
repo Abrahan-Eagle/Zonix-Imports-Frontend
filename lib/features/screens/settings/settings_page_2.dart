@@ -9,23 +9,6 @@ import 'package:zonix/features/DomainProfiles/Profiles/screens/profile_page.dart
 import 'package:zonix/features/screens/auth/sign_in_screen.dart';
 import 'package:zonix/features/DomainProfiles/Addresses/screens/adresse_list_screen.dart';
 import 'package:zonix/features/DomainProfiles/Profiles/api/profile_service.dart';
-// import 'package:zonix/features/screens/about/about_page.dart';
-// import 'package:zonix/features/screens/help/help_and_faq_page.dart';
-// import 'package:zonix/features/screens/notifications/notifications_page.dart';
-// Importaciones para funcionalidades avanzadas
-// import 'package:zonix/features/DomainProfiles/Profiles/screens/activity_history_page.dart';
-// import 'package:zonix/features/DomainProfiles/Profiles/screens/data_export_page.dart';
-// import 'package:zonix/features/DomainProfiles/Profiles/screens/privacy_settings_page.dart';
-// import 'package:zonix/features/screens/account_deletion_page.dart';
-// Removed app_colors import - using professional color palette
-
-// import 'package:zonix/features/screens/settings/commerce_data_page.dart';
-// import 'package:zonix/features/screens/settings/commerce_payment_page.dart';
-// import 'package:zonix/features/screens/settings/commerce_schedule_page.dart';
-// import 'package:zonix/features/screens/settings/commerce_open_page.dart';
-// import 'package:zonix/features/screens/commerce/commerce_promotions_page.dart';
-// import 'package:zonix/features/screens/commerce/commerce_zones_page.dart';
-// import 'package:zonix/features/screens/commerce/commerce_notifications_page.dart';
 
 // Configuración del logger
 final logger = Logger();

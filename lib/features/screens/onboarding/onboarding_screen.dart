@@ -5,7 +5,6 @@ import 'onboarding_page1.dart';
 import 'onboarding_page2.dart';
 import 'onboarding_page3.dart';
 import 'onboarding_page4.dart';
-import 'onboarding_page5.dart';
 import 'onboarding_page6.dart';
 import 'onboarding_service.dart';
 import 'package:zonix/features/utils/auth_utils.dart';
@@ -103,7 +102,6 @@ class OnboardingScreenState extends State<OnboardingScreen>
       OnboardingPage2(),
       OnboardingPage3(),
       OnboardingPage4(),
-      OnboardingPage5(),
       OnboardingPage6(),
     ];
   }

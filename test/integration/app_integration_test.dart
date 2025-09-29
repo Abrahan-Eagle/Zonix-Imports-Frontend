@@ -46,7 +46,6 @@ void main() {
       userProvider.setProfileCreated(true);
       userProvider.setAdresseCreated(true);
       userProvider.setDocumentCreated(true);
-      userProvider.setGasCylindersCreated(true);
       userProvider.setPhoneCreated(true);
       userProvider.setEmailCreated(true);
 
@@ -56,7 +55,6 @@ void main() {
       expect(userProvider.profileCreated, isTrue);
       expect(userProvider.adresseCreated, isTrue);
       expect(userProvider.documentCreated, isTrue);
-      expect(userProvider.gasCylindersCreated, isTrue);
       expect(userProvider.phoneCreated, isTrue);
       expect(userProvider.emailCreated, isTrue);
     });
