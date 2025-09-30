@@ -70,10 +70,9 @@ class ProfileService {
         logger.i('Perfil encontrado: $data');
         return Profile.fromJson(data);
       } else if (response.statusCode == 404) {
-        logger.w(
-            'Endpoint específico retorna 404, intentando con todos los perfiles');
-        // Si el endpoint específico no funciona, usamos el de todos los perfiles
-        return await _getProfileFromAllProfiles(userId);
+        logger.w('Usuario $userId no encontrado en el sistema');
+        // Usuario no existe, no intentar buscar en todos los perfiles
+        return null;
       } else {
         logger.w(
             'Endpoint específico retorna ${response.statusCode}, intentando con todos los perfiles');

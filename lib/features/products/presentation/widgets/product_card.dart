@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/constants/ui_constants.dart';
 import '../../data/models/product_model.dart';
 
-/// Widget para mostrar una tarjeta de producto
+/// Widget de tarjeta de producto reutilizable y responsive
 class ProductCard extends StatelessWidget {
   final ProductModel product;
   final VoidCallback? onTap;
@@ -20,40 +20,90 @@ class ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    // Calcular dimensiones responsive
+    final cardWidth = _getCardWidth(screenWidth);
+    final imageHeight = _getImageHeight(screenWidth);
+
     return Card(
-      elevation: 2,
-      shadowColor: UIConstants.gray.withOpacity(0.1),
+      elevation: UIConstants.elevationSM,
+      color: isDark ? UIConstants.cardBgDark : UIConstants.cardBgLight,
+      shadowColor: isDark ? Colors.black54 : UIConstants.gray.withOpacity(0.1),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(UIConstants.radiusMD),
       ),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(UIConstants.radiusMD),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _buildImageSection(context),
-            Expanded(
-              child: _buildContentSection(context),
-            ),
-            _buildActionSection(context),
-          ],
+        child: Container(
+          width: cardWidth,
+          constraints: BoxConstraints(
+            maxHeight: _getMaxCardHeight(screenWidth),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildImageSection(context, imageHeight, isDark),
+              Expanded(
+                child: _buildContentSection(context, isDark),
+              ),
+              _buildActionSection(context, isDark),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildImageSection(BuildContext context) {
+  /// Calcular ancho de tarjeta responsive
+  double _getCardWidth(double screenWidth) {
+    if (screenWidth < UIConstants.breakpointMobile) {
+      return (screenWidth - 48) / 2; // 2 columnas en móvil
+    } else if (screenWidth < UIConstants.breakpointTablet) {
+      return (screenWidth - 64) / 3; // 3 columnas en tablet pequeño
+    } else if (screenWidth < UIConstants.breakpointDesktop) {
+      return (screenWidth - 80) / 4; // 4 columnas en tablet grande
+    } else {
+      return (screenWidth - 96) / 5; // 5 columnas en desktop
+    }
+  }
+
+  /// Calcular altura de imagen responsive
+  double _getImageHeight(double screenWidth) {
+    if (screenWidth < UIConstants.breakpointMobile) {
+      return 100.0; // Móvil
+    } else if (screenWidth < UIConstants.breakpointTablet) {
+      return 120.0; // Tablet pequeño
+    } else {
+      return 140.0; // Tablet grande y desktop
+    }
+  }
+
+  /// Calcular altura máxima de tarjeta responsive
+  double _getMaxCardHeight(double screenWidth) {
+    if (screenWidth < UIConstants.breakpointMobile) {
+      return 280.0; // Móvil - aumentado para evitar overflow
+    } else if (screenWidth < UIConstants.breakpointTablet) {
+      return 300.0; // Tablet pequeño - aumentado
+    } else {
+      return 320.0; // Tablet grande y desktop - aumentado
+    }
+  }
+
+  Widget _buildImageSection(
+      BuildContext context, double imageHeight, bool isDark) {
     return Container(
-      height: UIConstants.productImageHeight,
+      height: imageHeight,
       width: double.infinity,
       decoration: BoxDecoration(
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(UIConstants.radiusMD),
           topRight: Radius.circular(UIConstants.radiusMD),
         ),
-        color: UIConstants.grayLight,
+        color: isDark ? UIConstants.grayDark : UIConstants.grayLight,
       ),
       child: Stack(
         children: [
@@ -71,55 +121,55 @@ class ProductCard extends StatelessWidget {
                     height: double.infinity,
                     loadingBuilder: (context, child, loadingProgress) {
                       if (loadingProgress == null) return child;
-                      return _buildImagePlaceholder();
+                      return _buildImagePlaceholder(isDark);
                     },
                     errorBuilder: (context, error, stackTrace) =>
-                        _buildImageError(),
+                        _buildImageError(isDark),
                   )
-                : _buildImagePlaceholder(),
+                : _buildImagePlaceholder(isDark),
           ),
 
           // Badges superpuestos
           Positioned(
             top: UIConstants.spacingSM,
             left: UIConstants.spacingSM,
-            child: _buildBadges(),
+            child: _buildBadges(isDark),
           ),
 
           // Botón de favoritos
           Positioned(
             top: UIConstants.spacingSM,
             right: UIConstants.spacingSM,
-            child: _buildFavoriteButton(context),
+            child: _buildFavoriteButton(context, isDark),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildImagePlaceholder() {
+  Widget _buildImagePlaceholder(bool isDark) {
     return Container(
-      color: UIConstants.grayLight,
-      child: const Icon(
+      color: isDark ? UIConstants.grayDark : UIConstants.grayLight,
+      child: Icon(
         Icons.image_outlined,
         size: UIConstants.iconSizeXL,
-        color: UIConstants.gray,
+        color: isDark ? UIConstants.textLight : UIConstants.gray,
       ),
     );
   }
 
-  Widget _buildImageError() {
+  Widget _buildImageError(bool isDark) {
     return Container(
-      color: UIConstants.grayLight,
-      child: const Icon(
+      color: isDark ? UIConstants.grayDark : UIConstants.grayLight,
+      child: Icon(
         Icons.broken_image_outlined,
         size: UIConstants.iconSizeXL,
-        color: UIConstants.error,
+        color: isDark ? UIConstants.error : UIConstants.error,
       ),
     );
   }
 
-  Widget _buildBadges() {
+  Widget _buildBadges(bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -150,7 +200,7 @@ class ProductCard extends StatelessWidget {
               vertical: UIConstants.spacingXS,
             ),
             decoration: BoxDecoration(
-              color: UIConstants.gray,
+              color: UIConstants.error,
               borderRadius: BorderRadius.circular(UIConstants.radiusXS),
             ),
             child: const Text(
@@ -166,54 +216,48 @@ class ProductCard extends StatelessWidget {
     );
   }
 
-  Widget _buildFavoriteButton(BuildContext context) {
+  Widget _buildFavoriteButton(BuildContext context, bool isDark) {
     return Container(
       decoration: BoxDecoration(
-        color: UIConstants.white.withOpacity(0.9),
-        shape: BoxShape.circle,
-        boxShadow: const [
-          BoxShadow(
-            color: Color.fromRGBO(0, 0, 0, 0.05),
-            offset: Offset(0, 1),
-            blurRadius: 2,
-          )
-        ],
+        color: isDark ? Colors.black54 : Colors.white70,
+        borderRadius: BorderRadius.circular(UIConstants.radiusCircle),
       ),
       child: IconButton(
-        onPressed: onAddToFavorites,
         icon: const Icon(
           Icons.favorite_border,
-          color: UIConstants.gray,
+          color: UIConstants.error,
           size: UIConstants.iconSizeSM,
         ),
+        onPressed: onAddToFavorites,
+        padding: const EdgeInsets.all(UIConstants.spacingXS),
         constraints: const BoxConstraints(
-          minWidth: UIConstants.iconSizeMD + UIConstants.spacingSM,
-          minHeight: UIConstants.iconSizeMD + UIConstants.spacingSM,
+          minWidth: UIConstants.iconSizeSM,
+          minHeight: UIConstants.iconSizeSM,
         ),
-        padding: EdgeInsets.zero,
       ),
     );
   }
 
-  Widget _buildContentSection(BuildContext context) {
+  Widget _buildContentSection(BuildContext context, bool isDark) {
     return Padding(
-      padding: const EdgeInsets.all(UIConstants.spacingSM),
+      padding: const EdgeInsets.symmetric(
+        horizontal: UIConstants.spacingSM,
+        vertical: UIConstants.spacingXS,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
           // Nombre del producto
-          Flexible(
-            child: Text(
-              product.name,
-              style: const TextStyle(
-                fontSize: UIConstants.fontSizeSM,
-                fontWeight: UIConstants.fontWeightMedium,
-                color: UIConstants.textPrimary,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
+          Text(
+            product.name,
+            style: TextStyle(
+              fontSize: UIConstants.fontSizeSM,
+              fontWeight: UIConstants.fontWeightMedium,
+              color: isDark ? UIConstants.textWhite : UIConstants.textPrimary,
             ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
 
           const SizedBox(height: UIConstants.spacingXS),
@@ -221,87 +265,77 @@ class ProductCard extends StatelessWidget {
           // Modalidad
           Text(
             product.modalityText,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: UIConstants.fontSizeXS,
-              color: UIConstants.textSecondary,
+              color: isDark ? Colors.white70 : UIConstants.textSecondary,
               fontWeight: UIConstants.fontWeightNormal,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
-
-          const SizedBox(height: UIConstants.spacingSM),
-
-          // Precio
-          _buildPriceSection(),
 
           const SizedBox(height: UIConstants.spacingXS),
 
-          // Estado del stock
-          _buildStockStatus(),
+          // Precio
+          _buildPriceSection(isDark),
+
+          const SizedBox(height: UIConstants.spacingXS),
+
+          // Estado de stock
+          _buildStockStatus(isDark),
         ],
       ),
     );
   }
 
-  Widget _buildPriceSection() {
-    return Row(
+  Widget _buildPriceSection(bool isDark) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Precio actual
+        // Precio principal
         Text(
           product.formattedFinalPrice,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: UIConstants.fontSizeMD,
             fontWeight: UIConstants.fontWeightBold,
-            color: UIConstants.primaryBlue,
+            color: isDark ? UIConstants.textWhite : UIConstants.primaryBlue,
           ),
         ),
 
-        // Precio original (si hay precio mayorista)
+        // Precio con descuento si aplica
         if (product.hasWholesalePrice) ...[
-          const SizedBox(width: UIConstants.spacingXS),
-          Text(
-            product.formattedPrice,
-            style: const TextStyle(
-              fontSize: UIConstants.fontSizeXS,
-              color: UIConstants.textSecondary,
-              decoration: TextDecoration.lineThrough,
-            ),
+          const SizedBox(height: UIConstants.spacingXS / 2),
+          Row(
+            children: [
+              Text(
+                'Antes: ${product.formattedPrice}',
+                style: TextStyle(
+                  fontSize: UIConstants.fontSizeXS,
+                  color: isDark ? Colors.white60 : UIConstants.textSecondary,
+                  decoration: TextDecoration.lineThrough,
+                ),
+              ),
+            ],
           ),
         ],
       ],
     );
   }
 
-  Widget _buildStockStatus() {
-    Color statusColor;
-    IconData statusIcon;
-
-    if (!product.available) {
-      statusColor = UIConstants.gray;
-      statusIcon = Icons.block;
-    } else if (product.stock <= 0) {
-      statusColor = UIConstants.error;
-      statusIcon = Icons.inventory_2_outlined;
-    } else if (product.stock <= 5) {
-      statusColor = UIConstants.warning;
-      statusIcon = Icons.warning_amber_outlined;
-    } else {
-      statusColor = UIConstants.success;
-      statusIcon = Icons.check_circle_outline;
-    }
-
+  Widget _buildStockStatus(bool isDark) {
     return Row(
       children: [
         Icon(
-          statusIcon,
+          product.inStock ? Icons.check_circle : Icons.cancel,
           size: UIConstants.iconSizeXS,
-          color: statusColor,
+          color: product.inStock ? UIConstants.success : UIConstants.error,
         ),
         const SizedBox(width: UIConstants.spacingXS),
         Text(
           product.stockStatus,
           style: TextStyle(
             fontSize: UIConstants.fontSizeXS,
-            color: statusColor,
+            color: product.inStock ? UIConstants.success : UIConstants.error,
             fontWeight: UIConstants.fontWeightMedium,
           ),
         ),
@@ -309,43 +343,41 @@ class ProductCard extends StatelessWidget {
     );
   }
 
-  Widget _buildActionSection(BuildContext context) {
+  Widget _buildActionSection(BuildContext context, bool isDark) {
     return Padding(
-      padding: const EdgeInsets.only(
-        left: UIConstants.spacingSM,
-        right: UIConstants.spacingSM,
-        bottom: UIConstants.spacingSM,
-      ),
-      child: Row(
-        children: [
-          // Rating no disponible en el modelo actual
-          // TODO: Implementar rating cuando esté disponible en el backend
-          const Spacer(),
-
-          // Botón de agregar al carrito
-          SizedBox(
-            height: UIConstants.heightButton * 0.7,
-            child: ElevatedButton(
-              onPressed: product.inStock ? onAddToCart : null,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: UIConstants.primaryBlue,
-                foregroundColor: UIConstants.white,
-                disabledBackgroundColor: UIConstants.grayMedium,
-                disabledForegroundColor: UIConstants.gray,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(UIConstants.radiusSM),
-                ),
-                elevation: 0,
-                padding: const EdgeInsets.symmetric(
-                    horizontal: UIConstants.spacingMD),
-              ),
-              child: const Icon(
-                Icons.add_shopping_cart_outlined,
-                size: UIConstants.iconSizeSM,
-              ),
+      padding: const EdgeInsets.all(UIConstants.spacingSM),
+      child: SizedBox(
+        width: double.infinity,
+        height: UIConstants.heightButton / 1.5,
+        child: ElevatedButton(
+          onPressed: product.inStock ? onAddToCart : null,
+          style: ElevatedButton.styleFrom(
+            backgroundColor:
+                product.inStock ? UIConstants.primaryBlue : UIConstants.gray,
+            foregroundColor: UIConstants.white,
+            elevation: UIConstants.elevationXS,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(UIConstants.radiusSM),
             ),
           ),
-        ],
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                product.inStock ? Icons.add_shopping_cart : Icons.block,
+                size: UIConstants.iconSizeSM,
+              ),
+              const SizedBox(width: UIConstants.spacingXS),
+              Text(
+                product.inStock ? 'Agregar' : 'Agotado',
+                style: const TextStyle(
+                  fontSize: UIConstants.fontSizeSM,
+                  fontWeight: UIConstants.fontWeightMedium,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

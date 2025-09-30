@@ -44,14 +44,24 @@ class ProductApiService {
 
       if (response['success']) {
         final data = response['data'];
-        final products = (data['data'] as List)
-            .map((json) => ProductModel.fromJson(json))
-            .toList();
+        List<ProductModel> products = [];
+
+        // Validar que data existe y tiene la estructura esperada
+        if (data != null && data['data'] is List) {
+          try {
+            products = (data['data'] as List)
+                .map((json) => ProductModel.fromJson(json))
+                .toList();
+          } catch (e) {
+            _logger.e('Error al parsear productos: $e');
+            products = <ProductModel>[];
+          }
+        }
 
         return {
           'success': true,
           'products': products,
-          'pagination': data['meta'],
+          'pagination': data?['meta'],
           'message': 'Productos obtenidos exitosamente',
         };
       } else {
