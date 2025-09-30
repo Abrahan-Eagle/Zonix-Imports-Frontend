@@ -11,7 +11,7 @@ import 'package:flutter/services.dart';
 
 // Imports del módulo Products
 import 'package:zonix/features/products/presentation/providers/product_provider.dart';
-import 'package:zonix/features/products/presentation/screens/products_page.dart';
+import 'package:zonix/features/products/presentation/screens/enhanced_products_page.dart';
 
 // import 'dart:io';
 // import 'package:http/http.dart' as http;
@@ -94,12 +94,16 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-    if (isIntegrationTest) {
-      // Forzar autenticación como comercio
-      userProvider.setAuthenticatedForTest(role: 'commerce');
-    } else {
-      userProvider.checkAuthentication();
-    }
+
+    // Usar WidgetsBinding para ejecutar después del build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (isIntegrationTest) {
+        // Forzar autenticación como comercio
+        userProvider.setAuthenticatedForTest(role: 'commerce');
+      } else {
+        userProvider.checkAuthentication();
+      }
+    });
 
     return MaterialApp(
       title: 'ZONIX',
@@ -600,7 +604,7 @@ class MainRouterState extends State<MainRouter> {
                 if (_selectedLevel == 0) {
                   switch (_bottomNavIndex) {
                     case 0:
-                      return const ProductsPage();
+                      return const EnhancedProductsPage();
                     case 1:
                       return const Center(child: Text('Carrito'));
                     case 2:
@@ -608,7 +612,7 @@ class MainRouterState extends State<MainRouter> {
                     case 3:
                       return const Center(child: Text('Pedidos'));
                     default:
-                      return const ProductsPage();
+                      return const EnhancedProductsPage();
                   }
                 }
 

@@ -21,8 +21,12 @@ class ProductApiService {
     double? maxPrice,
     String? brand,
     bool? inStock,
+    List<String>? modalities,
+    bool? hasDiscount,
   }) async {
     try {
+      _logger.i('🌐 Llamando API: /buyer/products');
+
       final queryParams = <String, String>{
         'page': page.toString(),
         'per_page': perPage.toString(),
@@ -38,13 +42,25 @@ class ProductApiService {
       if (maxPrice != null) queryParams['max_price'] = maxPrice.toString();
       if (brand != null && brand.isNotEmpty) queryParams['brand'] = brand;
       if (inStock != null) queryParams['in_stock'] = inStock.toString();
+      if (modalities != null && modalities.isNotEmpty) {
+        queryParams['modalities'] = modalities.join(',');
+      }
+      if (hasDiscount != null)
+        queryParams['has_discount'] = hasDiscount.toString();
+
+      _logger.i('📋 Parámetros: $queryParams');
 
       final response =
           await _apiService.get('/buyer/products', queryParams: queryParams);
 
+      _logger.i('📡 Respuesta de API: ${response['success']}');
+      _logger.i('📡 Mensaje: ${response['message']}');
+
       if (response['success']) {
         final data = response['data'];
         List<ProductModel> products = [];
+
+        _logger.i('📊 Datos recibidos: ${data != null ? 'Sí' : 'No'}');
 
         // Validar que data existe y tiene la estructura esperada
         if (data != null && data['data'] is List) {
@@ -52,10 +68,13 @@ class ProductApiService {
             products = (data['data'] as List)
                 .map((json) => ProductModel.fromJson(json))
                 .toList();
+            _logger.i('✅ Productos parseados: ${products.length}');
           } catch (e) {
-            _logger.e('Error al parsear productos: $e');
+            _logger.e('❌ Error al parsear productos: $e');
             products = <ProductModel>[];
           }
+        } else {
+          _logger.w('⚠️ Estructura de datos inesperada: ${data?.runtimeType}');
         }
 
         return {
@@ -65,6 +84,7 @@ class ProductApiService {
           'message': 'Productos obtenidos exitosamente',
         };
       } else {
+        _logger.e('❌ API retornó error: ${response['message']}');
         return {
           'success': false,
           'products': <ProductModel>[],

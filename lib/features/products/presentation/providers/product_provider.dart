@@ -4,11 +4,14 @@ import 'package:logger/logger.dart';
 import '../../data/models/product_model.dart';
 import '../../data/models/category_model.dart';
 import '../../data/datasources/product_api_service.dart';
+import '../../data/services/wishlist_service.dart';
+import '../../data/services/filter_cache_service.dart';
 
 /// Provider para manejo del estado de productos y categorías
 class ProductProvider extends ChangeNotifier {
   static final Logger _logger = Logger();
   final ProductApiService _apiService = ProductApiService();
+  final WishlistService _wishlistService = WishlistService();
 
   // Estados de carga
   bool _isLoading = false;
@@ -30,6 +33,9 @@ class ProductProvider extends ChangeNotifier {
   List<CategoryModel> _categories = [];
   CategoryModel? _selectedCategory;
 
+  // Datos de wishlist
+  List<ProductModel> _wishlist = [];
+
   // Datos de búsqueda y filtros
   String _searchQuery = '';
   String _selectedSort = 'name';
@@ -39,6 +45,10 @@ class ProductProvider extends ChangeNotifier {
   double? _minPrice;
   double? _maxPrice;
   bool? _inStockOnly;
+
+  // Cache de filtros
+  FilterCache _filterCache = FilterCache();
+  bool _cacheLoaded = false;
 
   // Paginación
   int _currentPage = 1;
@@ -61,8 +71,16 @@ class ProductProvider extends ChangeNotifier {
   List<CategoryModel> get categories => _categories;
   CategoryModel? get selectedCategory => _selectedCategory;
 
+  List<ProductModel> get wishlist => _wishlist;
+  int get wishlistCount => _wishlist.length;
+
   String get searchQuery => _searchQuery;
   String get selectedSort => _selectedSort;
+
+  // Getters para cache de filtros
+  FilterCache get filterCache => _filterCache;
+  bool get cacheLoaded => _cacheLoaded;
+  bool get hasActiveFilters => _filterCache.hasActiveFilters;
   String get sortOrder => _sortOrder;
   int? get selectedCategoryId => _selectedCategoryId;
   String? get selectedBrand => _selectedBrand;
@@ -80,6 +98,8 @@ class ProductProvider extends ChangeNotifier {
     Map<String, dynamic>? filters,
   }) async {
     try {
+      _logger.i('🔄 Cargando productos... (refresh: $refresh)');
+
       if (refresh) {
         _isRefreshing = true;
         _currentPage = 1;
@@ -95,19 +115,30 @@ class ProductProvider extends ChangeNotifier {
 
       final result = await _apiService.getProducts(
         page: _currentPage,
-        categoryId: _selectedCategoryId,
-        search: _searchQuery.isNotEmpty ? _searchQuery : null,
-        sortBy: _selectedSort,
+        categoryId: _filterCache.selectedCategoryId ?? _selectedCategoryId,
+        search: _filterCache.searchQuery.isNotEmpty
+            ? _filterCache.searchQuery
+            : (_searchQuery.isNotEmpty ? _searchQuery : null),
+        sortBy: _filterCache.selectedSort ?? _selectedSort,
         sortOrder: _sortOrder,
-        minPrice: _minPrice,
-        maxPrice: _maxPrice,
+        minPrice: _filterCache.minPrice ?? _minPrice,
+        maxPrice: _filterCache.maxPrice ?? _maxPrice,
         brand: _selectedBrand,
-        inStock: _inStockOnly,
+        inStock: _filterCache.inStockOnly ?? _inStockOnly,
+        modalities: _filterCache.selectedModalities.isNotEmpty
+            ? _filterCache.selectedModalities
+            : null,
+        hasDiscount: _filterCache.hasDiscount ? true : null,
       );
+
+      _logger.i('📊 Resultado de API: ${result['success']}');
+      _logger.i('📊 Mensaje: ${result['message']}');
 
       if (result['success']) {
         final newProducts = result['products'] as List<ProductModel>;
         final pagination = result['pagination'] as Map<String, dynamic>?;
+
+        _logger.i('📦 Productos recibidos: ${newProducts.length}');
 
         if (refresh || _currentPage == 1) {
           _products = newProducts;
@@ -119,14 +150,17 @@ class ProductProvider extends ChangeNotifier {
           _currentPage = pagination['current_page'] ?? 1;
           _totalPages = pagination['last_page'] ?? 1;
           _hasMoreProducts = _currentPage < _totalPages;
+          _logger.i('📄 Paginación: página $_currentPage de $_totalPages');
         }
 
         _error = null;
+        _logger.i('✅ Productos cargados exitosamente: ${_products.length}');
       } else {
         _error = result['message'] ?? 'Error al cargar productos';
+        _logger.e('❌ Error al cargar productos: $_error');
       }
     } catch (e) {
-      _logger.e('Error en loadProducts: $e');
+      _logger.e('❌ Error en loadProducts: $e');
       _error = 'Error de conexión al cargar productos';
     } finally {
       _isLoading = false;
@@ -288,6 +322,8 @@ class ProductProvider extends ChangeNotifier {
     bool? inStockOnly,
     String? sortBy,
     String? sortOrder,
+    List<String>? modalities,
+    bool? hasDiscount,
   }) {
     _selectedCategoryId = categoryId;
     _selectedBrand = brand;
@@ -296,6 +332,22 @@ class ProductProvider extends ChangeNotifier {
     _inStockOnly = inStockOnly;
     _selectedSort = sortBy ?? _selectedSort;
     _sortOrder = sortOrder ?? _sortOrder;
+
+    // Actualizar cache con modalidades y descuentos
+    _filterCache = FilterCache(
+      minPrice: _minPrice,
+      maxPrice: _maxPrice,
+      selectedBrands: _filterCache.selectedBrands,
+      selectedModalities: modalities ?? _filterCache.selectedModalities,
+      selectedSort: _selectedSort,
+      inStockOnly: _inStockOnly ?? false,
+      hasDiscount: hasDiscount ?? _filterCache.hasDiscount,
+      selectedCategoryId: _selectedCategoryId,
+      searchQuery: _searchQuery,
+    );
+
+    // Guardar filtros en cache
+    saveFiltersToCache();
 
     // Recargar productos con nuevos filtros
     loadProducts(refresh: true);
@@ -314,6 +366,9 @@ class ProductProvider extends ChangeNotifier {
     _searchResults.clear();
     _searchError = null;
 
+    // Limpiar cache de filtros
+    clearFiltersCache();
+
     // Recargar productos sin filtros
     loadProducts(refresh: true);
   }
@@ -328,11 +383,13 @@ class ProductProvider extends ChangeNotifier {
 
   /// Refrescar datos
   Future<void> refresh() async {
+    _logger.i('🔄 Iniciando refresh de productos...');
     await Future.wait([
       loadProducts(refresh: true),
       loadCategories(),
       loadFeaturedProducts(),
     ]);
+    _logger.i('✅ Refresh completado. Productos cargados: ${_products.length}');
   }
 
   /// Limpiar estado
@@ -365,11 +422,163 @@ class ProductProvider extends ChangeNotifier {
   /// Verificar si hay categorías
   bool get hasCategories => _categories.isNotEmpty;
 
+  /// Verificar si hay filtros activos (método legacy)
+  bool get hasActiveFiltersLegacy =>
+      _selectedCategoryId != null ||
+      _selectedBrand != null ||
+      _minPrice != null ||
+      _maxPrice != null ||
+      _inStockOnly != null ||
+      _selectedSort != 'name' ||
+      _sortOrder != 'asc';
+
   /// Obtener categorías principales
-  List<CategoryModel> get mainCategories => 
+  List<CategoryModel> get mainCategories =>
       _categories.where((cat) => cat.isMainCategory).toList();
 
   /// Obtener subcategorías de una categoría
-  List<CategoryModel> getSubCategories(int parentId) => 
+  List<CategoryModel> getSubCategories(int parentId) =>
       _categories.where((cat) => cat.parentId == parentId).toList();
+
+  /// Cargar wishlist
+  Future<void> loadWishlist() async {
+    try {
+      _wishlist = await _wishlistService.getWishlist();
+      notifyListeners();
+    } catch (e) {
+      _logger.e('Error al cargar wishlist: $e');
+    }
+  }
+
+  /// Cargar filtros desde cache
+  Future<void> loadFiltersFromCache() async {
+    if (_cacheLoaded) return;
+
+    try {
+      _logger.d('🔄 Cargando filtros desde cache...');
+      final cachedFilters = await FilterCacheService.loadFiltersOrDefault();
+
+      // Aplicar filtros cargados
+      _filterCache = cachedFilters;
+      _searchQuery = cachedFilters.searchQuery;
+      _selectedSort = cachedFilters.selectedSort ?? 'name';
+      _selectedCategoryId = cachedFilters.selectedCategoryId;
+      _minPrice = cachedFilters.minPrice;
+      _maxPrice = cachedFilters.maxPrice;
+      _inStockOnly = cachedFilters.inStockOnly;
+
+      _cacheLoaded = true;
+      _logger.d('✅ Filtros cargados desde cache: ${cachedFilters.toString()}');
+
+      // Aplicar filtros automáticamente si hay filtros activos
+      if (cachedFilters.hasActiveFilters) {
+        _logger.d('🔄 Aplicando filtros desde cache automáticamente...');
+        await loadProducts(refresh: true);
+      }
+
+      notifyListeners();
+    } catch (e) {
+      _logger.e('❌ Error cargando filtros desde cache: $e');
+      _cacheLoaded = true; // Marcar como cargado para evitar reintentos
+    }
+  }
+
+  /// Guardar filtros en cache
+  Future<void> saveFiltersToCache() async {
+    try {
+      _filterCache = FilterCache(
+        minPrice: _minPrice,
+        maxPrice: _maxPrice,
+        selectedBrands: _selectedBrand != null ? [_selectedBrand!] : [],
+        selectedModalities: [], // TODO: Implementar cuando se agregue
+        selectedSort: _selectedSort,
+        inStockOnly: _inStockOnly ?? false,
+        hasDiscount: false, // TODO: Implementar cuando se agregue
+        selectedCategoryId: _selectedCategoryId,
+        searchQuery: _searchQuery,
+      );
+
+      await FilterCacheService.saveFilters(_filterCache);
+      _logger.d('💾 Filtros guardados en cache');
+    } catch (e) {
+      _logger.e('❌ Error guardando filtros en cache: $e');
+    }
+  }
+
+  /// Limpiar cache de filtros
+  Future<void> clearFiltersCache() async {
+    try {
+      await FilterCacheService.clearFilters();
+      _filterCache = FilterCache();
+      _logger.d('🗑️ Cache de filtros limpiado');
+      notifyListeners();
+    } catch (e) {
+      _logger.e('❌ Error limpiando cache de filtros: $e');
+    }
+  }
+
+  /// Toggle wishlist
+  Future<bool> toggleWishlist(ProductModel product) async {
+    try {
+      final success = await _wishlistService.toggleWishlist(product);
+      if (success) {
+        await loadWishlist();
+      }
+      return success;
+    } catch (e) {
+      _logger.e('Error al toggle wishlist: $e');
+      return false;
+    }
+  }
+
+  /// Verificar si un producto está en wishlist
+  Future<bool> isInWishlist(int productId) async {
+    return await _wishlistService.isInWishlist(productId);
+  }
+
+  /// Limpiar wishlist
+  Future<void> clearWishlist() async {
+    try {
+      await _wishlistService.clearWishlist();
+      _wishlist.clear();
+      notifyListeners();
+    } catch (e) {
+      _logger.e('Error al limpiar wishlist: $e');
+    }
+  }
+
+  /// Obtener productos similares de la wishlist
+  Future<List<ProductModel>> getSimilarWishlistProducts(ProductModel product,
+      {int limit = 3}) async {
+    try {
+      return await _wishlistService.getSimilarProducts(product, limit: limit);
+    } catch (e) {
+      _logger.e('Error al obtener productos similares de wishlist: $e');
+      return [];
+    }
+  }
+
+  /// Exportar wishlist
+  Future<String?> exportWishlist() async {
+    try {
+      return await _wishlistService.exportWishlist();
+    } catch (e) {
+      _logger.e('Error al exportar wishlist: $e');
+      return null;
+    }
+  }
+
+  /// Importar wishlist
+  Future<bool> importWishlist(String jsonData) async {
+    try {
+      final success = await _wishlistService.importWishlist(jsonData);
+      if (success) {
+        await loadWishlist();
+      }
+      return success;
+    } catch (e) {
+      _logger.e('Error al importar wishlist: $e');
+      return false;
+    }
+  }
 }

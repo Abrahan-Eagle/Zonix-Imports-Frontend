@@ -625,90 +625,92 @@ class SignInScreenState extends State<SignInScreen>
   }
 
   Widget _buildTabletInfoSection() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Logo
-        Container(
-          width: 150,
-          height: 150,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(24),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFF1E40AF).withOpacity(0.1),
-                blurRadius: 30,
-                offset: const Offset(0, 12),
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Logo
+          Container(
+            width: 150,
+            height: 150,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(24),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF1E40AF).withOpacity(0.1),
+                  blurRadius: 30,
+                  offset: const Offset(0, 12),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(24),
+              child: Image.asset(
+                'assets/images/logo_login.png',
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1E40AF),
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                    child: const Icon(
+                      Icons.store,
+                      color: Colors.white,
+                      size: 80,
+                    ),
+                  );
+                },
               ),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(24),
-            child: Image.asset(
-              'assets/images/logo_login.png',
-              fit: BoxFit.contain,
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF1E40AF),
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                  child: const Icon(
-                    Icons.store,
-                    color: Colors.white,
-                    size: 80,
-                  ),
-                );
-              },
             ),
           ),
-        ),
-        const SizedBox(height: 40),
+          const SizedBox(height: 40),
 
-        // Título
-        Builder(
-          builder: (context) {
-            final textScaleFactor = MediaQuery.of(context).textScaleFactor;
-            double baseFontSize = 48.0;
-            double responsiveFontSize = baseFontSize * textScaleFactor;
+          // Título
+          Builder(
+            builder: (context) {
+              final textScaleFactor = MediaQuery.of(context).textScaleFactor;
+              double baseFontSize = 48.0;
+              double responsiveFontSize = baseFontSize * textScaleFactor;
 
-            return Text(
-              'Zonix Imports',
-              style: TextStyle(
-                fontSize: responsiveFontSize,
-                fontWeight: FontWeight.w700,
-                color: const Color(0xFF1E293B),
-                letterSpacing: -1,
-              ),
-            );
-          },
-        ),
-        const SizedBox(height: 16),
+              return Text(
+                'Zonix Imports',
+                style: TextStyle(
+                  fontSize: responsiveFontSize,
+                  fontWeight: FontWeight.w700,
+                  color: const Color(0xFF1E293B),
+                  letterSpacing: -1,
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 16),
 
-        // Subtítulo
-        Builder(
-          builder: (context) {
-            final textScaleFactor = MediaQuery.of(context).textScaleFactor;
-            double baseFontSize = 20.0;
-            double responsiveFontSize = baseFontSize * textScaleFactor;
+          // Subtítulo
+          Builder(
+            builder: (context) {
+              final textScaleFactor = MediaQuery.of(context).textScaleFactor;
+              double baseFontSize = 20.0;
+              double responsiveFontSize = baseFontSize * textScaleFactor;
 
-            return Text(
-              'Productos premium desde Estados Unidos',
-              style: TextStyle(
-                fontSize: responsiveFontSize,
-                fontWeight: FontWeight.w400,
-                color: const Color(0xFF64748B),
-                height: 1.5,
-              ),
-            );
-          },
-        ),
-        const SizedBox(height: 40),
+              return Text(
+                'Productos premium desde Estados Unidos',
+                style: TextStyle(
+                  fontSize: responsiveFontSize,
+                  fontWeight: FontWeight.w400,
+                  color: const Color(0xFF64748B),
+                  height: 1.5,
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 40),
 
-        // Características
-        _buildFeatureList(),
-      ],
+          // Características
+          _buildFeatureList(),
+        ],
+      ),
     );
   }
 

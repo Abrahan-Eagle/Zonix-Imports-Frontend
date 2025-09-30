@@ -1,7 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:zonix/shared/providers/user_provider.dart';
+import '../test_utils.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   group('UserProvider Tests', () {
     late UserProvider userProvider;
 
@@ -11,45 +13,60 @@ void main() {
 
     test('should initialize with default values', () {
       expect(userProvider.isAuthenticated, isFalse);
-      expect(userProvider.userRole, equals(''));
-      expect(userProvider.userName, equals(''));
-      expect(userProvider.userEmail, equals(''));
-      expect(userProvider.userPhotoUrl, equals(''));
-      expect(userProvider.profileCreated, isFalse);
-      expect(userProvider.userId, equals(0));
+      expect(userProvider.userRole, isNull);
+      expect(userProvider.userId, isNull);
+      expect(userProvider.userLevel, equals(0));
+      expect(userProvider.profile, isNull);
     });
 
-    test('should have correct getters for user information', () {
-      // These are read-only properties that should exist
-      expect(userProvider.userName, isA<String>());
-      expect(userProvider.userEmail, isA<String>());
-      expect(userProvider.userPhotoUrl, isA<String>());
-      expect(userProvider.userId, isA<int>());
-      expect(userProvider.userGoogleId, isA<String>());
-      expect(userProvider.userRole, isA<String>());
+    test('should have correct data types for user properties', () {
+      expect(userProvider.isAuthenticated, isA<bool>());
+      expect(userProvider.userLevel, isA<int>());
     });
 
-    test('should have correct getters for profile status', () {
-      // These are read-only properties that should exist
-      expect(userProvider.profileCreated, isA<bool>());
-      expect(userProvider.adresseCreated, isA<bool>());
-      expect(userProvider.documentCreated, isA<bool>());
-      expect(userProvider.phoneCreated, isA<bool>());
-      expect(userProvider.emailCreated, isA<bool>());
+    test('should set authentication state correctly', () async {
+      await userProvider.setAuthenticatedForTest(role: 'buyer');
+
+      expect(userProvider.isAuthenticated, isTrue);
+      expect(userProvider.userRole, equals('buyer'));
+      expect(userProvider.userLevel, equals(0));
     });
 
-    test('should validate business logic constants', () {
-      // Validar constantes del negocio
+    test('should set commerce role correctly', () async {
+      await userProvider.setAuthenticatedForTest(role: 'commerce');
+
+      expect(userProvider.isAuthenticated, isTrue);
+      expect(userProvider.userRole, equals('commerce'));
+      expect(userProvider.userLevel, equals(1));
+    });
+
+    test('should reset to default values after logout', () async {
+      // Primero autenticar
+      await userProvider.setAuthenticatedForTest(role: 'buyer');
+
+      // Luego hacer logout
+      await userProvider.logout();
+
       expect(userProvider.isAuthenticated, isFalse);
-      expect(userProvider.profileCreated, isFalse);
+      expect(userProvider.userRole, isNull);
+      expect(userProvider.userId, isNull);
+      expect(userProvider.userLevel, equals(0));
+      expect(userProvider.profile, isNull);
+    });
 
-      // Validar que los getters existen y funcionan
-      expect(userProvider.userName, equals(''));
-      expect(userProvider.userEmail, equals(''));
-      expect(userProvider.userPhotoUrl, equals(''));
-      expect(userProvider.userId, equals(0));
-      expect(userProvider.userGoogleId, equals(''));
-      expect(userProvider.userRole, equals(''));
+    test('should handle profile operations', () {
+      // Test setProfile with valid profile
+      final testProfile = TestUtils.createTestProfile();
+      userProvider.setProfile(testProfile);
+      expect(userProvider.profile, equals(testProfile));
+
+      // Test setProfileForTest with null
+      userProvider.setProfileForTest(null);
+      expect(userProvider.profile, isNull);
+
+      // Test clearProfile
+      userProvider.clearProfile();
+      expect(userProvider.profile, isNull);
     });
   });
 }

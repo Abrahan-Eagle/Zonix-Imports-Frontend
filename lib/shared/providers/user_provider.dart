@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -32,10 +33,20 @@ class UserProvider with ChangeNotifier {
 
   Future<void> checkAuthentication() async {
     try {
+      if (kIsWeb || kDebugMode) {
+        // En modo debug o web, no usar FlutterSecureStorage
+        _isAuthenticated = false;
+        _userRole = null;
+        _userId = null;
+        _userLevel = 0;
+        notifyListeners();
+        return;
+      }
+
       final token = await _storage.read(key: 'token');
       final role = await _storage.read(key: 'role');
       final userIdStr = await _storage.read(key: 'userId');
-      
+
       if (token != null && role != null && userIdStr != null) {
         _isAuthenticated = true;
         _userRole = role;
@@ -75,16 +86,18 @@ class UserProvider with ChangeNotifier {
 
   Future<void> logout() async {
     try {
-      await _storage.delete(key: 'token');
-      await _storage.delete(key: 'role');
-      await _storage.delete(key: 'userId');
-      
+      if (!kIsWeb && !kDebugMode) {
+        await _storage.delete(key: 'token');
+        await _storage.delete(key: 'role');
+        await _storage.delete(key: 'userId');
+      }
+
       _isAuthenticated = false;
       _userRole = null;
       _userId = null;
       _userLevel = 0;
       _profile = null;
-      
+
       notifyListeners();
       logger.i('User logged out successfully');
     } catch (e) {
@@ -94,6 +107,12 @@ class UserProvider with ChangeNotifier {
 
   // Métodos de perfil
   void setProfile(Profile profile) {
+    _profile = profile;
+    notifyListeners();
+  }
+
+  // Método para tests que permite establecer null
+  void setProfileForTest(Profile? profile) {
     _profile = profile;
     notifyListeners();
   }
@@ -117,6 +136,11 @@ class UserProvider with ChangeNotifier {
   // Métodos privados
   Future<void> _saveAuthState() async {
     try {
+      if (kIsWeb || kDebugMode) {
+        // En modo debug o web, no usar FlutterSecureStorage
+        return;
+      }
+
       if (_userRole != null) {
         await _storage.write(key: 'role', value: _userRole!);
       }

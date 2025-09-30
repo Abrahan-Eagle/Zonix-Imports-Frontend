@@ -3,8 +3,12 @@ import 'package:provider/provider.dart';
 
 import '../../../../core/constants/ui_constants.dart';
 import '../../data/models/product_model.dart';
+import '../../data/models/category_model.dart';
 import '../providers/product_provider.dart';
 import '../widgets/product_list.dart';
+import '../widgets/enhanced_search_bar.dart';
+import '../widgets/advanced_filters.dart';
+import '../widgets/breadcrumbs.dart';
 import 'product_detail_page.dart';
 import 'product_search_page.dart';
 
