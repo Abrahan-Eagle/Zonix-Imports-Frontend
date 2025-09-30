@@ -31,7 +31,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     _imagePageController = PageController();
-    
+
     // Cargar productos relacionados
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final productProvider = context.read<ProductProvider>();
@@ -92,7 +92,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
 
   Widget _buildImageCarousel() {
     final images = widget.product.allImages;
-    
+
     if (images.isEmpty) {
       return Container(
         color: UIConstants.grayLight,
@@ -140,7 +140,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
             );
           },
         ),
-        
+
         // Indicadores de página
         if (images.length > 1)
           Positioned(
@@ -185,14 +185,14 @@ class _ProductDetailPageState extends State<ProductDetailPage>
               color: UIConstants.textPrimary,
             ),
           ),
-          
+
           const SizedBox(height: UIConstants.spacingSM),
-          
-          // Marca y SKU
+
+          // Modalidad y SKU
           Row(
             children: [
               Text(
-                widget.product.brand,
+                widget.product.modalityText,
                 style: const TextStyle(
                   fontSize: UIConstants.fontSizeMD,
                   color: UIConstants.textSecondary,
@@ -209,32 +209,19 @@ class _ProductDetailPageState extends State<ProductDetailPage>
               ),
             ],
           ),
-          
+
           const SizedBox(height: UIConstants.spacingMD),
-          
+
           // Precio
           _buildPriceSection(),
-          
+
           const SizedBox(height: UIConstants.spacingMD),
-          
-          // Rating y reviews
-          if (widget.product.rating != null)
-            Row(
-              children: [
-                _buildRatingStars(widget.product.rating!),
-                const SizedBox(width: UIConstants.spacingSM),
-                Text(
-                  '(${widget.product.reviewCount ?? 0} reseñas)',
-                  style: const TextStyle(
-                    color: UIConstants.textSecondary,
-                    fontSize: UIConstants.fontSizeSM,
-                  ),
-                ),
-              ],
-            ),
-          
+
+          // Rating y reviews no disponibles en el modelo actual
+          // TODO: Implementar rating y reviews cuando estén disponibles en el backend
+
           const SizedBox(height: UIConstants.spacingMD),
-          
+
           // Estado del stock
           _buildStockStatus(),
         ],
@@ -247,16 +234,16 @@ class _ProductDetailPageState extends State<ProductDetailPage>
       children: [
         // Precio actual
         Text(
-          widget.product.formattedDiscountPrice,
+          widget.product.formattedFinalPrice,
           style: const TextStyle(
             fontSize: UIConstants.fontSizeTitle,
             fontWeight: UIConstants.fontWeightBold,
             color: UIConstants.primaryBlue,
           ),
         ),
-        
-        // Precio original (si hay descuento)
-        if (widget.product.hasDiscount) ...[
+
+        // Precio original (si hay precio mayorista)
+        if (widget.product.hasWholesalePrice) ...[
           const SizedBox(width: UIConstants.spacingSM),
           Text(
             widget.product.formattedPrice,
@@ -273,11 +260,11 @@ class _ProductDetailPageState extends State<ProductDetailPage>
               vertical: UIConstants.spacingXS,
             ),
             decoration: BoxDecoration(
-              color: UIConstants.error,
+              color: UIConstants.success,
               borderRadius: BorderRadius.circular(UIConstants.radiusXS),
             ),
             child: Text(
-              '-${widget.product.discountPercentage.toStringAsFixed(0)}%',
+              'Ahorro ${widget.product.savingsPercentage.toStringAsFixed(0)}%',
               style: const TextStyle(
                 color: UIConstants.white,
                 fontSize: UIConstants.fontSizeXS,
@@ -290,29 +277,12 @@ class _ProductDetailPageState extends State<ProductDetailPage>
     );
   }
 
-  Widget _buildRatingStars(double rating) {
-    return Row(
-      children: List.generate(5, (index) {
-        final starRating = index + 1;
-        return Icon(
-          starRating <= rating
-              ? Icons.star
-              : starRating - rating < 1
-                  ? Icons.star_half
-                  : Icons.star_border,
-          size: UIConstants.iconSizeSM,
-          color: UIConstants.warning,
-        );
-      }),
-    );
-  }
-
   Widget _buildStockStatus() {
     Color statusColor;
     IconData statusIcon;
     String statusText;
-    
-    if (!widget.product.isActive) {
+
+    if (!widget.product.available) {
       statusColor = UIConstants.gray;
       statusIcon = Icons.block;
       statusText = 'No disponible';
@@ -331,7 +301,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
     }
 
     return Container(
-          padding: const EdgeInsets.all(UIConstants.spacingSM),
+      padding: const EdgeInsets.all(UIConstants.spacingSM),
       decoration: BoxDecoration(
         color: statusColor.withOpacity(0.1),
         borderRadius: BorderRadius.circular(UIConstants.radiusSM),
@@ -404,52 +374,13 @@ class _ProductDetailPageState extends State<ProductDetailPage>
   }
 
   Widget _buildSpecificationsTab() {
-    final specs = widget.product.specifications;
-    
-    if (specs == null || specs.isEmpty) {
-      return const Center(
-        child: Text(
-          'No hay especificaciones disponibles',
-          style: TextStyle(color: UIConstants.textSecondary),
-        ),
-      );
-    }
-
-    return ListView.builder(
-      padding: const EdgeInsets.all(UIConstants.spacingMD),
-      itemCount: specs.length,
-      itemBuilder: (context, index) {
-        final key = specs.keys.elementAt(index);
-        final value = specs[key];
-        
-        return Padding(
-          padding: const EdgeInsets.only(bottom: UIConstants.spacingMD),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                flex: 2,
-                child: Text(
-                  key.toString(),
-                  style: const TextStyle(
-                    fontWeight: UIConstants.fontWeightMedium,
-                    color: UIConstants.textPrimary,
-                  ),
-                ),
-              ),
-              Expanded(
-                flex: 3,
-                child: Text(
-                  value.toString(),
-                  style: const TextStyle(
-                    color: UIConstants.textSecondary,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
+    // Especificaciones no disponibles en el modelo actual
+    // TODO: Implementar especificaciones cuando estén disponibles en el backend
+    return const Center(
+      child: Text(
+        'Especificaciones no disponibles',
+        style: TextStyle(color: UIConstants.textSecondary),
+      ),
     );
   }
 
@@ -515,7 +446,8 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: UIConstants.spacingMD),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: UIConstants.spacingMD),
                     child: Text(
                       _selectedQuantity.toString(),
                       style: const TextStyle(
@@ -525,7 +457,9 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                     ),
                   ),
                   IconButton(
-                    onPressed: _selectedQuantity < widget.product.stock ? _increaseQuantity : null,
+                    onPressed: _selectedQuantity < widget.product.stock
+                        ? _increaseQuantity
+                        : null,
                     icon: const Icon(Icons.add),
                     constraints: const BoxConstraints(
                       minWidth: 40,
@@ -535,16 +469,16 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                 ],
               ),
             ),
-            
+
             const SizedBox(width: UIConstants.spacingMD),
-            
+
             // Botón agregar al carrito
             Expanded(
               child: ElevatedButton.icon(
                 onPressed: widget.product.inStock ? _addToCartFromDetail : null,
                 icon: const Icon(Icons.add_shopping_cart),
                 label: Text(
-                  widget.product.inStock 
+                  widget.product.inStock
                       ? 'Agregar al carrito'
                       : 'No disponible',
                 ),
@@ -556,7 +490,8 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(UIConstants.radiusMD),
                   ),
-                  padding: const EdgeInsets.symmetric(vertical: UIConstants.spacingMD),
+                  padding: const EdgeInsets.symmetric(
+                      vertical: UIConstants.spacingMD),
                 ),
               ),
             ),
@@ -595,7 +530,8 @@ class _ProductDetailPageState extends State<ProductDetailPage>
   void _addToCartFromDetail() {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('${_selectedQuantity} x ${widget.product.name} agregado al carrito'),
+        content: Text(
+            '${_selectedQuantity} x ${widget.product.name} agregado al carrito'),
         backgroundColor: UIConstants.success,
         duration: const Duration(seconds: 2),
         action: SnackBarAction(

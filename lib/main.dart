@@ -9,6 +9,10 @@ import 'package:provider/provider.dart';
 import 'package:zonix/shared/providers/user_provider.dart';
 import 'package:flutter/services.dart';
 
+// Imports del módulo Products
+import 'package:zonix/features/products/presentation/providers/product_provider.dart';
+import 'package:zonix/features/products/presentation/screens/products_page.dart';
+
 // import 'dart:io';
 // import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -70,6 +74,7 @@ Future<void> main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => ProductProvider()),
       ],
       child: MyApp(isIntegrationTest: isIntegrationTest),
     ),
@@ -595,7 +600,7 @@ class MainRouterState extends State<MainRouter> {
                 if (_selectedLevel == 0) {
                   switch (_bottomNavIndex) {
                     case 0:
-                      return const Center(child: Text('Catálogo'));
+                      return const ProductsPage();
                     case 1:
                       return const Center(child: Text('Carrito'));
                     case 2:
@@ -603,7 +608,7 @@ class MainRouterState extends State<MainRouter> {
                     case 3:
                       return const Center(child: Text('Pedidos'));
                     default:
-                      return const Center(child: Text('Catálogo'));
+                      return const ProductsPage();
                   }
                 }
 

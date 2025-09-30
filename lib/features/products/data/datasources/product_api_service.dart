@@ -29,7 +29,8 @@ class ProductApiService {
       };
 
       // Agregar filtros opcionales
-      if (categoryId != null) queryParams['category_id'] = categoryId.toString();
+      if (categoryId != null)
+        queryParams['category_id'] = categoryId.toString();
       if (search != null && search.isNotEmpty) queryParams['search'] = search;
       if (sortBy != null) queryParams['sort_by'] = sortBy;
       if (sortOrder != null) queryParams['sort_order'] = sortOrder;
@@ -38,14 +39,15 @@ class ProductApiService {
       if (brand != null && brand.isNotEmpty) queryParams['brand'] = brand;
       if (inStock != null) queryParams['in_stock'] = inStock.toString();
 
-      final response = await _apiService.get('/products', queryParams: queryParams);
-      
+      final response =
+          await _apiService.get('/buyer/products', queryParams: queryParams);
+
       if (response['success']) {
         final data = response['data'];
         final products = (data['data'] as List)
             .map((json) => ProductModel.fromJson(json))
             .toList();
-        
+
         return {
           'success': true,
           'products': products,
@@ -74,8 +76,8 @@ class ProductApiService {
   /// Obtener un producto por ID
   Future<Map<String, dynamic>> getProductById(int productId) async {
     try {
-      final response = await _apiService.get('/products/$productId');
-      
+      final response = await _apiService.get('/buyer/products/$productId');
+
       if (response['success']) {
         final product = ProductModel.fromJson(response['data']);
         return {
@@ -101,16 +103,18 @@ class ProductApiService {
   }
 
   /// Obtener productos relacionados
-  Future<Map<String, dynamic>> getRelatedProducts(int productId, {int limit = 5}) async {
+  Future<Map<String, dynamic>> getRelatedProducts(int productId,
+      {int limit = 5}) async {
     try {
-      final response = await _apiService.get('/products/$productId/related', 
+      final response = await _apiService.get(
+          '/buyer/products/$productId/related',
           queryParams: {'limit': limit.toString()});
-      
+
       if (response['success']) {
         final products = (response['data'] as List)
             .map((json) => ProductModel.fromJson(json))
             .toList();
-        
+
         return {
           'success': true,
           'products': products,
@@ -120,7 +124,8 @@ class ProductApiService {
         return {
           'success': false,
           'products': <ProductModel>[],
-          'message': response['message'] ?? 'Error al obtener productos relacionados',
+          'message':
+              response['message'] ?? 'Error al obtener productos relacionados',
         };
       }
     } catch (e) {
@@ -136,14 +141,14 @@ class ProductApiService {
   /// Obtener productos destacados
   Future<Map<String, dynamic>> getFeaturedProducts({int limit = 10}) async {
     try {
-      final response = await _apiService.get('/products/featured', 
+      final response = await _apiService.get('/buyer/products/featured',
           queryParams: {'limit': limit.toString()});
-      
+
       if (response['success']) {
         final products = (response['data'] as List)
             .map((json) => ProductModel.fromJson(json))
             .toList();
-        
+
         return {
           'success': true,
           'products': products,
@@ -153,7 +158,8 @@ class ProductApiService {
         return {
           'success': false,
           'products': <ProductModel>[],
-          'message': response['message'] ?? 'Error al obtener productos destacados',
+          'message':
+              response['message'] ?? 'Error al obtener productos destacados',
         };
       }
     } catch (e) {
@@ -167,21 +173,22 @@ class ProductApiService {
   }
 
   /// Buscar productos
-  Future<Map<String, dynamic>> searchProducts(String query, {int page = 1, int perPage = 20}) async {
+  Future<Map<String, dynamic>> searchProducts(String query,
+      {int page = 1, int perPage = 20}) async {
     try {
-      final response = await _apiService.get('/products/search', 
-          queryParams: {
-            'q': query,
-            'page': page.toString(),
-            'per_page': perPage.toString(),
-          });
-      
+      final response =
+          await _apiService.get('/buyer/products/search', queryParams: {
+        'q': query,
+        'page': page.toString(),
+        'per_page': perPage.toString(),
+      });
+
       if (response['success']) {
         final data = response['data'];
         final products = (data['data'] as List)
             .map((json) => ProductModel.fromJson(json))
             .toList();
-        
+
         return {
           'success': true,
           'products': products,
@@ -208,20 +215,22 @@ class ProductApiService {
   }
 
   /// Obtener todas las categorías
-  Future<Map<String, dynamic>> getCategories({bool includeInactive = false}) async {
+  Future<Map<String, dynamic>> getCategories(
+      {bool includeInactive = false}) async {
     try {
       final queryParams = <String, String>{};
       if (includeInactive) {
         queryParams['include_inactive'] = 'true';
       }
 
-      final response = await _apiService.get('/categories', queryParams: queryParams);
-      
+      final response =
+          await _apiService.get('/categories', queryParams: queryParams);
+
       if (response['success']) {
         final categories = (response['data'] as List)
             .map((json) => CategoryModel.fromJson(json))
             .toList();
-        
+
         return {
           'success': true,
           'categories': categories,
@@ -248,7 +257,7 @@ class ProductApiService {
   Future<Map<String, dynamic>> getCategoryById(int categoryId) async {
     try {
       final response = await _apiService.get('/categories/$categoryId');
-      
+
       if (response['success']) {
         final category = CategoryModel.fromJson(response['data']);
         return {
@@ -276,9 +285,9 @@ class ProductApiService {
   /// Obtener marcas populares
   Future<Map<String, dynamic>> getPopularBrands({int limit = 10}) async {
     try {
-      final response = await _apiService.get('/products/brands', 
+      final response = await _apiService.get('/buyer/products/brands',
           queryParams: {'limit': limit.toString()});
-      
+
       if (response['success']) {
         final brands = (response['data'] as List).cast<String>();
         return {

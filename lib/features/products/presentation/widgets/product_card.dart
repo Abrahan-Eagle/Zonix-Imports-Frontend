@@ -31,9 +31,12 @@ class ProductCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(UIConstants.radiusMD),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
             _buildImageSection(context),
-            _buildContentSection(context),
+            Expanded(
+              child: _buildContentSection(context),
+            ),
             _buildActionSection(context),
           ],
         ),
@@ -70,18 +73,19 @@ class ProductCard extends StatelessWidget {
                       if (loadingProgress == null) return child;
                       return _buildImagePlaceholder();
                     },
-                    errorBuilder: (context, error, stackTrace) => _buildImageError(),
+                    errorBuilder: (context, error, stackTrace) =>
+                        _buildImageError(),
                   )
                 : _buildImagePlaceholder(),
           ),
-          
+
           // Badges superpuestos
           Positioned(
             top: UIConstants.spacingSM,
             left: UIConstants.spacingSM,
             child: _buildBadges(),
           ),
-          
+
           // Botón de favoritos
           Positioned(
             top: UIConstants.spacingSM,
@@ -119,18 +123,18 @@ class ProductCard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (product.hasDiscount)
+        if (product.hasWholesalePrice)
           Container(
             padding: const EdgeInsets.symmetric(
               horizontal: UIConstants.spacingSM,
               vertical: UIConstants.spacingXS,
             ),
             decoration: BoxDecoration(
-              color: UIConstants.error,
+              color: UIConstants.success,
               borderRadius: BorderRadius.circular(UIConstants.radiusXS),
             ),
             child: Text(
-              '-${product.discountPercentage.toStringAsFixed(0)}%',
+              'Ahorro ${product.savingsPercentage.toStringAsFixed(0)}%',
               style: const TextStyle(
                 color: UIConstants.white,
                 fontSize: UIConstants.fontSizeXS,
@@ -193,42 +197,44 @@ class ProductCard extends StatelessWidget {
 
   Widget _buildContentSection(BuildContext context) {
     return Padding(
-          padding: const EdgeInsets.all(UIConstants.spacingSM),
+      padding: const EdgeInsets.all(UIConstants.spacingSM),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           // Nombre del producto
-          Text(
-            product.name,
-            style: const TextStyle(
-              fontSize: UIConstants.fontSizeSM,
-              fontWeight: UIConstants.fontWeightMedium,
-              color: UIConstants.textPrimary,
-            ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-          
-          const SizedBox(height: UIConstants.spacingXS),
-          
-          // Marca
-          if (product.brand.isNotEmpty)
-            Text(
-              product.brand,
+          Flexible(
+            child: Text(
+              product.name,
               style: const TextStyle(
-                fontSize: UIConstants.fontSizeXS,
-                color: UIConstants.textSecondary,
-                fontWeight: UIConstants.fontWeightNormal,
+                fontSize: UIConstants.fontSizeSM,
+                fontWeight: UIConstants.fontWeightMedium,
+                color: UIConstants.textPrimary,
               ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
-          
+          ),
+
+          const SizedBox(height: UIConstants.spacingXS),
+
+          // Modalidad
+          Text(
+            product.modalityText,
+            style: const TextStyle(
+              fontSize: UIConstants.fontSizeXS,
+              color: UIConstants.textSecondary,
+              fontWeight: UIConstants.fontWeightNormal,
+            ),
+          ),
+
           const SizedBox(height: UIConstants.spacingSM),
-          
+
           // Precio
           _buildPriceSection(),
-          
+
           const SizedBox(height: UIConstants.spacingXS),
-          
+
           // Estado del stock
           _buildStockStatus(),
         ],
@@ -241,16 +247,16 @@ class ProductCard extends StatelessWidget {
       children: [
         // Precio actual
         Text(
-          product.formattedDiscountPrice,
+          product.formattedFinalPrice,
           style: const TextStyle(
             fontSize: UIConstants.fontSizeMD,
             fontWeight: UIConstants.fontWeightBold,
             color: UIConstants.primaryBlue,
           ),
         ),
-        
-        // Precio original (si hay descuento)
-        if (product.hasDiscount) ...[
+
+        // Precio original (si hay precio mayorista)
+        if (product.hasWholesalePrice) ...[
           const SizedBox(width: UIConstants.spacingXS),
           Text(
             product.formattedPrice,
@@ -268,8 +274,8 @@ class ProductCard extends StatelessWidget {
   Widget _buildStockStatus() {
     Color statusColor;
     IconData statusIcon;
-    
-    if (!product.isActive) {
+
+    if (!product.available) {
       statusColor = UIConstants.gray;
       statusIcon = Icons.block;
     } else if (product.stock <= 0) {
@@ -312,26 +318,10 @@ class ProductCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Rating (si está disponible)
-          if (product.rating != null) ...[
-            const Icon(
-              Icons.star,
-              size: UIConstants.iconSizeXS,
-              color: UIConstants.warning,
-            ),
-            const SizedBox(width: UIConstants.spacingXS),
-            Text(
-              product.rating!.toStringAsFixed(1),
-              style: const TextStyle(
-                fontSize: UIConstants.fontSizeXS,
-                color: UIConstants.textSecondary,
-                fontWeight: UIConstants.fontWeightMedium,
-              ),
-            ),
-            const Spacer(),
-          ] else
-            const Spacer(),
-          
+          // Rating no disponible en el modelo actual
+          // TODO: Implementar rating cuando esté disponible en el backend
+          const Spacer(),
+
           // Botón de agregar al carrito
           SizedBox(
             height: UIConstants.heightButton * 0.7,
@@ -346,7 +336,8 @@ class ProductCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(UIConstants.radiusSM),
                 ),
                 elevation: 0,
-                padding: const EdgeInsets.symmetric(horizontal: UIConstants.spacingMD),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: UIConstants.spacingMD),
               ),
               child: const Icon(
                 Icons.add_shopping_cart_outlined,
