@@ -3,10 +3,10 @@ import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:logger/logger.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:zonix/features/services/auth/api_service.dart';
+import 'package:zonix/core/services/api_service.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
-import 'package:zonix/features/utils/user_provider.dart';
+import 'package:zonix/shared/providers/user_provider.dart';
 import 'package:flutter/services.dart';
 
 // import 'dart:io';
@@ -14,10 +14,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 // import 'package:zonix/features/screens/profile/profile_page.dart';
-import 'package:zonix/features/screens/settings/settings_page_2.dart';
-import 'package:zonix/features/screens/auth/sign_in_screen.dart';
+import 'package:zonix/shared/widgets/settings_page_2.dart';
+import 'package:zonix/features/auth/presentation/screens/sign_in_screen.dart';
 
-import 'package:zonix/features/DomainProfiles/Profiles/api/profile_service.dart';
+import 'package:zonix/features/profile/data/datasources/profile_service.dart';
 
 /*
  * ZONIX IMPORTS - Aplicación E-commerce MVP
@@ -254,7 +254,7 @@ class MainRouterState extends State<MainRouter> {
       final userDetails = await userProvider.getUserDetails();
 
       // Extrae y valida el ID del usuario
-      final id = userDetails['userId'];
+      final id = userDetails?['userId'];
       if (id == null || id is! int) {
         throw Exception('El ID del usuario es inválido: $id');
       }
@@ -572,7 +572,7 @@ class MainRouterState extends State<MainRouter> {
       ),
       body: Consumer<UserProvider>(
         builder: (context, userProvider, child) {
-          return FutureBuilder<Map<String, dynamic>>(
+          return FutureBuilder<Map<String, dynamic>?>(
             future: userProvider.getUserDetails(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
@@ -659,7 +659,8 @@ class MainRouterState extends State<MainRouter> {
           ],
         ),
         child: BottomNavigationBar(
-          items: _getBottomNavItems(_selectedLevel, userProvider.userRole),
+          items:
+              _getBottomNavItems(_selectedLevel, userProvider.userRole ?? ''),
           currentIndex: _bottomNavIndex,
           backgroundColor: Colors.transparent,
           elevation: 0,
@@ -678,7 +679,7 @@ class MainRouterState extends State<MainRouter> {
             // Obtener el itemCount llamando a _getBottomNavItems antes de la navegación
             List<BottomNavigationBarItem> items = _getBottomNavItems(
               _selectedLevel,
-              userProvider.userRole,
+              userProvider.userRole ?? '',
             );
             int itemCount = items.length;
 
