@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:zonix/main.dart';
-import 'package:zonix/features/utils/user_provider.dart';
+import 'package:zonix/shared/providers/user_provider.dart';
 
 void main() {
   group('App Widget Tests', () {

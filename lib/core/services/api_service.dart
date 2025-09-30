@@ -10,6 +10,50 @@ final String baseUrl = const bool.fromEnvironment('dart.vm.product')
       ? dotenv.env['API_URL_PROD']!
       : dotenv.env['API_URL_LOCAL']!;
 class ApiService {
+  /// Método genérico para hacer peticiones GET
+  Future<Map<String, dynamic>> get(String endpoint, {Map<String, String>? queryParams}) async {
+    try {
+      final token = await _storage.read(key: 'token');
+      final uri = Uri.parse('$baseUrl/api$endpoint');
+      final uriWithParams = queryParams != null 
+          ? uri.replace(queryParameters: queryParams)
+          : uri;
+
+      final response = await http.get(
+        uriWithParams,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': token != null ? 'Bearer $token' : '',
+          'User-Agent': 'flutter/1.0',
+        },
+      );
+
+      final responseData = jsonDecode(response.body);
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        return {
+          'success': true,
+          'data': responseData['data'] ?? responseData,
+          'message': responseData['message'] ?? 'Petición exitosa',
+        };
+      } else {
+        return {
+          'success': false,
+          'data': null,
+          'message': responseData['message'] ?? 'Error en la petición',
+        };
+      }
+    } catch (e) {
+      logger.e('Error en petición GET: $e');
+      return {
+        'success': false,
+        'data': null,
+        'message': 'Error de conexión',
+      };
+    }
+  }
+
   // Enviar el token al backend
   Future<http.Response> sendTokenToBackend(String? result) async {
     if (result == null) {

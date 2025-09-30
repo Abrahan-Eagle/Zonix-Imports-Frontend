@@ -2,10 +2,10 @@ import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:zonix/features/utils/auth_utils.dart';
+import 'package:zonix/core/utils/auth_utils.dart';
 import 'package:logger/logger.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:zonix/helpers/env_helper.dart';
+import 'package:zonix/core/utils/env_helper.dart';
 import 'package:http/http.dart' as http;
 
 final logger = Logger();
