@@ -21,13 +21,12 @@ Fuera de alcance (post‑MVP): web Angular, IA recomendaciones, multi‑país, f
 - Referidos: generar/usar link de referido por producto; mostrar comisión estimada cuando aplica.
 - Dropshipping interno: referenciar producto origen; mostrar stock efectivo del origen; validar stock al agregar al carrito y al checkout.
 
-### 2) Estructura del proyecto
-- `lib/models/`
-- `lib/screens/`
-- `lib/widgets/`
-- `lib/services/` (API centralizada)
-- `lib/providers/` (Provider estado)
-- `lib/utils/`
+### 2) Estructura del proyecto (Clean Architecture + Feature-First)
+- `lib/core/` - Núcleo de la aplicación (config, constants, utils, services)
+- `lib/shared/` - Componentes compartidos (widgets, models, providers)
+- `lib/features/` - Módulos por funcionalidad (auth, products, cart, orders, etc.)
+  - Cada feature tiene: `data/`, `domain/`, `presentation/`
+- `lib/app/` - Configuración de la app (app.dart, routes, modules)
 
 ### 3) Instalación y ejecución
 Requisitos: Flutter 3.x, Dart 3.x
@@ -40,19 +39,25 @@ Requisitos: Flutter 3.x, Dart 3.x
 3. Ejecutar: `flutter run -d android`
 
 ### 4) Arquitectura y estándares (Flutter)
-- MVVM + Provider
-- Validaciones en UI; servicios HTTP en `lib/services` (timeouts y manejo de errores)
-- Internacionalización simple (post‑MVP)
-- Lint: respetar `analysis_options.yaml`
+- **Clean Architecture + Feature-First + Provider**
+- **Patrones**: Repository + UseCase + Provider
+- **UI**: Material Design 3, responsive design, modo oscuro/claro
+- **Estado**: Provider centralizado por feature, SharedPreferences para caché
+- **Servicios**: API centralizada con timeouts, reintentos y manejo de errores
+- **Testing**: Unit, widget e integration tests
+- **Lint**: Respetar `analysis_options.yaml`
 
 ### 5) Endpoints backend consumidos (MVP)
-- Autenticación
+- **Autenticación**
   - POST `/auth/google`
   - GET `/me`
   - PUT `/me/role`
-- Catálogo y Productos
-  - GET `/products?filters...`
-  - CRUD `/products` (solo vendedor)
+- **Catálogo y Productos**
+  - GET `/buyer/products?filters...` (con filtros avanzados: modalidades, descuentos, precios)
+  - GET `/buyer/products/featured`
+  - GET `/buyer/products/search`
+  - GET `/buyer/products/brands`
+  - CRUD `/commerce/products` (solo vendedor)
   - POST `/products/{id}/images` (subida de imágenes)
 - Carrito y Checkout
   - POST `/cart`
@@ -136,11 +141,23 @@ if (res.ok) {
 - 99.9% uptime; 98% pagos operativos
 
 ### 10) Roadmap de funcionalidades
-- Infra + Auth (login con Google, perfil)
-- Comprador (catálogo, carrito, checkout)
-- Pagos (API y manuales)
-- Vendedor (publicación, inventario, pedidos, pre‑order)
-- Admin mínimo + QA + APK
+- ✅ **Infra + Auth** (login con Google, perfil)
+- ✅ **Comprador** (catálogo con filtros avanzados, carrito, checkout)
+- 🔄 **Pagos** (API y manuales)
+- 🔄 **Vendedor** (publicación, inventario, pedidos, pre‑order)
+- 🔄 **Admin mínimo + QA + APK**
+
+### 10.1) Funcionalidades implementadas
+- ✅ **Autenticación Google OAuth2** con Sanctum
+- ✅ **Catálogo de productos** con filtros avanzados y caché persistente
+- ✅ **Filtros por modalidades** (detal, mayor, pre-order, referidos, dropshipping)
+- ✅ **Filtros por ofertas especiales** (descuentos)
+- ✅ **Diseño responsive** para móvil y tablet
+- ✅ **Modo oscuro/claro** con tema adaptativo
+- ✅ **Wishlist** con almacenamiento seguro
+- ✅ **Búsqueda en tiempo real** con debounce
+- ✅ **Animaciones y micro-interacciones**
+- ✅ **Testing completo** (unit, widget, integration)
 
 ### 11) Desarrollo y contribución
 - Commits convencionales: `tipo(scope): resumen` (feat, fix, refactor, docs, chore)
