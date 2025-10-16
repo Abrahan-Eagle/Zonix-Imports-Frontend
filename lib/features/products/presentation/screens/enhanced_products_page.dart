@@ -7,6 +7,7 @@ import '../../data/models/category_model.dart';
 import '../providers/product_provider.dart';
 import '../widgets/product_list.dart';
 import '../widgets/advanced_filters.dart';
+import '../../../cart/presentation/providers/cart_provider.dart';
 import '../widgets/breadcrumbs.dart';
 import 'product_detail_page.dart';
 
@@ -133,6 +134,7 @@ class _EnhancedProductsPageState extends State<EnhancedProductsPage>
           child: ProductList(
             products: productProvider.products,
             onProductTap: _navigateToProductDetail,
+            onAddToCart: (product) => _addToCart(product),
             onAddToFavorites: (product) => _toggleWishlist(product),
             onLoadMore: productProvider.hasMoreProducts
                 ? productProvider.loadMoreProducts
@@ -164,6 +166,7 @@ class _EnhancedProductsPageState extends State<EnhancedProductsPage>
           child: ProductList(
             products: productProvider.featuredProducts,
             onProductTap: _navigateToProductDetail,
+            onAddToCart: (product) => _addToCart(product),
             onAddToFavorites: (product) => _toggleWishlist(product),
           ),
         );
@@ -183,6 +186,7 @@ class _EnhancedProductsPageState extends State<EnhancedProductsPage>
           child: ProductList(
             products: productProvider.wishlist,
             onProductTap: _navigateToProductDetail,
+            onAddToCart: (product) => _addToCart(product),
             onAddToFavorites: (product) => _toggleWishlist(product),
           ),
         );
@@ -390,5 +394,270 @@ class _EnhancedProductsPageState extends State<EnhancedProductsPage>
         ),
       );
     }
+  }
+
+  Future<void> _addToCart(ProductModel product) async {
+    // Mostrar dialog para seleccionar modalidad y cantidad
+    final result = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (context) => _AddToCartDialog(product: product),
+    );
+
+    if (result != null) {
+      final cartProvider = context.read<CartProvider>();
+      final success = await cartProvider.addItem(
+        productId: product.id,
+        quantity: result['quantity'] as int,
+        modality: result['modality'] as String,
+      );
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              success
+                  ? '${product.name} agregado al carrito'
+                  : cartProvider.error ?? 'Error al agregar al carrito',
+            ),
+            backgroundColor: success ? UIConstants.success : UIConstants.error,
+            duration: const Duration(seconds: 2),
+            action: success
+                ? SnackBarAction(
+                    label: 'Ver Carrito',
+                    textColor: Colors.white,
+                    onPressed: () {
+                      // Cambiar a tab del carrito (index 1)
+                      DefaultTabController.of(context).animateTo(0);
+                      // Nota: necesitarás ajustar según tu navegación
+                    },
+                  )
+                : null,
+          ),
+        );
+      }
+    }
+  }
+}
+
+/// Dialog para agregar producto al carrito
+class _AddToCartDialog extends StatefulWidget {
+  final ProductModel product;
+
+  const _AddToCartDialog({required this.product});
+
+  @override
+  State<_AddToCartDialog> createState() => _AddToCartDialogState();
+}
+
+class _AddToCartDialogState extends State<_AddToCartDialog> {
+  int _quantity = 1;
+  String _modality = 'retail';
+
+  @override
+  Widget build(BuildContext context) {
+    final minQuantity = _modality == 'wholesale' 
+        ? (widget.product.minWholesaleQuantity ?? 1) 
+        : 1;
+    
+    // Asegurar que la cantidad sea al menos la mínima
+    if (_quantity < minQuantity) {
+      _quantity = minQuantity;
+    }
+
+    return AlertDialog(
+      title: const Text('Agregar al Carrito'),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Nombre del producto
+            Text(
+              widget.product.name,
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 16,
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Selector de modalidad
+            const Text('Modalidad:', style: TextStyle(fontWeight: FontWeight.w500)),
+            const SizedBox(height: 8),
+            DropdownButtonFormField<String>(
+              value: _modality,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              ),
+              items: _getAvailableModalities(),
+              onChanged: (value) {
+                setState(() {
+                  _modality = value!;
+                  // Ajustar cantidad si cambió a mayorista
+                  if (_modality == 'wholesale') {
+                    final min = widget.product.minWholesaleQuantity ?? 1;
+                    if (_quantity < min) {
+                      _quantity = min;
+                    }
+                  }
+                });
+              },
+            ),
+            const SizedBox(height: 16),
+
+            // Información de precio
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.blue.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Precio:'),
+                  Text(
+                    '\$${_getCurrentPrice().toStringAsFixed(2)}',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 18,
+                      color: Color(0xFF1E40AF),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Selector de cantidad
+            const Text('Cantidad:', style: TextStyle(fontWeight: FontWeight.w500)),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.remove),
+                  onPressed: _quantity > minQuantity
+                      ? () => setState(() => _quantity--)
+                      : null,
+                ),
+                Container(
+                  width: 80,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey[300]!),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    '$_quantity',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.add),
+                  onPressed: _quantity < widget.product.stock
+                      ? () => setState(() => _quantity++)
+                      : null,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Stock: ${widget.product.stock}',
+                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                ),
+              ],
+            ),
+
+            if (_modality == 'wholesale' && widget.product.minWholesaleQuantity != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Text(
+                  'Cantidad mínima: ${widget.product.minWholesaleQuantity}',
+                  style: TextStyle(fontSize: 12, color: Colors.orange[700]),
+                ),
+              ),
+
+            const SizedBox(height: 16),
+
+            // Subtotal
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.green.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Subtotal:', style: TextStyle(fontWeight: FontWeight.w600)),
+                  Text(
+                    '\$${(_getCurrentPrice() * _quantity).toStringAsFixed(2)}',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 20,
+                      color: Colors.green,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancelar'),
+        ),
+        ElevatedButton.icon(
+          onPressed: () {
+            Navigator.pop(context, {
+              'quantity': _quantity,
+              'modality': _modality,
+            });
+          },
+          icon: const Icon(Icons.shopping_cart),
+          label: const Text('Agregar'),
+        ),
+      ],
+    );
+  }
+
+  double _getCurrentPrice() {
+    if (_modality == 'wholesale' && widget.product.wholesalePrice != null) {
+      return widget.product.wholesalePrice!;
+    }
+    return widget.product.basePrice;
+  }
+
+  List<DropdownMenuItem<String>> _getAvailableModalities() {
+    final items = <DropdownMenuItem<String>>[];
+
+    // Retail siempre disponible
+    items.add(const DropdownMenuItem(
+      value: 'retail',
+      child: Text('🔵 Detal'),
+    ));
+
+    // Wholesale si está configurado
+    if (widget.product.wholesalePrice != null) {
+      items.add(const DropdownMenuItem(
+        value: 'wholesale',
+        child: Text('🟢 Mayor'),
+      ));
+    }
+
+    // Preorder si está configurado
+    if (widget.product.modality == 'preorder') {
+      items.add(const DropdownMenuItem(
+        value: 'preorder',
+        child: Text('🟠 Pre-orden'),
+      ));
+    }
+
+    return items;
   }
 }
