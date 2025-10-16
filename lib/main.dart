@@ -13,6 +13,10 @@ import 'package:flutter/services.dart';
 import 'package:zonix/features/products/presentation/providers/product_provider.dart';
 import 'package:zonix/features/products/presentation/screens/enhanced_products_page.dart';
 
+// Imports del módulo Cart
+import 'package:zonix/features/cart/presentation/providers/cart_provider.dart';
+import 'package:zonix/features/cart/presentation/screens/cart_page.dart';
+
 // import 'dart:io';
 // import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -75,6 +79,7 @@ Future<void> main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => ProductProvider()),
+        ChangeNotifierProvider(create: (_) => CartProvider()),
       ],
       child: MyApp(isIntegrationTest: isIntegrationTest),
     ),
@@ -606,7 +611,7 @@ class MainRouterState extends State<MainRouter> {
                     case 0:
                       return const EnhancedProductsPage();
                     case 1:
-                      return const Center(child: Text('Carrito'));
+                      return const CartPage();
                     case 2:
                       return const Center(child: Text('Checkout'));
                     case 3:
