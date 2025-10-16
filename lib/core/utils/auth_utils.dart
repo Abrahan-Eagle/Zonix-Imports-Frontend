@@ -4,6 +4,7 @@ import 'package:logger/logger.dart';
 
 const FlutterSecureStorage _storage = FlutterSecureStorage();
 final ApiService _apiService = ApiService();
+final Logger logger = Logger();
 
 class AuthUtils {
   // Método para verificar si el usuario está autenticado

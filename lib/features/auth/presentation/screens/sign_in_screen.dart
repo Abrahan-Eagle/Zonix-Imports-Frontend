@@ -143,10 +143,6 @@ class SignInScreenState extends State<SignInScreen>
         // Success haptic feedback
         HapticFeedback.mediumImpact();
 
-        // Actualizar el estado del UserProvider
-        final userProvider = Provider.of<UserProvider>(context, listen: false);
-        await userProvider.checkAuthentication();
-
         if (!onboardingCompleted) {
           Navigator.pushReplacement(
             context,

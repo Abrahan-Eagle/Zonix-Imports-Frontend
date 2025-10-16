@@ -5,7 +5,6 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:zonix/core/utils/auth_utils.dart';
 import 'package:logger/logger.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:zonix/core/utils/env_helper.dart';
 import 'package:http/http.dart' as http;
 
 final logger = Logger();
@@ -159,8 +158,15 @@ class UserProvider with ChangeNotifier {
         _userId = userDetails['id'] ?? 0;
         _role = userDetails['role'] ?? '';
 
+        // Guardar userId en storage si aún no está guardado
+        if (_userId != 0) {
+          await _storage.write(key: 'userId', value: _userId.toString());
+          logger.i('✅ UserId guardado en storage: $_userId');
+        }
+
         logger.i('User details: $userDetails');
         logger.i('User role: $_role');
+        logger.i('User ID: $_userId');
         return {
           'users': userDetails,
           'role': _role,

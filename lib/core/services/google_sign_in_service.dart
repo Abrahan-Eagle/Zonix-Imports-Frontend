@@ -65,23 +65,31 @@ class GoogleSignInService {
 
           String? token;
           String? role;
+          int? userId;
           if (responseData.containsKey('data')) {
             final data = responseData['data'] as Map<String, dynamic>;
             token = data['token']?.toString();
-            role = (data['user'] as Map<String, dynamic>?)?['role']?.toString();
+            final userMap = data['user'] as Map<String, dynamic>?;
+            role = userMap?['role']?.toString();
+            userId = userMap?['id'] as int?;
           } else {
             token = responseData['token']?.toString();
-            role = (responseData['user'] as Map<String, dynamic>?)?['role']
-                ?.toString();
+            final userMap = responseData['user'] as Map<String, dynamic>?;
+            role = userMap?['role']?.toString();
+            userId = userMap?['id'] as int?;
           }
 
           if (token != null && token.isNotEmpty) {
-            // Guardar token y rol de manera segura (sin expires_in si no viene)
+            // Guardar token, rol y userId de manera segura
             await _storage.write(key: 'token', value: token);
             if (role != null) {
               await _storage.write(key: 'role', value: role);
             }
-            logger.i('Token y rol guardados correctamente.');
+            if (userId != null) {
+              await _storage.write(key: 'userId', value: userId.toString());
+              logger.i('UserId guardado: $userId');
+            }
+            logger.i('Token, rol y userId guardados correctamente.');
             return user; // Retorna el usuario autenticado
           } else {
             logger.e('Respuesta sin token válida');

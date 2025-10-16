@@ -11,6 +11,7 @@ import 'package:zonix/core/utils/auth_utils.dart';
 import 'package:zonix/main.dart';
 import 'package:provider/provider.dart';
 import 'package:zonix/shared/providers/user_provider.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:ui';
 
 // Paleta de colores profesional (2025) - Inspirado en Alibaba/AliExpress/Amazon
@@ -115,14 +116,47 @@ class OnboardingScreenState extends State<OnboardingScreen>
       // Obtener el userId del UserProvider
       final userProvider = Provider.of<UserProvider>(context, listen: false);
 
-      // Asegurar que tenemos los detalles más recientes del usuario
-      final userDetails = await userProvider.getUserDetails();
-      final userId = userDetails?['userId'];
+      int? userId;
 
-      if (userId == null || userId == 0) {
-        throw Exception("ID de usuario no encontrado");
+      // Intentar obtener userId desde getUserDetails
+      try {
+        final userDetails = await userProvider.getUserDetails();
+        debugPrint("🔍 userDetails completos: $userDetails");
+        userId = userDetails?['userId'];
+        debugPrint("🔍 userId desde getUserDetails: $userId");
+      } catch (e) {
+        debugPrint("⚠️ Error al obtener getUserDetails: $e");
       }
 
+      // Fallback 1: intentar obtener userId desde el storage directamente
+      if (userId == null || userId == 0) {
+        debugPrint("🔄 Intentando obtener userId desde storage...");
+        const storage = FlutterSecureStorage();
+        final userIdStr = await storage.read(key: 'userId');
+        debugPrint("🔍 userId desde storage: $userIdStr");
+
+        if (userIdStr != null && userIdStr.isNotEmpty) {
+          userId = int.tryParse(userIdStr);
+          debugPrint("🔍 userId parseado: $userId");
+        }
+      }
+
+      // Fallback 2: usar el userId del provider
+      if (userId == null || userId == 0) {
+        userId = userProvider.userId;
+        debugPrint("🔍 userId desde provider.userId: $userId");
+      }
+
+      debugPrint(
+          "🔍 userId final obtenido: $userId (tipo: ${userId.runtimeType})");
+
+      if (userId == null || userId == 0) {
+        debugPrint("❌ Error: userId es null o 0 después de todos los intentos");
+        throw Exception(
+            "ID de usuario no encontrado. Por favor, cierre sesión e inicie sesión nuevamente.");
+      }
+
+      debugPrint("✅ Completando onboarding con userId: $userId");
       await _onboardingService.completeOnboarding(userId);
       if (!mounted) return;
 
@@ -131,14 +165,15 @@ class OnboardingScreenState extends State<OnboardingScreen>
         MaterialPageRoute(builder: (context) => const MainRouter()),
       );
     } catch (e) {
-      debugPrint("Error al completar el onboarding: $e");
+      debugPrint("❌ Error al completar el onboarding: $e");
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Error al completar el onboarding'),
+        SnackBar(
+          content: Text('Error: ${e.toString()}'),
           behavior: SnackBarBehavior.floating,
-          margin: EdgeInsets.all(20),
+          margin: const EdgeInsets.all(20),
+          duration: const Duration(seconds: 5),
         ),
       );
     } finally {

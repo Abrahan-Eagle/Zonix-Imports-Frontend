@@ -12,7 +12,7 @@ class AuthService {
       errorMethodCount: 5,
       colors: true,
       printEmojis: true,
-      printTime: true,
+      dateTimeFormat: DateTimeFormat.onlyTimeAndSinceStart,
     ),
   );
 
@@ -109,7 +109,7 @@ class AuthService {
       final token = await storage.read(key: 'token');
       if (token == null) return true;
 
-      final response = await http.post(
+      await http.post(
         Uri.parse('${EnvHelper.apiUrl}/api/auth/logout'),
         headers: {
           'Authorization': 'Bearer $token',
