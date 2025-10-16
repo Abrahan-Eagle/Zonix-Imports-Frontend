@@ -192,20 +192,44 @@ rules:
 
   - type: tasks
     value: |
-      MVP Frontend (alineado):
-      - ✅ Auth Google + perfil básico
-      - ✅ Catálogo con modalidades (detal, mayor, pre-order, referidos, dropshipping)
-        - ✅ Filtros avanzados con caché persistente
-        - ✅ Diseño responsive (móvil/tablet)
-        - ✅ Modo oscuro/claro
-        - ✅ Wishlist con almacenamiento seguro
-        - ✅ Búsqueda en tiempo real con debounce
-        - ✅ Animaciones y micro-interacciones
-      - 🔄 Carrito + Checkout
-      - 🔄 Pagos (API y manuales)
-      - 🔄 Pedidos (lista/detalle/seguimiento)
-      - 🔄 Notificaciones (lista + marcar leídas)
-      - 🔄 Módulo vendedor mínimo (CRUD productos + inventario básico)
+      Aplicación Completa (Plan de Trabajo Detallado):
+      
+      ✅ COMPLETADO:
+      - Auth Google + perfil básico
+      - Catálogo con modalidades (detal, mayor, pre-order, referidos, dropshipping)
+        - Filtros avanzados con caché persistente
+        - Diseño responsive (móvil/tablet)
+        - Modo oscuro/claro
+        - Wishlist local con almacenamiento seguro
+        - Búsqueda en tiempo real con debounce
+        - Animaciones y micro-interacciones
+      - Tiendas (estructura backend + provider, falta UI)
+      
+      🔄 EN DESARROLLO (Orden lineal):
+      1. Carrito + Checkout (3 días)
+      2. Pagos (Stripe, PayPal, Binance, Manual+OCR) (4 días)
+      3. Pedidos (lista/detalle/tracking) (2 días)
+      4. Reviews/Calificaciones (Intermedio: rating+fotos+respuesta) (3 días)
+      5. Chat Tiempo Real (Pusher: mensajes+imágenes+visto) (4 días)
+      6. Notificaciones (Pusher Beams + In-App) (2 días)
+      7. Programa Referidos (Completo: multinivel+códigos+ranking) (3 días)
+      8. Wishlist Backend (sincronización+alertas precio) (1 día)
+      9. Búsqueda Avanzada (autocompletado+filtros+historial) (2 días)
+      10. Pre-order Avanzado (abonos auto+recordatorios) (2 días)
+      11. Dropshipping Automatizado (liquidación+dashboard) (2 días)
+      12. Seguridad/KYC (verificación vendedores) (2 días)
+      13. Tiendas UI (completar pantallas) (1 día)
+      14. Multi-moneda (USD/VES/USDT) (1 día)
+      15. Testing Exhaustivo (3 días)
+      16. Deploy (2 días)
+      
+      📌 POST-MVP (Fase 2):
+      - Reviews C (verificadas, moderación)
+      - Chat C (voz, video, E2E)
+      - Admin Dashboard completo
+      - Analytics avanzado
+      - WhatsApp Business API
+      - Cupones/Descuentos
 
   - type: contribution
     value: |

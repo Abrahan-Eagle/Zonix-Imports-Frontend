@@ -85,9 +85,9 @@ class StoreModel {
 
   // Helpers
   String get displayName => businessName;
-  
+
   String get statusText => open ? 'Abierta' : 'Cerrada';
-  
+
   String get businessTypeLabel {
     switch (businessType) {
       case 'retail':
@@ -112,4 +112,3 @@ class StoreModel {
     return image;
   }
 }
-

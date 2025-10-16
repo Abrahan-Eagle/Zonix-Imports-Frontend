@@ -68,7 +68,7 @@ class StoreProvider with ChangeNotifier {
 
       if (result['success'] == true) {
         final newStores = result['stores'] as List<StoreModel>;
-        
+
         if (refresh) {
           _stores = newStores;
         } else {
@@ -99,7 +99,7 @@ class StoreProvider with ChangeNotifier {
   /// Cargar más tiendas (paginación)
   Future<void> loadMoreStores() async {
     if (!hasMore || _isLoadingMore) return;
-    
+
     _currentPage++;
     await loadStores();
   }
@@ -217,4 +217,3 @@ class StoreProvider with ChangeNotifier {
     notifyListeners();
   }
 }
-
