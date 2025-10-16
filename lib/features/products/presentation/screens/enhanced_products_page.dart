@@ -455,10 +455,10 @@ class _AddToCartDialogState extends State<_AddToCartDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final minQuantity = _modality == 'wholesale' 
-        ? (widget.product.minWholesaleQuantity ?? 1) 
+    final minQuantity = _modality == 'wholesale'
+        ? (widget.product.minWholesaleQuantity ?? 1)
         : 1;
-    
+
     // Asegurar que la cantidad sea al menos la mínima
     if (_quantity < minQuantity) {
       _quantity = minQuantity;
@@ -482,13 +482,15 @@ class _AddToCartDialogState extends State<_AddToCartDialog> {
             const SizedBox(height: 16),
 
             // Selector de modalidad
-            const Text('Modalidad:', style: TextStyle(fontWeight: FontWeight.w500)),
+            const Text('Modalidad:',
+                style: TextStyle(fontWeight: FontWeight.w500)),
             const SizedBox(height: 8),
             DropdownButtonFormField<String>(
               value: _modality,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
-                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                contentPadding:
+                    EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               ),
               items: _getAvailableModalities(),
               onChanged: (value) {
@@ -531,7 +533,8 @@ class _AddToCartDialogState extends State<_AddToCartDialog> {
             const SizedBox(height: 16),
 
             // Selector de cantidad
-            const Text('Cantidad:', style: TextStyle(fontWeight: FontWeight.w500)),
+            const Text('Cantidad:',
+                style: TextStyle(fontWeight: FontWeight.w500)),
             const SizedBox(height: 8),
             Row(
               children: [
@@ -571,7 +574,8 @@ class _AddToCartDialogState extends State<_AddToCartDialog> {
               ],
             ),
 
-            if (_modality == 'wholesale' && widget.product.minWholesaleQuantity != null)
+            if (_modality == 'wholesale' &&
+                widget.product.minWholesaleQuantity != null)
               Padding(
                 padding: const EdgeInsets.only(top: 8),
                 child: Text(
@@ -592,7 +596,8 @@ class _AddToCartDialogState extends State<_AddToCartDialog> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Subtotal:', style: TextStyle(fontWeight: FontWeight.w600)),
+                  const Text('Subtotal:',
+                      style: TextStyle(fontWeight: FontWeight.w600)),
                   Text(
                     '\$${(_getCurrentPrice() * _quantity).toStringAsFixed(2)}',
                     style: const TextStyle(

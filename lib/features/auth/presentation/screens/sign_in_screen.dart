@@ -8,9 +8,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:zonix/core/utils/auth_utils.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:zonix/features/onboarding/presentation/screens/onboarding_screen.dart';
-import 'package:provider/provider.dart';
-import 'package:zonix/shared/providers/user_provider.dart';
-import 'dart:ui';
 
 const FlutterSecureStorage _storage = FlutterSecureStorage();
 final ApiService apiService = ApiService();
