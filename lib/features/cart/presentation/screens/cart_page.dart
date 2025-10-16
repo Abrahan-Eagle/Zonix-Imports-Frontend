@@ -5,6 +5,7 @@ import '../widgets/cart_item_card.dart';
 import '../widgets/cart_summary_widget.dart';
 import '../widgets/empty_cart_widget.dart';
 import '../../data/models/cart_item_model.dart';
+import 'package:zonix/features/checkout/presentation/screens/checkout_page.dart';
 
 class CartPage extends StatefulWidget {
   const CartPage({super.key});
@@ -162,11 +163,9 @@ class _CartPageState extends State<CartPage> {
   }
 
   void _navigateToCheckout(BuildContext context) {
-    // TODO: Navegar a checkout cuando esté implementado
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Checkout próximamente'),
-        backgroundColor: Colors.blue,
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const CheckoutPage(),
       ),
     );
   }

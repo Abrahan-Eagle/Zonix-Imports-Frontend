@@ -17,6 +17,16 @@ import 'package:zonix/features/products/presentation/screens/enhanced_products_p
 import 'package:zonix/features/cart/presentation/providers/cart_provider.dart';
 import 'package:zonix/features/cart/presentation/screens/cart_page.dart';
 
+// Imports del módulo Checkout
+import 'package:zonix/features/checkout/presentation/providers/checkout_provider.dart';
+import 'package:zonix/features/checkout/presentation/screens/checkout_page.dart';
+
+// Imports del módulo Payments
+import 'package:zonix/features/payments/presentation/providers/payment_provider.dart';
+
+// Imports del módulo Orders
+import 'package:zonix/features/orders/presentation/providers/order_provider.dart';
+
 // import 'dart:io';
 // import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -80,6 +90,9 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => ProductProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),
+        ChangeNotifierProvider(create: (_) => CheckoutProvider()),
+        ChangeNotifierProvider(create: (_) => PaymentProvider()),
+        ChangeNotifierProvider(create: (_) => OrderProvider()),
       ],
       child: MyApp(isIntegrationTest: isIntegrationTest),
     ),
