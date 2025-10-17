@@ -46,7 +46,7 @@ class EditProfilePageState extends State<EditProfilePage> {
     try {
       _profile = await ProfileService().getProfileByUserId(widget.userId);
       if (_profile != null) {
-        _dateController.text = formatDate(_profile!.dateOfBirth);
+        _dateController.text = formatDate(_profile!.dateOfBirth ?? '');
         // Solo actualizamos el estado una vez que los datos están listos
         if (mounted) {
           setState(() {});
@@ -235,7 +235,7 @@ class EditProfilePageState extends State<EditProfilePage> {
       try {
         // Asegúrate de que la fecha esté en formato yyyy-MM-dd antes de enviarlo
         String formattedDateOfBirth = DateFormat('yyyy-MM-dd')
-            .format(DateFormat('dd-MM-yyyy').parse(_profile!.dateOfBirth));
+            .format(DateFormat('dd-MM-yyyy').parse(_profile!.dateOfBirth ?? '01-01-2000'));
 
         // Actualizar el perfil con la fecha de nacimiento correctamente formateada
         await ProfileService().updateProfile(

@@ -163,13 +163,13 @@ class ProfileService {
       final request = http.MultipartRequest('POST', uri)
         ..headers['Authorization'] = 'Bearer $token'
         ..headers['Accept'] = 'application/json'
-        ..fields['firstName'] = profile.firstName
-        ..fields['middleName'] = profile.middleName
-        ..fields['lastName'] = profile.lastName
-        ..fields['secondLastName'] = profile.secondLastName
-        ..fields['date_of_birth'] = profile.dateOfBirth
-        ..fields['maritalStatus'] = profile.maritalStatus
-        ..fields['sex'] = profile.sex
+        ..fields['firstName'] = profile.firstName ?? ''
+        ..fields['middleName'] = profile.middleName ?? ''
+        ..fields['lastName'] = profile.lastName ?? ''
+        ..fields['secondLastName'] = profile.secondLastName ?? ''
+        ..fields['date_of_birth'] = profile.dateOfBirth ?? ''
+        ..fields['maritalStatus'] = profile.maritalStatus ?? ''
+        ..fields['sex'] = profile.sex ?? ''
         ..fields['user_id'] = userId.toString(); // Agregar user_id
 
       // Agrega la imagen si está presente.
@@ -212,13 +212,13 @@ class ProfileService {
           'POST', uri) // Cambiar PUT a POST si tu API requiere POST.
         ..headers['Authorization'] = 'Bearer $token'
         ..headers['Accept'] = 'application/json'
-        ..fields['firstName'] = profile.firstName
-        ..fields['middleName'] = profile.middleName
-        ..fields['lastName'] = profile.lastName
-        ..fields['secondLastName'] = profile.secondLastName
-        ..fields['date_of_birth'] = profile.dateOfBirth
-        ..fields['maritalStatus'] = profile.maritalStatus
-        ..fields['sex'] = profile.sex;
+        ..fields['firstName'] = profile.firstName ?? ''
+        ..fields['middleName'] = profile.middleName ?? ''
+        ..fields['lastName'] = profile.lastName ?? ''
+        ..fields['secondLastName'] = profile.secondLastName ?? ''
+        ..fields['date_of_birth'] = profile.dateOfBirth ?? ''
+        ..fields['maritalStatus'] = profile.maritalStatus ?? ''
+        ..fields['sex'] = profile.sex ?? '';
 
       // Agrega la imagen si está presente.
       if (imageFile != null) {
