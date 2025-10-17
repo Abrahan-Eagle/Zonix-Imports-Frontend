@@ -27,14 +27,14 @@ class UserInfo {
 class Profile {
   int id;
   int userId; // Clave foránea
-  String firstName;
-  String middleName;
-  String lastName;
-  String secondLastName;
+  String? firstName;
+  String? middleName;
+  String? lastName;
+  String? secondLastName;
   String? photo; // Cambiado a nullable
-  String dateOfBirth;
-  String maritalStatus;
-  String sex;
+  String? dateOfBirth;
+  String? maritalStatus;
+  String? sex;
   String status; // Estado del perfil
   String? phone; // Teléfono
   String? address; // Dirección
@@ -51,14 +51,14 @@ class Profile {
   Profile({
     required this.id,
     required this.userId,
-    required this.firstName,
-    required this.middleName,
-    required this.lastName,
-    required this.secondLastName,
+    this.firstName,
+    this.middleName,
+    this.lastName,
+    this.secondLastName,
     this.photo,
-    required this.dateOfBirth,
-    required this.maritalStatus,
-    required this.sex,
+    this.dateOfBirth,
+    this.maritalStatus,
+    this.sex,
     this.status = 'notverified', // Valor por defecto
     this.phone,
     this.address,
