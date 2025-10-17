@@ -5,19 +5,21 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 final logger = Logger();
-const FlutterSecureStorage _storage = FlutterSecureStorage(); // Inicializa _storage
+const FlutterSecureStorage _storage =
+    FlutterSecureStorage(); // Inicializa _storage
 final String baseUrl = const bool.fromEnvironment('dart.vm.product')
-      ? dotenv.env['API_URL_PROD']!
-      : dotenv.env['API_URL_LOCAL']!;
+    ? dotenv.env['API_URL_PROD']!
+    : dotenv.env['API_URL_LOCAL']!;
+
 class ApiService {
   /// Método genérico para hacer peticiones GET
-  Future<Map<String, dynamic>> get(String endpoint, {Map<String, String>? queryParams}) async {
+  Future<Map<String, dynamic>> get(String endpoint,
+      {Map<String, String>? queryParams}) async {
     try {
       final token = await _storage.read(key: 'token');
-      final uri = Uri.parse('$baseUrl/api$endpoint');
-      final uriWithParams = queryParams != null 
-          ? uri.replace(queryParameters: queryParams)
-          : uri;
+      final uri = Uri.parse('$baseUrl$endpoint');
+      final uriWithParams =
+          queryParams != null ? uri.replace(queryParameters: queryParams) : uri;
 
       final response = await http.get(
         uriWithParams,
@@ -72,7 +74,7 @@ class ApiService {
       });
 
       final response = await http.post(
-      Uri.parse( '$baseUrl/api/auth/google'), // Cambia por la URL de tu backend
+        Uri.parse('$baseUrl/auth/google'), // Cambia por la URL de tu backend
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -84,12 +86,13 @@ class ApiService {
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         logger.i('Respuesta del servidor: $responseData');
-        
+
         // Handle the nested response structure: {success: true, data: {user: {...}, token: ...}}
         Map<String, dynamic> userData;
         String? token;
-        
-        if (responseData.containsKey('success') && responseData.containsKey('data')) {
+
+        if (responseData.containsKey('success') &&
+            responseData.containsKey('data')) {
           // New format: {success: true, data: {user: {...}, token: ...}}
           userData = responseData['data']['user'] ?? {};
           token = responseData['data']['token'] ?? responseData['token'];
@@ -98,22 +101,28 @@ class ApiService {
           userData = responseData['user'] ?? {};
           token = responseData['token'];
         }
-        
+
         var $varToken = token;
         logger.i($varToken);
         var $varRole = userData['role'];
         logger.i($varRole);
         var $varUserId = userData['id']?.toString(); // Agregar userId
         logger.i('User ID: ${$varUserId}');
-        var $completedOnboarding = userData['completed_onboarding']?.toString(); // Convertimos a String
+        var $completedOnboarding = userData['completed_onboarding']
+            ?.toString(); // Convertimos a String
         logger.i($completedOnboarding);
 
         // Verificación más flexible para data
         if ($varToken != null) {
-          await _storage.write(key: 'token', value: $varToken);  // Guardar el JWT en almacenamiento seguro
+          await _storage.write(
+              key: 'token',
+              value: $varToken); // Guardar el JWT en almacenamiento seguro
           await _storage.write(key: 'role', value: $varRole);
-          await _storage.write(key: 'userId', value: $varUserId); // Guardar userId
-          await _storage.write(key: 'userCompletedOnboarding', value: $completedOnboarding); // Guardamos como String
+          await _storage.write(
+              key: 'userId', value: $varUserId); // Guardar userId
+          await _storage.write(
+              key: 'userCompletedOnboarding',
+              value: $completedOnboarding); // Guardamos como String
 
           logger.i('Inicio de sesión exitoso');
 
@@ -125,36 +134,40 @@ class ApiService {
             logger.e('No se encontró ningún token almacenado');
           }
 
-         // Leer el token del almacenamiento seguro
+          // Leer el token del almacenamiento seguro
           String? role = await _storage.read(key: 'role');
           if (role != null) {
-            logger.i('role almacenadoaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa: $role');
+            logger.i(
+                'role almacenadoaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa: $role');
           } else {
             logger.e('No se encontró ningún role almacenado');
           }
 
-                    // Convertir a booleano al leer desde el almacenamiento
-          bool storedOnboarding = (await _storage.read(key: 'userCompletedOnboarding')) == '1';
-          logger.i('Estado de completedOnboarding almacenado: $storedOnboarding');
-
+          // Convertir a booleano al leer desde el almacenamiento
+          bool storedOnboarding =
+              (await _storage.read(key: 'userCompletedOnboarding')) == '1';
+          logger
+              .i('Estado de completedOnboarding almacenado: $storedOnboarding');
         } else {
           logger.e('Respuesta inesperada: ${response.body}');
         }
       } else {
-        logger.e('Error al iniciar sesión en Laravel: ${response.statusCode} - ${response.body}');
+        logger.e(
+            'Error al iniciar sesión en Laravel: ${response.statusCode} - ${response.body}');
       }
 
       return response; // Devuelve la respuesta
     } catch (error) {
       logger.e('Error: $error');
-      throw Exception('Error en el envío de datos: $error'); // Lanza una excepción
+      throw Exception(
+          'Error en el envío de datos: $error'); // Lanza una excepción
     }
   }
 
   // Método para cerrar sesión
   Future<http.Response> logout(String token) async {
     final response = await http.post(
-      Uri.parse('$baseUrl/api/auth/logout'),
+      Uri.parse('$baseUrl/auth/logout'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
@@ -168,7 +181,7 @@ class ApiService {
     final token = await _storage.read(key: 'token');
     if (token != null) {
       final response = await http.get(
-        Uri.parse('$baseUrl/api/auth/protected-endpoint'),
+        Uri.parse('$baseUrl/auth/protected-endpoint'),
         headers: {
           'Authorization': 'Bearer $token',
           'Accept': 'application/json',
@@ -190,9 +203,6 @@ class ApiService {
     }
   }
 }
-
-
-
 
 // import 'dart:convert';
 // import 'package:http/http.dart' as http;
@@ -224,7 +234,7 @@ class ApiService {
 //       });
 
 //       final response = await http.post(
-//       Uri.parse( '$baseUrl/api/auth/google'), // Cambia por la URL de tu backend
+//       Uri.parse( '$baseUrl/auth/google'), // Cambia por la URL de tu backend
 //         headers: {
 //           'Content-Type': 'application/json',
 //           'Accept': 'application/json',
@@ -288,7 +298,7 @@ class ApiService {
 //   // Método para cerrar sesión
 //   Future<http.Response> logout(String token) async {
 //     final response = await http.post(
-//       Uri.parse('$baseUrl/api/auth/logout'),
+//       Uri.parse('$baseUrl/auth/logout'),
 //       headers: {
 //         'Authorization': 'Bearer $token',
 //         'Content-Type': 'application/json',
@@ -302,7 +312,7 @@ class ApiService {
 //     final token = await _storage.read(key: 'token');
 //     if (token != null) {
 //       final response = await http.get(
-//         Uri.parse('$baseUrl/api/auth/protected-endpoint'),
+//         Uri.parse('$baseUrl/auth/protected-endpoint'),
 //         headers: {
 //           'Authorization': 'Bearer $token',
 //           'Accept': 'application/json',
