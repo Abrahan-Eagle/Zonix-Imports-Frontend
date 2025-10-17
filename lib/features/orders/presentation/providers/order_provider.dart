@@ -18,6 +18,7 @@ class OrderProvider with ChangeNotifier {
   String? get error => _error;
   List<Map<String, dynamic>> get orders => _orders;
   OrderModel? get currentOrder => _currentOrder;
+  Map<String, dynamic>? get selectedOrder => _currentOrder?.toJson(); // Alias para compatibilidad
   Map<String, dynamic>? get tracking => _tracking;
   Map<String, dynamic>? get pagination => _pagination;
 
@@ -106,6 +107,11 @@ class OrderProvider with ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  /// Alias para compatibilidad
+  Future<void> loadOrderDetails(int orderId) async {
+    await loadOrderDetail(orderId);
   }
 
   /// Cargar tracking de una orden

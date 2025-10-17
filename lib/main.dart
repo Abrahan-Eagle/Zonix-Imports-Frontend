@@ -26,6 +26,7 @@ import 'package:zonix/features/payments/presentation/providers/payment_provider.
 
 // Imports del módulo Orders
 import 'package:zonix/features/orders/presentation/providers/order_provider.dart';
+import 'package:zonix/features/orders/presentation/screens/orders_page.dart';
 
 // import 'dart:io';
 // import 'package:http/http.dart' as http;
@@ -626,9 +627,9 @@ class MainRouterState extends State<MainRouter> {
                     case 1:
                       return const CartPage();
                     case 2:
-                      return const Center(child: Text('Checkout'));
+                      return const CheckoutPage();
                     case 3:
-                      return const Center(child: Text('Pedidos'));
+                      return const OrdersPage();
                     default:
                       return const EnhancedProductsPage();
                   }
