@@ -27,7 +27,7 @@ class DocumentService {
       if (token == null) throw Exception('Token not found.');
 
       final response = await http.get(
-        Uri.parse('$baseUrl/api/documents/$id'),
+        Uri.parse('$baseUrl/documents/$id'),
         headers: {'Authorization': 'Bearer $token'},
       );
 
@@ -62,7 +62,7 @@ class DocumentService {
 
       final request = http.MultipartRequest(
         'POST',
-        Uri.parse('$baseUrl/api/documents'),
+        Uri.parse('$baseUrl/documents'),
       );
 
       // Configure headers and basic fields
@@ -133,7 +133,7 @@ class DocumentService {
 
       final request = http.MultipartRequest(
         'POST',
-        Uri.parse('$baseUrl/api/documents/${document.id}'),
+        Uri.parse('$baseUrl/documents/${document.id}'),
       );
 
       // Configure headers and basic fields
@@ -202,7 +202,7 @@ class DocumentService {
     try {
       final response = await http.post(
         Uri.parse(
-            '$baseUrl/api/data-verification/$userId/update-status-check-scanner/documents'),
+            '$baseUrl/data-verification/$userId/update-status-check-scanner/documents'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',

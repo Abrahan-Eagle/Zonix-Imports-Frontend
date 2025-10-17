@@ -30,7 +30,7 @@ class StoreApiService {
     String sortOrder = 'asc',
   }) async {
     try {
-      final url = Uri.parse('$baseUrl/api/commerces').replace(queryParameters: {
+      final url = Uri.parse('$baseUrl/commerces').replace(queryParameters: {
         'page': page.toString(),
         'per_page': perPage.toString(),
         if (onlyOpen != null) 'open': onlyOpen.toString(),
@@ -79,7 +79,7 @@ class StoreApiService {
   /// GET /api/commerces/{id}
   Future<Map<String, dynamic>> getStoreDetails(int storeId) async {
     try {
-      final url = Uri.parse('$baseUrl/api/commerces/$storeId');
+      final url = Uri.parse('$baseUrl/commerces/$storeId');
       logger.i('🌐 Obteniendo detalles de tienda: $storeId');
 
       final response = await http.get(url);
@@ -123,7 +123,7 @@ class StoreApiService {
     String sortOrder = 'asc',
   }) async {
     try {
-      final url = Uri.parse('$baseUrl/api/commerces/$storeId/products')
+      final url = Uri.parse('$baseUrl/commerces/$storeId/products')
           .replace(queryParameters: {
         'page': page.toString(),
         'per_page': perPage.toString(),
@@ -184,7 +184,7 @@ class StoreApiService {
         };
       }
 
-      final url = Uri.parse('$baseUrl/api/my-commerce');
+      final url = Uri.parse('$baseUrl/my-commerce');
       logger.i('🌐 Obteniendo mi tienda');
 
       final response = await http.get(
@@ -228,7 +228,7 @@ class StoreApiService {
         };
       }
 
-      final url = Uri.parse('$baseUrl/api/my-commerce/toggle');
+      final url = Uri.parse('$baseUrl/my-commerce/toggle');
       logger.i('🔄 Cambiando estado de tienda');
 
       final response = await http.put(
@@ -265,7 +265,7 @@ class StoreApiService {
   /// GET /api/business-types
   Future<List<Map<String, String>>> getBusinessTypes() async {
     try {
-      final url = Uri.parse('$baseUrl/api/business-types');
+      final url = Uri.parse('$baseUrl/business-types');
       final response = await http.get(url);
 
       if (response.statusCode == 200) {

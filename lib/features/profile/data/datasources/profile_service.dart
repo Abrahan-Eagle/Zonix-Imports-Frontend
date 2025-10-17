@@ -28,7 +28,7 @@ class ProfileService {
     final token = await _getToken();
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/api/profiles/$id'),
+        Uri.parse('$baseUrl/profiles/$id'),
         headers: {'Authorization': 'Bearer $token'},
       ).timeout(const Duration(seconds: 12));
 
@@ -55,7 +55,7 @@ class ProfileService {
 
     try {
       // Primero intentamos con el endpoint específico
-      final url = '$baseUrl/api/profiles/user/$userId';
+      final url = '$baseUrl/profiles/user/$userId';
       logger.i('Intentando endpoint específico: $url');
       final response = await http.get(
         Uri.parse(url),
@@ -91,7 +91,7 @@ class ProfileService {
   Future<Profile?> _getProfileFromAllProfiles(int userId) async {
     try {
       final token = await _getToken();
-      final url = '$baseUrl/api/profiles';
+      final url = '$baseUrl/profiles';
       logger.i('Intentando obtener todos los perfiles desde: $url');
 
       final response = await http.get(
@@ -140,7 +140,7 @@ class ProfileService {
   Future<List<Profile>> getAllProfiles() async {
     final token = await _getToken();
     final response = await http.get(
-      Uri.parse('$baseUrl/api/profiles'),
+      Uri.parse('$baseUrl/profiles'),
       headers: {'Authorization': 'Bearer $token'},
     );
 
@@ -159,7 +159,7 @@ class ProfileService {
       final token = await _getToken();
       if (token == null) throw Exception('Token no encontrado.');
 
-      final uri = Uri.parse('$baseUrl/api/profiles');
+      final uri = Uri.parse('$baseUrl/profiles');
       final request = http.MultipartRequest('POST', uri)
         ..headers['Authorization'] = 'Bearer $token'
         ..headers['Accept'] = 'application/json'
@@ -207,7 +207,7 @@ class ProfileService {
       final token = await _getToken();
       if (token == null) throw Exception('Token no encontrado.');
 
-      final uri = Uri.parse('$baseUrl/api/profiles/$id');
+      final uri = Uri.parse('$baseUrl/profiles/$id');
       final request = http.MultipartRequest(
           'POST', uri) // Cambiar PUT a POST si tu API requiere POST.
         ..headers['Authorization'] = 'Bearer $token'
@@ -262,7 +262,7 @@ class ProfileService {
       final response = await http
           .post(
             Uri.parse(
-                '$baseUrl/api/data-verification/$userId/update-status-check-scanner/profiles'),
+                '$baseUrl/data-verification/$userId/update-status-check-scanner/profiles'),
             headers: {
               'Authorization': 'Bearer $token',
               'Content-Type': 'application/json',
@@ -286,7 +286,7 @@ class ProfileService {
   Future<void> deleteAccount() async {
     final token = await _getToken();
     final response = await http.delete(
-      Uri.parse('$baseUrl/api/buyer/account'),
+      Uri.parse('$baseUrl/buyer/account'),
       headers: {'Authorization': 'Bearer $token'},
     );
     if (response.statusCode != 200) {
@@ -301,7 +301,7 @@ class ProfileService {
 
       // Obtener datos del usuario para crear el perfil
       final userResponse = await http.get(
-        Uri.parse('$baseUrl/api/user'),
+        Uri.parse('$baseUrl/user'),
         headers: {'Authorization': 'Bearer $token'},
       );
 
@@ -330,7 +330,7 @@ class ProfileService {
         logger.i('🔄 Creando perfil con datos: $profileData');
 
         final createResponse = await http.post(
-          Uri.parse('$baseUrl/api/profiles'),
+          Uri.parse('$baseUrl/profiles'),
           headers: {
             'Authorization': 'Bearer $token',
             'Content-Type': 'application/json',

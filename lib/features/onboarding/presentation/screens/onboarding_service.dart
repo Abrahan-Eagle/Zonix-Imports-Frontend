@@ -32,7 +32,7 @@ class OnboardingService {
 
     try {
       final response = await http.put(
-        Uri.parse('$baseUrl/api/onboarding/$userId'),
+        Uri.parse('$baseUrl/onboarding/$userId'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',

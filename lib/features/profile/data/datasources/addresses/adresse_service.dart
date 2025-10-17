@@ -34,7 +34,7 @@ class AddressService {
     final token = await _getToken();
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/api/addresses/getCountries'),
+        Uri.parse('$baseUrl/addresses/getCountries'),
         headers: {'Authorization': 'Bearer $token'},
       ).timeout(const Duration(seconds: 10));
 
@@ -60,7 +60,7 @@ class AddressService {
     try {
       final response = await http
           .post(
-            Uri.parse('$baseUrl/api/addresses/get-states-by-country'),
+            Uri.parse('$baseUrl/addresses/get-states-by-country'),
             headers: {
               'Authorization': 'Bearer $token',
               'Content-Type': 'application/json'
@@ -91,7 +91,7 @@ class AddressService {
     try {
       final response = await http
           .post(
-            Uri.parse('$baseUrl/api/addresses/get-cities-by-state'),
+            Uri.parse('$baseUrl/addresses/get-cities-by-state'),
             headers: {
               'Authorization': 'Bearer $token',
               'Content-Type': 'application/json'
@@ -122,7 +122,7 @@ class AddressService {
     try {
       final response = await http
           .post(
-            Uri.parse('$baseUrl/api/addresses'),
+            Uri.parse('$baseUrl/addresses'),
             headers: {
               'Authorization': 'Bearer $token',
               'Content-Type': 'application/json',
@@ -157,7 +157,7 @@ class AddressService {
     final token = await _getToken();
 
     logger.i('Token obtenido: $token');
-    logger.i('URL de actualización: $baseUrl/api/addresses/${address.id}');
+    logger.i('URL de actualización: $baseUrl/addresses/${address.id}');
 
     try {
       final requestBody = {
@@ -175,7 +175,7 @@ class AddressService {
 
       final response = await http
           .put(
-            Uri.parse('$baseUrl/api/addresses/${address.id}'),
+            Uri.parse('$baseUrl/addresses/${address.id}'),
             headers: {
               'Authorization': 'Bearer $token',
               'Content-Type': 'application/json',
@@ -205,7 +205,7 @@ class AddressService {
   Future<Address?> getAddressById(int id) async {
     final token = await _getToken();
     final response = await http.get(
-      Uri.parse('$baseUrl/api/addresses/$id'),
+      Uri.parse('$baseUrl/addresses/$id'),
       headers: {'Authorization': 'Bearer $token'},
     );
 
@@ -249,7 +249,7 @@ class AddressService {
     try {
       final response = await http.post(
         Uri.parse(
-            '$baseUrl/api/data-verification/$userId/update-status-check-scanner/addresses'),
+            '$baseUrl/data-verification/$userId/update-status-check-scanner/addresses'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',

@@ -27,7 +27,7 @@ class PhoneService {
       logger.i('Fetching phones for user: $id');
 
       final response = await http.get(
-        Uri.parse('$baseUrl/api/phones/$id'),
+        Uri.parse('$baseUrl/phones/$id'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -73,7 +73,7 @@ class PhoneService {
 
       final response = await http
           .post(
-            Uri.parse('$baseUrl/api/phones'),
+            Uri.parse('$baseUrl/phones'),
             headers: {
               'Authorization': 'Bearer $token',
               'Content-Type': 'application/json',
@@ -113,7 +113,7 @@ class PhoneService {
 
       final response = await http
           .put(
-            Uri.parse('$baseUrl/api/phones/$id'),
+            Uri.parse('$baseUrl/phones/$id'),
             headers: {
               'Authorization': 'Bearer $token',
               'Content-Type': 'application/json',
@@ -211,7 +211,7 @@ class PhoneService {
       if (token == null) throw Exception('Token no encontrado.');
 
       final response = await http.delete(
-        Uri.parse('$baseUrl/api/phones/$id'),
+        Uri.parse('$baseUrl/phones/$id'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -248,7 +248,7 @@ class PhoneService {
 
       final response = await http.get(
         Uri.parse(
-            '$baseUrl/api/phones/operator-codes'), // URL correcta para códigos de operador
+            '$baseUrl/phones/operator-codes'), // URL correcta para códigos de operador
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -296,7 +296,7 @@ class PhoneService {
 
       final response = await http.post(
         Uri.parse(
-            '$baseUrl/api/data-verification/$userId/update-status-check-scanner/phones'),
+            '$baseUrl/data-verification/$userId/update-status-check-scanner/phones'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',

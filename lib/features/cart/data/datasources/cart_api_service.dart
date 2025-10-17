@@ -34,7 +34,7 @@ class CartApiService {
         };
       }
 
-      final url = Uri.parse('$baseUrl/api/buyer/cart/add');
+      final url = Uri.parse('$baseUrl/buyer/cart/add');
       logger.i('🛒 Agregando producto al carrito: $productId');
 
       final response = await http.post(
@@ -89,7 +89,7 @@ class CartApiService {
         };
       }
 
-      final url = Uri.parse('$baseUrl/api/buyer/cart');
+      final url = Uri.parse('$baseUrl/buyer/cart');
       logger.i('🛒 Obteniendo carrito');
 
       final response = await http.get(
@@ -144,7 +144,7 @@ class CartApiService {
         };
       }
 
-      final url = Uri.parse('$baseUrl/api/cart/$cartItemId');
+      final url = Uri.parse('$baseUrl/buyer/cart/$cartItemId');
       logger.i('🔄 Actualizando cantidad: $cartItemId → $quantity');
 
       final response = await http.put(
@@ -194,7 +194,7 @@ class CartApiService {
         };
       }
 
-      final url = Uri.parse('$baseUrl/api/cart/$cartItemId');
+      final url = Uri.parse('$baseUrl/buyer/cart/$cartItemId');
       logger.i('🗑️ Eliminando item: $cartItemId');
 
       final response = await http.delete(
@@ -241,7 +241,7 @@ class CartApiService {
         };
       }
 
-      final url = Uri.parse('$baseUrl/api/buyer/cart');
+      final url = Uri.parse('$baseUrl/buyer/cart');
       logger.i('🗑️ Limpiando carrito completo');
 
       final response = await http.delete(
@@ -288,7 +288,7 @@ class CartApiService {
         };
       }
 
-      final url = Uri.parse('$baseUrl/api/buyer/cart/validate');
+      final url = Uri.parse('$baseUrl/buyer/cart/validate');
       logger.i('✅ Validando stock del carrito');
 
       final response = await http.get(
