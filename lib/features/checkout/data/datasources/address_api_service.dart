@@ -15,7 +15,7 @@ class AddressApiService {
     try {
       _logger.i('🏠 Obteniendo direcciones del usuario');
       
-      final token = await _storage.read(key: 'auth_token');
+      final token = await _storage.read(key: 'token');
       if (token == null) {
         throw Exception('Token no disponible');
       }

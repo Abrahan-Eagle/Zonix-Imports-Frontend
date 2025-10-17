@@ -18,7 +18,7 @@ class CheckoutApiService {
     try {
       _logger.i('🛒 Obteniendo resumen de checkout');
       
-      final token = await _storage.read(key: 'auth_token');
+      final token = await _storage.read(key: 'token');
       if (token == null) {
         throw Exception('Token no disponible');
       }
@@ -80,7 +80,7 @@ class CheckoutApiService {
       _logger.d('Shipping Address ID: $shippingAddressId');
       _logger.d('Delivery Type: $deliveryType');
       
-      final token = await _storage.read(key: 'auth_token');
+      final token = await _storage.read(key: 'token');
       if (token == null) {
         throw Exception('Token no disponible');
       }
@@ -161,7 +161,7 @@ class CheckoutApiService {
     try {
       _logger.i('✅ Confirmando checkout');
       
-      final token = await _storage.read(key: 'auth_token');
+      final token = await _storage.read(key: 'token');
       if (token == null) {
         throw Exception('Token no disponible');
       }

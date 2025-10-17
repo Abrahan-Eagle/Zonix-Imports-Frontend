@@ -20,7 +20,7 @@ class OrderApiService {
     try {
       _logger.i('📦 Obteniendo órdenes del comprador');
       
-      final token = await _storage.read(key: 'auth_token');
+      final token = await _storage.read(key: 'token');
       if (token == null) {
         throw Exception('Token no disponible');
       }
@@ -74,7 +74,7 @@ class OrderApiService {
     try {
       _logger.i('📋 Obteniendo detalle de orden $orderId');
       
-      final token = await _storage.read(key: 'auth_token');
+      final token = await _storage.read(key: 'token');
       if (token == null) {
         throw Exception('Token no disponible');
       }
@@ -118,7 +118,7 @@ class OrderApiService {
     try {
       _logger.i('🚚 Obteniendo tracking de orden $orderId');
       
-      final token = await _storage.read(key: 'auth_token');
+      final token = await _storage.read(key: 'token');
       if (token == null) {
         throw Exception('Token no disponible');
       }

@@ -16,7 +16,7 @@ class PaymentApiService {
     try {
       _logger.i('💳 Obteniendo métodos de pago para orden $orderId');
       
-      final token = await _storage.read(key: 'auth_token');
+      final token = await _storage.read(key: 'token');
       if (token == null) {
         throw Exception('Token no disponible');
       }
@@ -65,7 +65,7 @@ class PaymentApiService {
     try {
       _logger.i('🚀 Iniciando pago: $paymentMethod para orden $orderId');
       
-      final token = await _storage.read(key: 'auth_token');
+      final token = await _storage.read(key: 'token');
       if (token == null) {
         throw Exception('Token no disponible');
       }
@@ -136,7 +136,7 @@ class PaymentApiService {
     try {
       _logger.i('📄 Registrando pago manual: $paymentMethod');
       
-      final token = await _storage.read(key: 'auth_token');
+      final token = await _storage.read(key: 'token');
       if (token == null) {
         throw Exception('Token no disponible');
       }
@@ -189,7 +189,7 @@ class PaymentApiService {
     try {
       _logger.i('🔍 Verificando estado del pago $paymentId');
       
-      final token = await _storage.read(key: 'auth_token');
+      final token = await _storage.read(key: 'token');
       if (token == null) {
         throw Exception('Token no disponible');
       }
