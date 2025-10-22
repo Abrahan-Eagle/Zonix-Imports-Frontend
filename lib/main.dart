@@ -28,6 +28,9 @@ import 'package:zonix/features/payments/presentation/providers/payment_provider.
 import 'package:zonix/features/orders/presentation/providers/order_provider.dart';
 import 'package:zonix/features/orders/presentation/screens/orders_page.dart';
 
+// Imports del módulo Profile
+import 'package:zonix/features/profile/presentation/providers/profile_provider.dart';
+
 // import 'dart:io';
 // import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -94,6 +97,7 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (_) => CheckoutProvider()),
         ChangeNotifierProvider(create: (_) => PaymentProvider()),
         ChangeNotifierProvider(create: (_) => OrderProvider()),
+        ChangeNotifierProvider(create: (_) => ProfileProvider()),
       ],
       child: MyApp(isIntegrationTest: isIntegrationTest),
     ),

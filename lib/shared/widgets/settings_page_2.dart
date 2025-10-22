@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:zonix/features/profile/presentation/screens/documents/document_list_screen.dart';
-
 import 'package:zonix/features/profile/presentation/screens/phones/phone_list_screen.dart';
 import 'package:zonix/shared/providers/user_provider.dart';
 import 'package:zonix/features/profile/presentation/screens/profile_page.dart';
 import 'package:zonix/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:zonix/features/profile/presentation/screens/addresses/adresse_list_screen.dart';
 import 'package:zonix/features/profile/data/datasources/profile_service.dart';
+import 'package:zonix/features/profile/presentation/providers/profile_provider.dart';
+import 'package:zonix/features/orders/presentation/screens/orders_page.dart';
 
 // Configuración del logger
 final logger = Logger();
@@ -235,123 +236,8 @@ class _SettingsPage2State extends State<SettingsPage2> {
                   ),
                   const SizedBox(height: 20),
 
-                  // Sección: Información de cuenta
-                  Text(
-                    "Mi cuenta",
-                    style: TextStyle(
-                      color: ZonixColors.primaryBlue,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 18,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Card(
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? ZonixColors.darkGray
-                        : ZonixColors.white,
-                    elevation: 6,
-                    shadowColor: ZonixColors.primaryBlue.withOpacity(0.1),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16)),
-                    child: Column(
-                      children: [
-                        _buildListTile(
-                          context,
-                          icon: Icons.person_outline_rounded,
-                          color: ZonixColors.primaryBlue,
-                          title: "Perfil",
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ProfilePagex(
-                                    userId: userProvider.userId ?? 0),
-                              ),
-                            );
-                          },
-                        ),
-                        _buildListTile(
-                          context,
-                          icon: Icons.folder_outlined,
-                          color: ZonixColors.secondaryBlue,
-                          title: "Documentos",
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => DocumentListScreen(
-                                    userId: userProvider.userId ?? 0),
-                              ),
-                            );
-                          },
-                        ),
-                        _buildListTile(
-                          context,
-                          icon: Icons.location_on_outlined,
-                          color: ZonixColors.warningOrange,
-                          title: "Direcciones",
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => AddressPage(
-                                    userId: userProvider.userId ?? 0),
-                              ),
-                            );
-                          },
-                        ),
-                        _buildListTile(
-                          context,
-                          icon: Icons.phone_outlined,
-                          color: ZonixColors.successGreen,
-                          title: "Teléfonos",
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => PhoneScreen(
-                                    userId: userProvider.userId ?? 0),
-                              ),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  // Después de la sección 'Mi cuenta' y antes de 'Funcionalidades Avanzadas':
-                  if (userProvider.userRole == 'commerce') ...[
-                    const SizedBox(height: 24),
-                    Text(
-                      "Gestión del comercio",
-                      style: TextStyle(
-                        color: ZonixColors.primaryBlue,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 18,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Card(
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? ZonixColors.darkGray
-                          : ZonixColors.white,
-                      elevation: 6,
-                      shadowColor: ZonixColors.primaryBlue.withOpacity(0.1),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16)),
-                      child: const Padding(
-                        padding: EdgeInsets.all(16.0),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            'Gestión del comercio (próximamente)',
-                            style: TextStyle(fontWeight: FontWeight.w600),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                  // Sección: Menú dinámico según rol
+                  _buildDynamicMenuSection(context, userProvider),
                   const SizedBox(height: 24),
 
                   // Sección: Funcionalidades Avanzadas
@@ -528,5 +414,207 @@ class _SettingsPage2State extends State<SettingsPage2> {
 
     logger.w('Usando imagen predeterminada');
     return const AssetImage('assets/default_avatar.png');
+  }
+
+  /// Construye el menú dinámico según el rol del usuario
+  Widget _buildDynamicMenuSection(BuildContext context, UserProvider userProvider) {
+    final role = userProvider.userRole;
+    final isSeller = role == 'sellers' || role == 'commerce';
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          isSeller ? "Gestión de mi tienda" : "Mi cuenta",
+          style: TextStyle(
+            color: ZonixColors.primaryBlue,
+            fontWeight: FontWeight.w700,
+            fontSize: 18,
+            letterSpacing: 0.5,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Card(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? ZonixColors.darkGray
+              : ZonixColors.white,
+          elevation: 6,
+          shadowColor: ZonixColors.primaryBlue.withOpacity(0.1),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16)),
+          child: Column(
+            children: _buildMenuItems(context, userProvider, isSeller),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Construye los elementos del menú según el rol
+  List<Widget> _buildMenuItems(BuildContext context, UserProvider userProvider, bool isSeller) {
+    if (isSeller) {
+      return _buildSellerMenuItems(context, userProvider);
+    } else {
+      return _buildBuyerMenuItems(context, userProvider);
+    }
+  }
+
+  /// Elementos del menú para compradores (Nivel 0)
+  List<Widget> _buildBuyerMenuItems(BuildContext context, UserProvider userProvider) {
+    return [
+      _buildListTile(
+        context,
+        icon: Icons.person_outline_rounded,
+        color: ZonixColors.primaryBlue,
+        title: "Mi Perfil",
+        subtitle: "Editar información personal",
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ProfilePagex(
+                  userId: userProvider.userId ?? 0),
+            ),
+          );
+        },
+      ),
+      _buildListTile(
+        context,
+        icon: Icons.location_on_outlined,
+        color: ZonixColors.warningOrange,
+        title: "Mis Direcciones",
+        subtitle: "Gestionar direcciones de envío",
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AddressPage(
+                  userId: userProvider.userId ?? 0),
+            ),
+          );
+        },
+      ),
+      _buildListTile(
+        context,
+        icon: Icons.phone_outlined,
+        color: ZonixColors.successGreen,
+        title: "Mis Teléfonos",
+        subtitle: "Gestionar números de contacto",
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PhoneScreen(
+                  userId: userProvider.userId ?? 0),
+            ),
+          );
+        },
+      ),
+      _buildListTile(
+        context,
+        icon: Icons.folder_outlined,
+        color: ZonixColors.secondaryBlue,
+        title: "Mis Documentos",
+        subtitle: "Gestionar documentos personales",
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => DocumentListScreen(
+                  userId: userProvider.userId ?? 0),
+            ),
+          );
+        },
+      ),
+      _buildListTile(
+        context,
+        icon: Icons.shopping_bag_outlined,
+        color: const Color(0xFF8B5CF6),
+        title: "Mis Pedidos",
+        subtitle: "Ver historial de compras",
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const OrdersPage(),
+            ),
+          );
+        },
+      ),
+    ];
+  }
+
+  /// Elementos del menú para vendedores (Nivel 1)
+  List<Widget> _buildSellerMenuItems(BuildContext context, UserProvider userProvider) {
+    return [
+      _buildListTile(
+        context,
+        icon: Icons.person_outline_rounded,
+        color: ZonixColors.primaryBlue,
+        title: "Mi Perfil",
+        subtitle: "Editar información personal",
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ProfilePagex(
+                  userId: userProvider.userId ?? 0),
+            ),
+          );
+        },
+      ),
+      _buildListTile(
+        context,
+        icon: Icons.inventory_outlined,
+        color: ZonixColors.successGreen,
+        title: "Mis Productos",
+        subtitle: "Gestionar productos de mi tienda",
+        onTap: () {
+          // TODO: Implementar SellerProductsPage
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Gestión de productos (próximamente)')),
+          );
+        },
+      ),
+      _buildListTile(
+        context,
+        icon: Icons.shopping_bag_outlined,
+        color: const Color(0xFF8B5CF6),
+        title: "Mis Pedidos",
+        subtitle: "Gestionar pedidos recibidos",
+        onTap: () {
+          // TODO: Implementar SellerOrdersPage
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Gestión de pedidos (próximamente)')),
+          );
+        },
+      ),
+      _buildListTile(
+        context,
+        icon: Icons.dashboard_outlined,
+        color: ZonixColors.warningOrange,
+        title: "Dashboard",
+        subtitle: "Estadísticas de ventas",
+        onTap: () {
+          // TODO: Implementar SellerDashboardPage
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Dashboard de ventas (próximamente)')),
+          );
+        },
+      ),
+      _buildListTile(
+        context,
+        icon: Icons.store_outlined,
+        color: ZonixColors.secondaryBlue,
+        title: "Configuración de Tienda",
+        subtitle: "Configurar mi tienda",
+        onTap: () {
+          // TODO: Implementar StoreSettingsPage
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Configuración de tienda (próximamente)')),
+          );
+        },
+      ),
+    ];
   }
 }
