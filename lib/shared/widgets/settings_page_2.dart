@@ -417,10 +417,11 @@ class _SettingsPage2State extends State<SettingsPage2> {
   }
 
   /// Construye el menú dinámico según el rol del usuario
-  Widget _buildDynamicMenuSection(BuildContext context, UserProvider userProvider) {
+  Widget _buildDynamicMenuSection(
+      BuildContext context, UserProvider userProvider) {
     final role = userProvider.userRole;
     final isSeller = role == 'sellers' || role == 'commerce';
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -440,8 +441,8 @@ class _SettingsPage2State extends State<SettingsPage2> {
               : ZonixColors.white,
           elevation: 6,
           shadowColor: ZonixColors.primaryBlue.withOpacity(0.1),
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           child: Column(
             children: _buildMenuItems(context, userProvider, isSeller),
           ),
@@ -451,7 +452,8 @@ class _SettingsPage2State extends State<SettingsPage2> {
   }
 
   /// Construye los elementos del menú según el rol
-  List<Widget> _buildMenuItems(BuildContext context, UserProvider userProvider, bool isSeller) {
+  List<Widget> _buildMenuItems(
+      BuildContext context, UserProvider userProvider, bool isSeller) {
     if (isSeller) {
       return _buildSellerMenuItems(context, userProvider);
     } else {
@@ -460,7 +462,8 @@ class _SettingsPage2State extends State<SettingsPage2> {
   }
 
   /// Elementos del menú para compradores (Nivel 0)
-  List<Widget> _buildBuyerMenuItems(BuildContext context, UserProvider userProvider) {
+  List<Widget> _buildBuyerMenuItems(
+      BuildContext context, UserProvider userProvider) {
     return [
       _buildListTile(
         context,
@@ -472,8 +475,8 @@ class _SettingsPage2State extends State<SettingsPage2> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => ProfilePagex(
-                  userId: userProvider.userId ?? 0),
+              builder: (context) =>
+                  ProfilePagex(userId: userProvider.userId ?? 0),
             ),
           );
         },
@@ -488,8 +491,8 @@ class _SettingsPage2State extends State<SettingsPage2> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => AddressPage(
-                  userId: userProvider.userId ?? 0),
+              builder: (context) =>
+                  AddressPage(userId: userProvider.userId ?? 0),
             ),
           );
         },
@@ -504,8 +507,8 @@ class _SettingsPage2State extends State<SettingsPage2> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => PhoneScreen(
-                  userId: userProvider.userId ?? 0),
+              builder: (context) =>
+                  PhoneScreen(userId: userProvider.userId ?? 0),
             ),
           );
         },
@@ -520,8 +523,8 @@ class _SettingsPage2State extends State<SettingsPage2> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => DocumentListScreen(
-                  userId: userProvider.userId ?? 0),
+              builder: (context) =>
+                  DocumentListScreen(userId: userProvider.userId ?? 0),
             ),
           );
         },
@@ -545,7 +548,8 @@ class _SettingsPage2State extends State<SettingsPage2> {
   }
 
   /// Elementos del menú para vendedores (Nivel 1)
-  List<Widget> _buildSellerMenuItems(BuildContext context, UserProvider userProvider) {
+  List<Widget> _buildSellerMenuItems(
+      BuildContext context, UserProvider userProvider) {
     return [
       _buildListTile(
         context,
@@ -557,8 +561,8 @@ class _SettingsPage2State extends State<SettingsPage2> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => ProfilePagex(
-                  userId: userProvider.userId ?? 0),
+              builder: (context) =>
+                  ProfilePagex(userId: userProvider.userId ?? 0),
             ),
           );
         },
@@ -572,7 +576,8 @@ class _SettingsPage2State extends State<SettingsPage2> {
         onTap: () {
           // TODO: Implementar SellerProductsPage
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Gestión de productos (próximamente)')),
+            const SnackBar(
+                content: Text('Gestión de productos (próximamente)')),
           );
         },
       ),
@@ -611,7 +616,8 @@ class _SettingsPage2State extends State<SettingsPage2> {
         onTap: () {
           // TODO: Implementar StoreSettingsPage
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Configuración de tienda (próximamente)')),
+            const SnackBar(
+                content: Text('Configuración de tienda (próximamente)')),
           );
         },
       ),
