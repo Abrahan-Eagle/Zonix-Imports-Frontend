@@ -171,7 +171,7 @@ class OnboardingScreenState extends State<OnboardingScreen>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error: ${e.toString()}'),
-          behavior: SnackBarBehavior.floating,
+          behavior: SnackBarBehavior.fixed,
           margin: const EdgeInsets.all(20),
           duration: const Duration(seconds: 5),
         ),

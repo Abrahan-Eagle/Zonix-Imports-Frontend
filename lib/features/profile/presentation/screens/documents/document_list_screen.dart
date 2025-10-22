@@ -461,7 +461,7 @@ class _DocumentListScreenState extends State<DocumentListScreen>
           SnackBar(
             content: const Text('Estado actualizado exitosamente'),
             backgroundColor: Colors.green,
-            behavior: SnackBarBehavior.floating,
+            behavior: SnackBarBehavior.fixed,
             action: SnackBarAction(
               label: 'Cerrar',
               textColor: Colors.white,
@@ -477,7 +477,7 @@ class _DocumentListScreenState extends State<DocumentListScreen>
           SnackBar(
             content: Text('Error: ${e.toString()}'),
             backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
+            behavior: SnackBarBehavior.fixed,
             action: SnackBarAction(
               label: 'Cerrar',
               textColor: Colors.white,

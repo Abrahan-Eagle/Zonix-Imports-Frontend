@@ -156,7 +156,7 @@ class RegisterAddressScreenState extends State<RegisterAddressScreen>
           ],
         ),
         backgroundColor: Colors.red,
-        behavior: SnackBarBehavior.floating,
+        behavior: SnackBarBehavior.fixed,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     );
@@ -173,7 +173,7 @@ class RegisterAddressScreenState extends State<RegisterAddressScreen>
           ],
         ),
         backgroundColor: Colors.green,
-        behavior: SnackBarBehavior.floating,
+        behavior: SnackBarBehavior.fixed,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     );

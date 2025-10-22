@@ -553,7 +553,7 @@ class AddressPage extends StatelessWidget {
               ],
             ),
             backgroundColor: Colors.green,
-            behavior: SnackBarBehavior.floating,
+            behavior: SnackBarBehavior.fixed,
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           ),
@@ -572,7 +572,7 @@ class AddressPage extends StatelessWidget {
               ],
             ),
             backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
+            behavior: SnackBarBehavior.fixed,
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           ),

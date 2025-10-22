@@ -219,6 +219,9 @@ class AddressService {
         logger.e('Formato de datos inesperado: $data');
         throw ApiException('Error al obtener la dirección: formato inesperado');
       }
+    } else if (response.statusCode == 404) {
+      logger.w('Dirección no encontrada: $id');
+      return null; // Retornar null en lugar de lanzar excepción
     } else {
       logger.e(
           'Error al obtener la dirección: ${response.statusCode} ${response.body}');

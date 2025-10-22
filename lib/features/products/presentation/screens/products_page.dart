@@ -344,7 +344,7 @@ class _ProductsPageState extends State<ProductsPage>
         ),
         backgroundColor: UIConstants.success,
         duration: const Duration(seconds: 2),
-        behavior: SnackBarBehavior.floating,
+        behavior: SnackBarBehavior.fixed,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(UIConstants.radiusSM),
         ),
@@ -365,7 +365,7 @@ class _ProductsPageState extends State<ProductsPage>
         content: Text('${product.name} agregado a favoritos'),
         backgroundColor: UIConstants.primaryBlue,
         duration: const Duration(seconds: 2),
-        behavior: SnackBarBehavior.floating,
+        behavior: SnackBarBehavior.fixed,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(UIConstants.radiusSM),
         ),

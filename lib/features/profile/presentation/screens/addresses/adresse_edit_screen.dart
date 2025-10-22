@@ -256,7 +256,7 @@ class EditAddressScreenState extends State<EditAddressScreen> {
               ],
             ),
             backgroundColor: Colors.green,
-            behavior: SnackBarBehavior.floating,
+            behavior: SnackBarBehavior.fixed,
             shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(8))),
           ),
@@ -275,7 +275,7 @@ class EditAddressScreenState extends State<EditAddressScreen> {
               ],
             ),
             backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
+            behavior: SnackBarBehavior.fixed,
             shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(8))),
           ),
