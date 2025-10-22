@@ -8,7 +8,6 @@ import 'package:zonix/features/profile/presentation/screens/profile_page.dart';
 import 'package:zonix/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:zonix/features/profile/presentation/screens/addresses/adresse_list_screen.dart';
 import 'package:zonix/features/profile/data/datasources/profile_service.dart';
-import 'package:zonix/features/profile/presentation/providers/profile_provider.dart';
 import 'package:zonix/features/orders/presentation/screens/orders_page.dart';
 
 // Configuración del logger
