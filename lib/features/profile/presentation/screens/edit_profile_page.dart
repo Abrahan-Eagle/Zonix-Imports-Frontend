@@ -61,9 +61,16 @@ class EditProfilePageState extends State<EditProfilePage> {
     }
   }
 
-  String formatDate(String date) {
-    DateTime parsedDate = DateTime.parse(date);
-    return DateFormat('dd-MM-yyyy').format(parsedDate);
+  String formatDate(String? date) {
+    if (date == null || date.isEmpty) {
+      return '';
+    }
+    try {
+      DateTime parsedDate = DateTime.parse(date);
+      return DateFormat('dd-MM-yyyy').format(parsedDate);
+    } catch (e) {
+      return '';
+    }
   }
 
   Future<void> _pickDate(BuildContext context) async {
@@ -233,9 +240,18 @@ class EditProfilePageState extends State<EditProfilePage> {
       debugPrint("Fecha de nacimiento: ${_profile!.dateOfBirth}");
 
       try {
-        // Asegúrate de que la fecha esté en formato yyyy-MM-dd antes de enviarlo
-        String formattedDateOfBirth = DateFormat('yyyy-MM-dd')
-            .format(DateFormat('dd-MM-yyyy').parse(_profile!.dateOfBirth ?? '01-01-2000'));
+        // Manejar la fecha de nacimiento de forma segura
+        String? formattedDateOfBirth;
+        if (_profile!.dateOfBirth != null && _profile!.dateOfBirth!.isNotEmpty) {
+          try {
+            // Intentar parsear la fecha en formato dd-MM-yyyy
+            final parsedDate = DateFormat('dd-MM-yyyy').parse(_profile!.dateOfBirth!);
+            formattedDateOfBirth = DateFormat('yyyy-MM-dd').format(parsedDate);
+          } catch (e) {
+            // Si falla el parsing, usar la fecha tal como está
+            formattedDateOfBirth = _profile!.dateOfBirth;
+          }
+        }
 
         // Actualizar el perfil con la fecha de nacimiento correctamente formateada
         await ProfileService().updateProfile(

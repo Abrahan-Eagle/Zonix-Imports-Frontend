@@ -699,9 +699,6 @@ class ProfilePagex extends StatelessWidget {
       builder: (context) => EditProfilePage(userId: profile.userId),
     );
 
-    Navigator.push(context, route).then((_) {
-      Provider.of<ProfileModel>(context, listen: false)
-          .loadProfile(profile.userId);
-    });
+    Navigator.push(context, route);
   }
 }
