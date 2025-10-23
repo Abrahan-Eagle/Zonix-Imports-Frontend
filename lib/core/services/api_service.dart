@@ -31,7 +31,49 @@ class ApiService {
         },
       );
 
-      final responseData = jsonDecode(response.body);
+      // Verificar que la respuesta no esté vacía
+      if (response.body.isEmpty) {
+        logger.e('Respuesta vacía del servidor');
+        return {
+          'success': false,
+          'data': null,
+          'message': 'Respuesta vacía del servidor',
+        };
+      }
+
+      // Parsear JSON de forma segura
+      dynamic parsedResponse;
+      try {
+        parsedResponse = jsonDecode(response.body);
+      } catch (jsonError) {
+        logger.e('Error al parsear JSON: $jsonError');
+        logger.e('Respuesta del servidor: ${response.body}');
+        return {
+          'success': false,
+          'data': null,
+          'message': 'Error al parsear respuesta del servidor',
+        };
+      }
+
+      // Manejar diferentes tipos de respuesta
+      Map<String, dynamic> responseData;
+      if (parsedResponse is Map<String, dynamic>) {
+        responseData = parsedResponse;
+      } else if (parsedResponse is List) {
+        // Si es una lista, la envolvemos en un objeto
+        responseData = {
+          'success': true,
+          'data': parsedResponse,
+          'message': 'Datos obtenidos exitosamente',
+        };
+      } else {
+        // Para otros tipos de datos
+        responseData = {
+          'success': true,
+          'data': parsedResponse,
+          'message': 'Datos obtenidos exitosamente',
+        };
+      }
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
         return {
@@ -51,7 +93,7 @@ class ApiService {
       return {
         'success': false,
         'data': null,
-        'message': 'Error de conexión',
+        'message': 'Error de conexión: $e',
       };
     }
   }

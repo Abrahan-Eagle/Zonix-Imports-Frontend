@@ -1,0 +1,3057 @@
+<!DOCTYPE html>
+<html lang="es">
+<!--
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                    ZONIX IMPORTS - PROFILE MODULE TEMPLATE                   ║
+║                          E-Commerce Mobile App                               ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+📋 CARACTERÍSTICAS:
+   ✅ Modo claro/oscuro funcional (toggle en header)
+   ✅ Colores sólidos (sin degradados)
+   ✅ Responsive (móvil 320px+, tablet 768px+)
+   ✅ Botones "+" circulares para agregar
+   ✅ Adaptación por rol (buyer/seller/admin)
+   ✅ HTML/CSS/JS puro (sin frameworks)
+
+🎨 PALETA DE COLORES (app_colors.dart):
+   - Primarios: #0A2239 (blue-dark), #1CA9E5 (blue), #FF9800 (orange)
+   - Estados: #43D675 (green), #FF4B3E (red), #FFC72C (yellow)
+   - Neutros: #F5F5F5 (gray-light), #4A4A4A (gray), #23262B (gray-dark)
+   - Dark Mode: #181A20 (background-dark)
+
+📱 SECCIONES INCLUIDAS:
+   1. Información Personal (editar)
+   2. Teléfonos (CRUD)
+   3. Direcciones (CRUD)
+   4. Documentos de Identidad (CRUD)
+   5. Datos del Comercio (solo vendedores/admin)
+   6. Historial de Órdenes
+
+🔧 FUNCIONES JS DISPONIBLES:
+   - toggleTheme() - Cambiar entre modo claro/oscuro
+   - changeRole('buyer'|'seller'|'admin') - Cambiar rol
+   - openModal(id) / closeModal(id) - Gestión de modales
+   - CRUD functions: add*, edit*, delete*, save*
+
+💡 INTEGRACIÓN CON FLUTTER:
+   Este template sirve como referencia de diseño para implementar en Flutter:
+   - Estructura: lib/features/profile/presentation/screens/
+   - Widgets: Extraer cada card como widget independiente
+   - Theme: Usar ThemeProvider con las mismas variables CSS
+   - Colors: Ya están definidos en lib/core/utils/app_colors.dart
+   - State: Implementar con ProfileProvider
+   - Modales: Usar showModalBottomSheet() o showDialog()
+
+📝 NOTAS:
+   - El tema se guarda en localStorage (en Flutter: SharedPreferences)
+   - Los datos son dummy, conectar con backend API
+   - Validaciones de formularios pendientes de implementar
+   - Imágenes placeholder deben ser reemplazadas
+
+🔗 BACKEND ENDPOINTS:
+   - GET /api/profile - Obtener perfil
+   - PUT /api/profile - Actualizar perfil
+   - GET /api/profile/phones - Lista teléfonos
+   - POST /api/profile/phones - Crear teléfono
+   - PUT /api/profile/phones/{id} - Editar teléfono
+   - DELETE /api/profile/phones/{id} - Eliminar teléfono
+   (Similar para addresses, documents, commerce)
+
+════════════════════════════════════════════════════════════════════════════════
+📚 INSTRUCCIONES DETALLADAS PARA IMPLEMENTACIÓN EN FLUTTER
+════════════════════════════════════════════════════════════════════════════════
+
+🎯 OBJETIVO:
+Implementar el módulo de perfil de usuario en Flutter siguiendo este template HTML como
+referencia visual y funcional. El módulo debe soportar tres roles (buyer, seller, admin)
+y tener modo claro/oscuro.
+
+════════════════════════════════════════════════════════════════════════════════
+📁 ESTRUCTURA DE ARCHIVOS A CREAR
+════════════════════════════════════════════════════════════════════════════════
+
+lib/features/profile/
+├── data/
+│   ├── models/
+│   │   ├── profile_model.dart          # Modelo de perfil completo
+│   │   ├── phone_model.dart            # Modelo de teléfono
+│   │   ├── address_model.dart          # Modelo de dirección
+│   │   ├── document_model.dart         # Modelo de documento
+│   │   └── commerce_model.dart         # Modelo de comercio (vendedor)
+│   ├── repositories/
+│   │   └── profile_repository.dart     # Repositorio para todas las operaciones
+│   └── datasources/
+│       └── profile_service.dart        # Servicio API
+├── domain/
+│   ├── entities/
+│   │   └── profile_entity.dart         # Entidades de dominio
+│   ├── repositories/
+│   │   └── profile_repository_interface.dart
+│   └── usecases/
+│       ├── get_profile_usecase.dart
+│       ├── update_profile_usecase.dart
+│       ├── manage_phones_usecase.dart
+│       ├── manage_addresses_usecase.dart
+│       ├── manage_documents_usecase.dart
+│       └── manage_commerce_usecase.dart
+└── presentation/
+    ├── providers/
+    │   └── profile_provider.dart       # Estado global del perfil
+    ├── screens/
+    │   └── profile_screen.dart         # Pantalla principal
+    └── widgets/
+        ├── profile_header.dart         # Header con avatar y datos
+        ├── profile_info_card.dart      # Card de información personal
+        ├── phones_card.dart            # Card de teléfonos
+        ├── addresses_card.dart         # Card de direcciones
+        ├── documents_card.dart         # Card de documentos
+        ├── commerce_card.dart          # Card de comercio (seller only)
+        ├── orders_card.dart            # Card de órdenes
+        └── modals/
+            ├── edit_profile_modal.dart
+            ├── phone_form_modal.dart
+            ├── address_form_modal.dart
+            ├── document_form_modal.dart
+            └── commerce_form_modal.dart
+
+════════════════════════════════════════════════════════════════════════════════
+🎨 PASO 1: IMPLEMENTAR TEMA Y COLORES
+════════════════════════════════════════════════════════════════════════════════
+
+1.1) Verificar que lib/core/utils/app_colors.dart contenga TODOS estos colores:
+     - blueDark: #0A2239
+     - blue: #1CA9E5
+     - yellow: #FFC72C
+     - orange: #FF9800
+     - orangeCoral: #FF5722
+     - red: #FF4B3E
+     - green: #43D675
+     - white: #FFFFFF
+     - black: #000000
+     - grayLight: #F5F5F5
+     - gray: #4A4A4A
+     - grayDark: #23262B
+     - backgroundDark: #181A20
+
+1.2) Crear lib/shared/providers/theme_provider.dart:
+     ```dart
+     class ThemeProvider extends ChangeNotifier {
+       bool _isDarkMode = false;
+       
+       bool get isDarkMode => _isDarkMode;
+       
+       // Cargar tema desde SharedPreferences al iniciar
+       Future<void> loadTheme() async {
+         final prefs = await SharedPreferences.getInstance();
+         _isDarkMode = prefs.getBool('theme') == true;
+         notifyListeners();
+       }
+       
+       // Toggle tema y guardar en SharedPreferences
+       Future<void> toggleTheme() async {
+         _isDarkMode = !_isDarkMode;
+         final prefs = await SharedPreferences.getInstance();
+         await prefs.setString('theme', _isDarkMode ? 'dark' : 'light');
+         notifyListeners();
+       }
+       
+       // Colores dinámicos según tema
+       Color get bgPrimary => _isDarkMode ? AppColors.backgroundDark : AppColors.white;
+       Color get bgSecondary => _isDarkMode ? AppColors.grayDark : AppColors.grayLight;
+       Color get textPrimary => _isDarkMode ? AppColors.white : AppColors.blueDark;
+       Color get textSecondary => _isDarkMode ? Colors.white70 : AppColors.gray;
+       Color get cardBg => _isDarkMode ? AppColors.grayDark : AppColors.white;
+       Color get headerBg => _isDarkMode ? AppColors.blueDark : AppColors.blue;
+       Color get borderColor => _isDarkMode ? AppColors.grayDark : AppColors.grayLight;
+     }
+     ```
+
+1.3) Registrar el provider en main.dart:
+     ```dart
+     MultiProvider(
+       providers: [
+         ChangeNotifierProvider(create: (_) => ThemeProvider()..loadTheme()),
+         ChangeNotifierProvider(create: (_) => ProfileProvider()),
+       ],
+       child: MyApp(),
+     )
+     ```
+
+════════════════════════════════════════════════════════════════════════════════
+📦 PASO 2: CREAR MODELOS DE DATOS
+════════════════════════════════════════════════════════════════════════════════
+
+2.1) lib/features/profile/data/models/phone_model.dart:
+     ```dart
+     class PhoneModel {
+       final int? id;
+       final int profileId;
+       final String operatorCode;  // '0412', '0424', etc.
+       final String countryCode;   // '+58'
+       final String number;         // '1234567'
+       final bool isPrimary;
+       final bool isActive;
+       
+       // Getter para número completo
+       String get fullNumber => '$countryCode $operatorCode-$number';
+       
+       factory PhoneModel.fromJson(Map<String, dynamic> json) { ... }
+       Map<String, dynamic> toJson() { ... }
+     }
+     ```
+
+2.2) lib/features/profile/data/models/address_model.dart:
+     ```dart
+     class AddressModel {
+       final int? id;
+       final int profileId;
+       final int cityId;
+       final String street;
+       final String houseNumber;
+       final String? addressLine2;
+       final String? reference;
+       final String? postalCode;
+       final double? latitude;
+       final double? longitude;
+       final String status;  // 'completeData', 'incompleteData', 'notverified'
+       final bool isDefault;
+       
+       // Relaciones
+       final String? cityName;
+       final String? stateName;
+       
+       factory AddressModel.fromJson(Map<String, dynamic> json) { ... }
+       Map<String, dynamic> toJson() { ... }
+     }
+     ```
+
+2.3) lib/features/profile/data/models/document_model.dart:
+     ```dart
+     class DocumentModel {
+       final int? id;
+       final int profileId;
+       final String type;  // 'ci', 'passport', 'rif'
+       final String documentNumber;
+       final String? rifUrl;
+       final String? frontImage;
+       final String? backImage;
+       final DateTime? issuedAt;
+       final DateTime? expiresAt;
+       final bool approved;
+       final DateTime? verifiedAt;
+       
+       factory DocumentModel.fromJson(Map<String, dynamic> json) { ... }
+       Map<String, dynamic> toJson() { ... }
+     }
+     ```
+
+2.4) lib/features/profile/data/models/commerce_model.dart:
+     ```dart
+     class CommerceModel {
+       final int? id;
+       final int profileId;
+       final String? businessName;
+       final String? businessType;
+       final String? image;
+       final String? phone;
+       final String rif;
+       final String? bankAccount;
+       final bool isVerified;
+       final bool open;
+       final List<String>? paymentMethods;  // ['stripe', 'paypal', 'pago_movil']
+       final Map<String, dynamic>? schedule;
+       
+       factory CommerceModel.fromJson(Map<String, dynamic> json) { ... }
+       Map<String, dynamic> toJson() { ... }
+     }
+     ```
+
+2.5) lib/features/profile/data/models/profile_model.dart:
+     ```dart
+     class ProfileModel {
+       final int id;
+       final int userId;
+       final String firstName;
+       final String? middleName;
+       final String lastName;
+       final String? secondLastName;
+       final String? photoUsers;
+       final DateTime? dateOfBirth;
+       final String role;  // 'buyer', 'seller', 'admin'
+       final String status;  // 'completeData', 'incompleteData', 'notverified'
+       final bool isVerified;
+       final String? phone;
+       final String? rif;
+       final String? bankAccount;
+       
+       // Relaciones
+       final List<PhoneModel>? phones;
+       final List<AddressModel>? addresses;
+       final List<DocumentModel>? documents;
+       final CommerceModel? commerce;
+       
+       // Getters útiles
+       String get fullName => [firstName, middleName, lastName, secondLastName]
+           .where((name) => name != null && name.isNotEmpty)
+           .join(' ');
+       
+       factory ProfileModel.fromJson(Map<String, dynamic> json) { ... }
+       Map<String, dynamic> toJson() { ... }
+     }
+     ```
+
+════════════════════════════════════════════════════════════════════════════════
+🌐 PASO 3: IMPLEMENTAR SERVICIO API
+════════════════════════════════════════════════════════════════════════════════
+
+3.1) lib/features/profile/data/datasources/profile_service.dart:
+     ```dart
+     class ProfileService {
+       final ApiService _apiService;
+       
+       ProfileService(this._apiService);
+       
+       // === PERFIL ===
+       Future<ProfileModel> getProfile() async {
+         final response = await _apiService.get('/profile');
+         return ProfileModel.fromJson(response.data);
+       }
+       
+       Future<ProfileModel> updateProfile(Map<String, dynamic> data) async {
+         final response = await _apiService.put('/profile', data: data);
+         return ProfileModel.fromJson(response.data);
+       }
+       
+       Future<String> uploadProfileImage(File image) async {
+         final formData = FormData.fromMap({
+           'photo': await MultipartFile.fromFile(image.path),
+         });
+         final response = await _apiService.post('/profile/photo', data: formData);
+         return response.data['url'];
+       }
+       
+       // === TELÉFONOS ===
+       Future<List<PhoneModel>> getPhones() async {
+         final response = await _apiService.get('/profile/phones');
+         return (response.data as List)
+             .map((json) => PhoneModel.fromJson(json))
+             .toList();
+       }
+       
+       Future<PhoneModel> createPhone(Map<String, dynamic> data) async {
+         final response = await _apiService.post('/profile/phones', data: data);
+         return PhoneModel.fromJson(response.data);
+       }
+       
+       Future<PhoneModel> updatePhone(int id, Map<String, dynamic> data) async {
+         final response = await _apiService.put('/profile/phones/$id', data: data);
+         return PhoneModel.fromJson(response.data);
+       }
+       
+       Future<void> deletePhone(int id) async {
+         await _apiService.delete('/profile/phones/$id');
+       }
+       
+       // === DIRECCIONES ===
+       Future<List<AddressModel>> getAddresses() async {
+         final response = await _apiService.get('/profile/addresses');
+         return (response.data as List)
+             .map((json) => AddressModel.fromJson(json))
+             .toList();
+       }
+       
+       Future<AddressModel> createAddress(Map<String, dynamic> data) async {
+         final response = await _apiService.post('/profile/addresses', data: data);
+         return AddressModel.fromJson(response.data);
+       }
+       
+       Future<AddressModel> updateAddress(int id, Map<String, dynamic> data) async {
+         final response = await _apiService.put('/profile/addresses/$id', data: data);
+         return AddressModel.fromJson(response.data);
+       }
+       
+       Future<void> deleteAddress(int id) async {
+         await _apiService.delete('/profile/addresses/$id');
+       }
+       
+       // === DOCUMENTOS ===
+       Future<List<DocumentModel>> getDocuments() async {
+         final response = await _apiService.get('/profile/documents');
+         return (response.data as List)
+             .map((json) => DocumentModel.fromJson(json))
+             .toList();
+       }
+       
+       Future<DocumentModel> createDocument(Map<String, dynamic> data, 
+           {File? frontImage, File? backImage}) async {
+         final formData = FormData.fromMap(data);
+         
+         if (frontImage != null) {
+           formData.files.add(MapEntry(
+             'front_image',
+             await MultipartFile.fromFile(frontImage.path),
+           ));
+         }
+         
+         if (backImage != null) {
+           formData.files.add(MapEntry(
+             'back_image',
+             await MultipartFile.fromFile(backImage.path),
+           ));
+         }
+         
+         final response = await _apiService.post('/profile/documents', data: formData);
+         return DocumentModel.fromJson(response.data);
+       }
+       
+       Future<void> deleteDocument(int id) async {
+         await _apiService.delete('/profile/documents/$id');
+       }
+       
+       // === COMERCIO (VENDEDOR) ===
+       Future<CommerceModel> getCommerce() async {
+         final response = await _apiService.get('/profile/commerce');
+         return CommerceModel.fromJson(response.data);
+       }
+       
+       Future<CommerceModel> updateCommerce(Map<String, dynamic> data) async {
+         final response = await _apiService.put('/profile/commerce', data: data);
+         return CommerceModel.fromJson(response.data);
+       }
+       
+       Future<String> uploadCommerceLogo(File image) async {
+         final formData = FormData.fromMap({
+           'image': await MultipartFile.fromFile(image.path),
+         });
+         final response = await _apiService.post('/profile/commerce/logo', data: formData);
+         return response.data['url'];
+       }
+     }
+     ```
+
+════════════════════════════════════════════════════════════════════════════════
+🔄 PASO 4: IMPLEMENTAR PROVIDER DE ESTADO
+════════════════════════════════════════════════════════════════════════════════
+
+4.1) lib/features/profile/presentation/providers/profile_provider.dart:
+     ```dart
+     enum ProfileStatus { initial, loading, loaded, error }
+     
+     class ProfileProvider extends ChangeNotifier {
+       final ProfileService _profileService;
+       
+       ProfileProvider(this._profileService);
+       
+       ProfileStatus _status = ProfileStatus.initial;
+       ProfileModel? _profile;
+       List<PhoneModel> _phones = [];
+       List<AddressModel> _addresses = [];
+       List<DocumentModel> _documents = [];
+       CommerceModel? _commerce;
+       String? _errorMessage;
+       
+       // Getters
+       ProfileStatus get status => _status;
+       ProfileModel? get profile => _profile;
+       List<PhoneModel> get phones => _phones;
+       List<AddressModel> get addresses => _addresses;
+       List<DocumentModel> get documents => _documents;
+       CommerceModel? get commerce => _commerce;
+       String? get errorMessage => _errorMessage;
+       
+       bool get isLoading => _status == ProfileStatus.loading;
+       bool get hasError => _status == ProfileStatus.error;
+       
+       // Rol del usuario
+       String get userRole => _profile?.role ?? 'buyer';
+       bool get isSeller => userRole == 'seller' || userRole == 'admin';
+       bool get isAdmin => userRole == 'admin';
+       
+       // === CARGAR PERFIL COMPLETO ===
+       Future<void> loadProfile() async {
+         _status = ProfileStatus.loading;
+         notifyListeners();
+         
+         try {
+           _profile = await _profileService.getProfile();
+           
+           // Cargar teléfonos, direcciones, documentos en paralelo
+           await Future.wait([
+             loadPhones(),
+             loadAddresses(),
+             loadDocuments(),
+             if (isSeller) loadCommerce(),
+           ]);
+           
+           _status = ProfileStatus.loaded;
+           _errorMessage = null;
+         } catch (e) {
+           _status = ProfileStatus.error;
+           _errorMessage = e.toString();
+         }
+         
+         notifyListeners();
+       }
+       
+       // === ACTUALIZAR PERFIL ===
+       Future<bool> updateProfile(Map<String, dynamic> data) async {
+         try {
+           _profile = await _profileService.updateProfile(data);
+           notifyListeners();
+           return true;
+         } catch (e) {
+           _errorMessage = e.toString();
+           notifyListeners();
+           return false;
+         }
+       }
+       
+       Future<bool> uploadProfileImage(File image) async {
+         try {
+           final imageUrl = await _profileService.uploadProfileImage(image);
+           _profile = _profile?.copyWith(photoUsers: imageUrl);
+           notifyListeners();
+           return true;
+         } catch (e) {
+           _errorMessage = e.toString();
+           notifyListeners();
+           return false;
+         }
+       }
+       
+       // === TELÉFONOS ===
+       Future<void> loadPhones() async {
+         try {
+           _phones = await _profileService.getPhones();
+         } catch (e) {
+           print('Error loading phones: $e');
+         }
+       }
+       
+       Future<bool> createPhone(Map<String, dynamic> data) async {
+         try {
+           final phone = await _profileService.createPhone(data);
+           _phones.add(phone);
+           notifyListeners();
+           return true;
+         } catch (e) {
+           _errorMessage = e.toString();
+           notifyListeners();
+           return false;
+         }
+       }
+       
+       Future<bool> updatePhone(int id, Map<String, dynamic> data) async {
+         try {
+           final updatedPhone = await _profileService.updatePhone(id, data);
+           final index = _phones.indexWhere((p) => p.id == id);
+           if (index != -1) {
+             _phones[index] = updatedPhone;
+             notifyListeners();
+           }
+           return true;
+         } catch (e) {
+           _errorMessage = e.toString();
+           notifyListeners();
+           return false;
+         }
+       }
+       
+       Future<bool> deletePhone(int id) async {
+         try {
+           await _profileService.deletePhone(id);
+           _phones.removeWhere((p) => p.id == id);
+           notifyListeners();
+           return true;
+         } catch (e) {
+           _errorMessage = e.toString();
+           notifyListeners();
+           return false;
+         }
+       }
+       
+       // === DIRECCIONES ===
+       Future<void> loadAddresses() async {
+         try {
+           _addresses = await _profileService.getAddresses();
+         } catch (e) {
+           print('Error loading addresses: $e');
+         }
+       }
+       
+       Future<bool> createAddress(Map<String, dynamic> data) async {
+         try {
+           final address = await _profileService.createAddress(data);
+           _addresses.add(address);
+           notifyListeners();
+           return true;
+         } catch (e) {
+           _errorMessage = e.toString();
+           notifyListeners();
+           return false;
+         }
+       }
+       
+       Future<bool> updateAddress(int id, Map<String, dynamic> data) async {
+         try {
+           final updatedAddress = await _profileService.updateAddress(id, data);
+           final index = _addresses.indexWhere((a) => a.id == id);
+           if (index != -1) {
+             _addresses[index] = updatedAddress;
+             notifyListeners();
+           }
+           return true;
+         } catch (e) {
+           _errorMessage = e.toString();
+           notifyListeners();
+           return false;
+         }
+       }
+       
+       Future<bool> deleteAddress(int id) async {
+         try {
+           await _profileService.deleteAddress(id);
+           _addresses.removeWhere((a) => a.id == id);
+           notifyListeners();
+           return true;
+         } catch (e) {
+           _errorMessage = e.toString();
+           notifyListeners();
+           return false;
+         }
+       }
+       
+       // === DOCUMENTOS ===
+       Future<void> loadDocuments() async {
+         try {
+           _documents = await _profileService.getDocuments();
+         } catch (e) {
+           print('Error loading documents: $e');
+         }
+       }
+       
+       Future<bool> createDocument(Map<String, dynamic> data, 
+           {File? frontImage, File? backImage}) async {
+         try {
+           final document = await _profileService.createDocument(
+             data,
+             frontImage: frontImage,
+             backImage: backImage,
+           );
+           _documents.add(document);
+           notifyListeners();
+           return true;
+         } catch (e) {
+           _errorMessage = e.toString();
+           notifyListeners();
+           return false;
+         }
+       }
+       
+       Future<bool> deleteDocument(int id) async {
+         try {
+           await _profileService.deleteDocument(id);
+           _documents.removeWhere((d) => d.id == id);
+           notifyListeners();
+           return true;
+         } catch (e) {
+           _errorMessage = e.toString();
+           notifyListeners();
+           return false;
+         }
+       }
+       
+       // === COMERCIO ===
+       Future<void> loadCommerce() async {
+         try {
+           _commerce = await _profileService.getCommerce();
+         } catch (e) {
+           print('Error loading commerce: $e');
+         }
+       }
+       
+       Future<bool> updateCommerce(Map<String, dynamic> data) async {
+         try {
+           _commerce = await _profileService.updateCommerce(data);
+           notifyListeners();
+           return true;
+         } catch (e) {
+           _errorMessage = e.toString();
+           notifyListeners();
+           return false;
+         }
+       }
+       
+       Future<bool> uploadCommerceLogo(File image) async {
+         try {
+           final imageUrl = await _profileService.uploadCommerceLogo(image);
+           _commerce = _commerce?.copyWith(image: imageUrl);
+           notifyListeners();
+           return true;
+         } catch (e) {
+           _errorMessage = e.toString();
+           notifyListeners();
+           return false;
+         }
+       }
+       
+       // === LOGOUT ===
+       Future<void> logout() async {
+         final prefs = await SharedPreferences.getInstance();
+         await prefs.remove('userToken');
+         await prefs.remove('userId');
+         
+         _profile = null;
+         _phones = [];
+         _addresses = [];
+         _documents = [];
+         _commerce = null;
+         _status = ProfileStatus.initial;
+         
+         notifyListeners();
+       }
+     }
+     ```
+
+════════════════════════════════════════════════════════════════════════════════
+📱 PASO 5: CREAR PANTALLA PRINCIPAL
+════════════════════════════════════════════════════════════════════════════════
+
+5.1) lib/features/profile/presentation/screens/profile_screen.dart:
+     ```dart
+     class ProfileScreen extends StatefulWidget {
+       const ProfileScreen({Key? key}) : super(key: key);
+       
+       @override
+       State<ProfileScreen> createState() => _ProfileScreenState();
+     }
+     
+     class _ProfileScreenState extends State<ProfileScreen> {
+       @override
+       void initState() {
+         super.initState();
+         // Cargar perfil al iniciar
+         WidgetsBinding.instance.addPostFrameCallback((_) {
+           context.read<ProfileProvider>().loadProfile();
+         });
+       }
+       
+       @override
+       Widget build(BuildContext context) {
+         final themeProvider = context.watch<ThemeProvider>();
+         final profileProvider = context.watch<ProfileProvider>();
+         
+         return Scaffold(
+           backgroundColor: themeProvider.bgSecondary,
+           body: profileProvider.isLoading
+               ? const Center(child: CircularProgressIndicator())
+               : profileProvider.hasError
+                   ? Center(child: Text('Error: ${profileProvider.errorMessage}'))
+                   : RefreshIndicator(
+                       onRefresh: () => profileProvider.loadProfile(),
+                       child: SingleChildScrollView(
+                         physics: const AlwaysScrollableScrollPhysics(),
+                         child: Column(
+                           children: [
+                             // Header con avatar y datos
+                             ProfileHeader(),
+                             
+                             // Container con padding para las cards
+                             Padding(
+                               padding: const EdgeInsets.all(16.0),
+                               child: Column(
+                                 children: [
+                                   // Card de información personal
+                                   ProfileInfoCard(),
+                                   const SizedBox(height: 16),
+                                   
+                                   // Card de teléfonos
+                                   PhonesCard(),
+                                   const SizedBox(height: 16),
+                                   
+                                   // Card de direcciones
+                                   AddressesCard(),
+                                   const SizedBox(height: 16),
+                                   
+                                   // Card de documentos
+                                   DocumentsCard(),
+                                   const SizedBox(height: 16),
+                                   
+                                   // Card de comercio (solo vendedores)
+                                   if (profileProvider.isSeller) ...[
+                                     CommerceCard(),
+                                     const SizedBox(height: 16),
+                                   ],
+                                   
+                                   // Card de órdenes
+                                   OrdersCard(),
+                                   const SizedBox(height: 30),
+                                   
+                                   // Botón de cerrar sesión
+                                   SizedBox(
+                                     width: double.infinity,
+                                     child: ElevatedButton(
+                                       onPressed: () => _handleLogout(context),
+                                       style: ElevatedButton.styleFrom(
+                                         backgroundColor: AppColors.red,
+                                         padding: const EdgeInsets.symmetric(
+                                           horizontal: 40,
+                                           vertical: 16,
+                                         ),
+                                         shape: RoundedRectangleBorder(
+                                           borderRadius: BorderRadius.circular(12),
+                                         ),
+                                       ),
+                                       child: const Text(
+                                         'Cerrar Sesión',
+                                         style: TextStyle(
+                                           fontSize: 16,
+                                           fontWeight: FontWeight.w600,
+                                           color: Colors.white,
+                                         ),
+                                       ),
+                                     ),
+                                   ),
+                                   const SizedBox(height: 30),
+                                 ],
+                               ),
+                             ),
+                           ],
+                         ),
+                       ),
+                     ),
+         );
+       }
+       
+       Future<void> _handleLogout(BuildContext context) async {
+         final confirmed = await showDialog<bool>(
+           context: context,
+           builder: (context) => AlertDialog(
+             title: const Text('Cerrar Sesión'),
+             content: const Text('¿Estás seguro que deseas cerrar sesión?'),
+             actions: [
+               TextButton(
+                 onPressed: () => Navigator.pop(context, false),
+                 child: const Text('Cancelar'),
+               ),
+               ElevatedButton(
+                 onPressed: () => Navigator.pop(context, true),
+                 style: ElevatedButton.styleFrom(
+                   backgroundColor: AppColors.red,
+                 ),
+                 child: const Text('Cerrar Sesión'),
+               ),
+             ],
+           ),
+         );
+         
+         if (confirmed == true) {
+           await context.read<ProfileProvider>().logout();
+           if (mounted) {
+             Navigator.pushReplacementNamed(context, '/login');
+           }
+         }
+       }
+     }
+     ```
+
+════════════════════════════════════════════════════════════════════════════════
+🎯 PASO 6: CREAR WIDGETS INDIVIDUALES
+════════════════════════════════════════════════════════════════════════════════
+
+6.1) lib/features/profile/presentation/widgets/profile_header.dart:
+     
+     DISEÑO:
+     - Fondo sólido con color según tema (headerBg del ThemeProvider)
+     - Avatar circular de 100x100px (120x120px en tablet)
+     - Border blanco de 4px en el avatar
+     - Nombre completo del usuario (fontSize: 24, bold)
+     - Email del usuario (fontSize: 14, opacity: 0.9)
+     - Badge con rol (comprador/vendedor/admin) color naranja
+     - Botón circular de tema (☀️/🌙) en esquina superior derecha
+     - Esquinas redondeadas en la parte inferior (radius: 30)
+     
+     FUNCIONALIDAD:
+     - Botón de tema llama a themeProvider.toggleTheme()
+     - Avatar clickeable para cambiar foto (ImagePicker)
+     - Cargar imagen desde assets/default_avatar.png con fallback a UI Avatars
+     
+     ```dart
+     class ProfileHeader extends StatelessWidget {
+       @override
+       Widget build(BuildContext context) {
+         final theme = context.watch<ThemeProvider>();
+         final profile = context.watch<ProfileProvider>().profile;
+         
+         return Container(
+           decoration: BoxDecoration(
+             color: theme.headerBg,
+             borderRadius: const BorderRadius.only(
+               bottomLeft: Radius.circular(30),
+               bottomRight: Radius.circular(30),
+             ),
+             boxShadow: [
+               BoxShadow(
+                 color: Colors.black.withOpacity(0.15),
+                 blurRadius: 12,
+                 offset: const Offset(0, 4),
+               ),
+             ],
+           ),
+           padding: const EdgeInsets.only(top: 60, bottom: 40, left: 20, right: 20),
+           child: Column(
+             children: [
+               // Botón de tema en esquina superior derecha
+               Align(
+                 alignment: Alignment.topRight,
+                 child: IconButton(
+                   onPressed: () => theme.toggleTheme(),
+                   icon: Icon(
+                     theme.isDarkMode ? Icons.dark_mode : Icons.light_mode,
+                     color: Colors.white,
+                     size: 28,
+                   ),
+                   style: IconButton.styleFrom(
+                     backgroundColor: Colors.white.withOpacity(0.2),
+                     padding: const EdgeInsets.all(12),
+                   ),
+                 ),
+               ),
+               
+               // Avatar
+               GestureDetector(
+                 onTap: () => _changeProfileImage(context),
+                 child: Container(
+                   width: 100,
+                   height: 100,
+                   decoration: BoxDecoration(
+                     shape: BoxShape.circle,
+                     border: Border.all(color: Colors.white, width: 4),
+                     boxShadow: [
+                       BoxShadow(
+                         color: Colors.black.withOpacity(0.2),
+                         blurRadius: 12,
+                       ),
+                     ],
+                   ),
+                   child: ClipOval(
+                     child: profile?.photoUsers != null
+                         ? Image.network(
+                             profile!.photoUsers!,
+                             fit: BoxFit.cover,
+                             errorBuilder: (_, __, ___) => _buildDefaultAvatar(profile),
+                           )
+                         : _buildDefaultAvatar(profile),
+                   ),
+                 ),
+               ),
+               
+               const SizedBox(height: 15),
+               
+               // Nombre
+               Text(
+                 profile?.fullName ?? 'Usuario',
+                 style: const TextStyle(
+                   fontSize: 24,
+                   fontWeight: FontWeight.w700,
+                   color: Colors.white,
+                 ),
+                 textAlign: TextAlign.center,
+               ),
+               
+               const SizedBox(height: 5),
+               
+               // Email (obtener del user)
+               Text(
+                 'usuario@example.com', // TODO: obtener del user
+                 style: TextStyle(
+                   fontSize: 14,
+                   color: Colors.white.withOpacity(0.9),
+                 ),
+               ),
+               
+               const SizedBox(height: 8),
+               
+               // Badge de rol
+               Container(
+                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                 decoration: BoxDecoration(
+                   color: AppColors.orange,
+                   borderRadius: BorderRadius.circular(20),
+                 ),
+                 child: Text(
+                   _getRoleName(profile?.role),
+                   style: const TextStyle(
+                     fontSize: 13,
+                     fontWeight: FontWeight.w600,
+                     color: Colors.white,
+                   ),
+                 ),
+               ),
+             ],
+           ),
+         );
+       }
+       
+       Widget _buildDefaultAvatar(ProfileModel? profile) {
+         final initials = _getInitials(profile?.fullName ?? 'U');
+         return Container(
+           color: AppColors.orange,
+           child: Center(
+             child: Text(
+               initials,
+               style: const TextStyle(
+                 fontSize: 36,
+                 fontWeight: FontWeight.bold,
+                 color: Colors.white,
+               ),
+             ),
+           ),
+         );
+       }
+       
+       String _getInitials(String name) {
+         final parts = name.split(' ');
+         if (parts.length >= 2) {
+           return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+         }
+         return name.isNotEmpty ? name[0].toUpperCase() : 'U';
+       }
+       
+       String _getRoleName(String? role) {
+         switch (role) {
+           case 'seller': return 'VENDEDOR';
+           case 'admin': return 'ADMINISTRADOR';
+           default: return 'COMPRADOR';
+         }
+       }
+       
+       Future<void> _changeProfileImage(BuildContext context) async {
+         // TODO: Implementar ImagePicker y subir imagen
+       }
+     }
+     ```
+
+6.2) lib/features/profile/presentation/widgets/profile_info_card.dart:
+     
+     DISEÑO:
+     - Card con backgroundColor: theme.cardBg
+     - borderRadius: 16
+     - padding: 20
+     - Header con título "Información Personal" y botón "Editar" (lápiz)
+     - Grid de 2 columnas (1 en móvil) con información:
+       * Primer Nombre
+       * Segundo Nombre
+       * Primer Apellido
+       * Segundo Apellido
+       * Fecha de Nacimiento
+       * Estado del Perfil (con indicador de color)
+     - Label en uppercase, fontSize: 12, color: textSecondary
+     - Value fontSize: 15, color: textPrimary, fontWeight: 500
+     
+     FUNCIONALIDAD:
+     - Botón "Editar" abre modal EditProfileModal
+     - Indicador de estado con colores:
+       * completeData: verde
+       * incompleteData: naranja
+       * notverified: gris
+
+6.3) lib/features/profile/presentation/widgets/phones_card.dart:
+     
+     DISEÑO:
+     - Card similar a profile_info_card
+     - Header con título "Teléfonos" y botón "+" circular (40x40px)
+     - Lista de teléfonos:
+       * Fondo: theme.bgSecondary
+       * borderRadius: 12
+       * padding: 16
+       * marginBottom: 12
+       * Título: número completo (+58 412-1234567)
+       * Badge "Principal" si isPrimary (color azul)
+       * Subtítulo: nombre del operador (Movilnet, Movistar, etc.)
+       * Cursor: pointer
+       * Hover: translateX(4px)
+     
+     FUNCIONALIDAD:
+     - Botón "+" abre PhoneFormModal en modo crear
+     - Click en item abre PhoneFormModal en modo editar
+     - Mantener presionado muestra opción de eliminar (con confirmación)
+
+6.4) lib/features/profile/presentation/widgets/addresses_card.dart:
+     
+     DISEÑO:
+     - Card similar a phones_card
+     - Header con título "Direcciones" y botón "+"
+     - Lista de direcciones:
+       * Layout igual que phones
+       * Título: tipo + dirección (Casa - Av. Principal, Edif. A...)
+       * Badge "Por Defecto" si isDefault (color verde)
+       * Subtítulo línea 1: ciudad, estado
+       * Subtítulo línea 2: referencia (si existe)
+     
+     FUNCIONALIDAD:
+     - Botón "+" abre AddressFormModal en modo crear
+     - Click en item abre AddressFormModal en modo editar
+     - Mantener presionado muestra opción de eliminar
+
+6.5) lib/features/profile/presentation/widgets/documents_card.dart:
+     
+     DISEÑO:
+     - Card similar a anteriores
+     - Header con título "Documentos de Identidad" y botón "+"
+     - Lista de documentos:
+       * Layout igual que anteriores
+       * Título: tipo + número (Cédula de Identidad - V-12345678)
+       * Badge "Verificado" si approved (color verde)
+       * Badge "Pendiente" si !approved (color naranja)
+       * Subtítulo: Emitida: DD/MM/YYYY | Vence: DD/MM/YYYY
+     
+     FUNCIONALIDAD:
+     - Botón "+" abre DocumentFormModal en modo crear
+     - Click en item abre DocumentFormModal en modo ver/editar (solo lectura si approved)
+     - NO permitir eliminar si approved
+
+6.6) lib/features/profile/presentation/widgets/commerce_card.dart:
+     
+     DISEÑO:
+     - Card visible SOLO si profileProvider.isSeller
+     - Header con título "Datos del Comercio" y botón "Editar"
+     - Grid de 2 columnas con información:
+       * Nombre del Negocio
+       * Tipo de Negocio
+       * RIF
+       * Cuenta Bancaria (enmascarada: 0134-****-****-1234)
+       * Estado (Verificado/Pendiente con indicador)
+       * Métodos de Pago (badges horizontales)
+     
+     FUNCIONALIDAD:
+     - Botón "Editar" abre CommerceFormModal
+     - Mostrar logo del negocio si existe
+
+6.7) lib/features/profile/presentation/widgets/orders_card.dart:
+     
+     DISEÑO:
+     - Card con título "Mis Órdenes" y botón "Ver Todo"
+     - Lista de últimas 3 órdenes:
+       * Layout igual que anteriores cards
+       * Título: Orden #XXXX con badge de estado
+       * Estados con colores:
+         - pending_payment: azul
+         - paid: verde
+         - preparing: naranja
+         - on_way: amarillo
+         - delivered: verde
+         - cancelled: rojo
+       * Subtítulo: X productos • $XX.XX • DD/MM/YYYY
+     
+     FUNCIONALIDAD:
+     - Botón "Ver Todo" navega a OrdersPage
+     - Click en orden navega a OrderDetailPage
+
+════════════════════════════════════════════════════════════════════════════════
+📝 PASO 7: CREAR MODALES DE FORMULARIOS
+════════════════════════════════════════════════════════════════════════════════
+
+7.1) TODOS los modales deben usar showModalBottomSheet() con:
+     - backgroundColor: theme.cardBg
+     - isScrollControlled: true
+     - shape: RoundedRectangleBorder con borderRadius superior de 20
+     - padding: MediaQuery.of(context).viewInsets para manejar teclado
+     
+7.2) Estructura de cada modal:
+     ```dart
+     return Container(
+       padding: EdgeInsets.only(
+         bottom: MediaQuery.of(context).viewInsets.bottom,
+       ),
+       child: SingleChildScrollView(
+         child: Padding(
+           padding: const EdgeInsets.all(24.0),
+           child: Column(
+             mainAxisSize: MainAxisSize.min,
+             crossAxisAlignment: CrossAxisAlignment.start,
+             children: [
+               // Header con título
+               Text(
+                 'Título del Modal',
+                 style: TextStyle(
+                   fontSize: 20,
+                   fontWeight: FontWeight.w700,
+                   color: theme.textPrimary,
+                 ),
+               ),
+               const SizedBox(height: 24),
+               
+               // Formulario
+               Form(
+                 key: _formKey,
+                 child: Column(
+                   children: [
+                     // Campos del formulario
+                   ],
+                 ),
+               ),
+               
+               const SizedBox(height: 24),
+               
+               // Botones de acción
+               Row(
+                 children: [
+                   Expanded(
+                     child: OutlinedButton(...),  // Cancelar
+                   ),
+                   const SizedBox(width: 12),
+                   Expanded(
+                     child: ElevatedButton(...),  // Guardar
+                   ),
+                 ],
+               ),
+             ],
+           ),
+         ),
+       ),
+     );
+     ```
+
+7.3) phone_form_modal.dart:
+     - Campo: Operador (Dropdown con operator_codes de BD)
+     - Campo: Número (TextField, maxLength: 7, keyboardType: number)
+     - Checkbox: Teléfono Principal
+     - Checkbox: Activo
+     - Validaciones:
+       * Operador requerido
+       * Número requerido, exactamente 7 dígitos
+     - Al guardar: llamar profileProvider.createPhone() o updatePhone()
+
+7.4) address_form_modal.dart:
+     - Campo: Estado (Dropdown - cargar de API)
+     - Campo: Ciudad (Dropdown - cargar según estado seleccionado)
+     - Campo: Calle/Avenida (TextField)
+     - Campo: Número de Casa/Edificio (TextField)
+     - Campo: Código Postal (TextField, opcional)
+     - Campo: Línea 2 (TextField, opcional)
+     - Campo: Referencia (TextArea)
+     - Checkbox: Dirección por Defecto
+     - Validaciones:
+       * Estado requerido
+       * Ciudad requerido
+       * Calle requerido
+       * Número requerido
+
+7.5) document_form_modal.dart:
+     - Campo: Tipo de Documento (Dropdown: CI, Pasaporte, RIF)
+     - Campo: Número de Documento (TextField)
+     - Campo: Fecha de Emisión (DatePicker)
+     - Campo: Fecha de Vencimiento (DatePicker)
+     - Campo: Imagen Frontal (ImagePicker con preview)
+     - Campo: Imagen Posterior (ImagePicker con preview, opcional)
+     - Validaciones:
+       * Tipo requerido
+       * Número requerido
+       * Imagen frontal requerida
+     - Upload de imágenes al guardar
+
+7.6) edit_profile_modal.dart:
+     - Campo: Primer Nombre (TextField)
+     - Campo: Segundo Nombre (TextField, opcional)
+     - Campo: Primer Apellido (TextField)
+     - Campo: Segundo Apellido (TextField, opcional)
+     - Campo: Fecha de Nacimiento (DatePicker)
+     - Campo: Foto de Perfil (ImagePicker con preview circular)
+     - Validaciones:
+       * Nombres y apellidos requeridos
+       * Fecha de nacimiento requerida, mayor de 18 años
+
+7.7) commerce_form_modal.dart:
+     - Campo: Nombre del Negocio (TextField)
+     - Campo: Tipo de Negocio (TextField)
+     - Campo: RIF (TextField con formato J-XXXXXXXXX)
+     - Campo: Cuenta Bancaria (TextField)
+     - Campo: Teléfono del Negocio (TextField)
+     - CheckboxGroup: Métodos de Pago
+       * Stripe
+       * PayPal
+       * Binance
+       * Pago Móvil
+       * Zelle
+     - Campo: Logo del Negocio (ImagePicker con preview)
+     - Validaciones:
+       * Nombre requerido
+       * RIF requerido con formato válido
+       * Al menos un método de pago seleccionado
+
+════════════════════════════════════════════════════════════════════════════════
+🎨 PASO 8: ESTILOS Y WIDGETS REUTILIZABLES
+════════════════════════════════════════════════════════════════════════════════
+
+8.1) Crear lib/shared/widgets/custom_card.dart:
+     ```dart
+     class CustomCard extends StatelessWidget {
+       final Widget child;
+       final EdgeInsetsGeometry? padding;
+       
+       const CustomCard({
+         required this.child,
+         this.padding = const EdgeInsets.all(20),
+       });
+       
+       @override
+       Widget build(BuildContext context) {
+         final theme = context.watch<ThemeProvider>();
+         
+         return Container(
+           decoration: BoxDecoration(
+             color: theme.cardBg,
+             borderRadius: BorderRadius.circular(16),
+             boxShadow: [
+               BoxShadow(
+                 color: Colors.black.withOpacity(0.08),
+                 blurRadius: 8,
+                 offset: const Offset(0, 2),
+               ),
+             ],
+           ),
+           padding: padding,
+           child: child,
+         );
+       }
+     }
+     ```
+
+8.2) Crear lib/shared/widgets/card_header.dart:
+     ```dart
+     class CardHeader extends StatelessWidget {
+       final String title;
+       final Widget? action;
+       
+       const CardHeader({
+         required this.title,
+         this.action,
+       });
+       
+       @override
+       Widget build(BuildContext context) {
+         final theme = context.watch<ThemeProvider>();
+         
+         return Container(
+           padding: const EdgeInsets.only(bottom: 12),
+           margin: const EdgeInsets.only(bottom: 20),
+           decoration: BoxDecoration(
+             border: Border(
+               bottom: BorderSide(
+                 color: theme.borderColor,
+                 width: 2,
+               ),
+             ),
+           ),
+           child: Row(
+             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+             children: [
+               Text(
+                 title,
+                 style: TextStyle(
+                   fontSize: 18,
+                   fontWeight: FontWeight.w700,
+                   color: theme.textPrimary,
+                 ),
+               ),
+               if (action != null) action!,
+             ],
+           ),
+         );
+       }
+     }
+     ```
+
+8.3) Crear lib/shared/widgets/add_button.dart:
+     ```dart
+     class AddButton extends StatelessWidget {
+       final VoidCallback onPressed;
+       
+       const AddButton({required this.onPressed});
+       
+       @override
+       Widget build(BuildContext context) {
+         return Material(
+           color: AppColors.orange,
+           borderRadius: BorderRadius.circular(20),
+           child: InkWell(
+             onTap: onPressed,
+             borderRadius: BorderRadius.circular(20),
+             child: Container(
+               width: 40,
+               height: 40,
+               alignment: Alignment.center,
+               child: const Icon(
+                 Icons.add,
+                 color: Colors.white,
+                 size: 24,
+               ),
+             ),
+           ),
+         );
+       }
+     }
+     ```
+
+8.4) Crear lib/shared/widgets/status_badge.dart:
+     ```dart
+     class StatusBadge extends StatelessWidget {
+       final String text;
+       final Color color;
+       
+       const StatusBadge({
+         required this.text,
+         required this.color,
+       });
+       
+       @override
+       Widget build(BuildContext context) {
+         return Container(
+           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+           decoration: BoxDecoration(
+             color: color,
+             borderRadius: BorderRadius.circular(12),
+           ),
+           child: Text(
+             text,
+             style: const TextStyle(
+               fontSize: 11,
+               fontWeight: FontWeight.w600,
+               color: Colors.white,
+             ),
+           ),
+         );
+       }
+     }
+     ```
+
+8.5) Crear lib/shared/widgets/list_item_tile.dart:
+     ```dart
+     class ListItemTile extends StatelessWidget {
+       final String title;
+       final String? subtitle;
+       final String? subtitle2;
+       final Widget? badge;
+       final VoidCallback onTap;
+       
+       const ListItemTile({
+         required this.title,
+         this.subtitle,
+         this.subtitle2,
+         this.badge,
+         required this.onTap,
+       });
+       
+       @override
+       Widget build(BuildContext context) {
+         final theme = context.watch<ThemeProvider>();
+         
+         return GestureDetector(
+           onTap: onTap,
+           child: Container(
+             margin: const EdgeInsets.only(bottom: 12),
+             padding: const EdgeInsets.all(16),
+             decoration: BoxDecoration(
+               color: theme.bgSecondary,
+               borderRadius: BorderRadius.circular(12),
+             ),
+             child: Column(
+               crossAxisAlignment: CrossAxisAlignment.start,
+               children: [
+                 Row(
+                   children: [
+                     Expanded(
+                       child: Text(
+                         title,
+                         style: TextStyle(
+                           fontSize: 15,
+                           fontWeight: FontWeight.w600,
+                           color: theme.textPrimary,
+                         ),
+                       ),
+                     ),
+                     if (badge != null) badge!,
+                   ],
+                 ),
+                 if (subtitle != null) ...[
+                   const SizedBox(height: 4),
+                   Text(
+                     subtitle!,
+                     style: TextStyle(
+                       fontSize: 13,
+                       color: theme.textSecondary,
+                     ),
+                   ),
+                 ],
+                 if (subtitle2 != null) ...[
+                   const SizedBox(height: 4),
+                   Text(
+                     subtitle2!,
+                     style: TextStyle(
+                       fontSize: 13,
+                       color: theme.textSecondary,
+                     ),
+                   ),
+                 ],
+               ],
+             ),
+           ),
+         );
+       }
+     }
+     ```
+
+════════════════════════════════════════════════════════════════════════════════
+✅ PASO 9: VALIDACIONES Y MANEJO DE ERRORES
+════════════════════════════════════════════════════════════════════════════════
+
+9.1) Crear lib/core/utils/validators.dart (si no existe):
+     ```dart
+     class Validators {
+       static String? required(String? value, [String fieldName = 'Este campo']) {
+         if (value == null || value.trim().isEmpty) {
+           return '$fieldName es requerido';
+         }
+         return null;
+       }
+       
+       static String? phone(String? value) {
+         if (value == null || value.isEmpty) {
+           return 'El número es requerido';
+         }
+         if (value.length != 7) {
+           return 'El número debe tener 7 dígitos';
+         }
+         if (!RegExp(r'^[0-9]+$').hasMatch(value)) {
+           return 'Solo se permiten números';
+         }
+         return null;
+       }
+       
+       static String? rif(String? value) {
+         if (value == null || value.isEmpty) {
+           return 'El RIF es requerido';
+         }
+         if (!RegExp(r'^[VEJPG]-\d{8,9}$').hasMatch(value)) {
+           return 'Formato de RIF inválido (Ej: J-12345678)';
+         }
+         return null;
+       }
+       
+       static String? age(DateTime? date) {
+         if (date == null) return 'La fecha es requerida';
+         
+         final now = DateTime.now();
+         final age = now.year - date.year;
+         
+         if (age < 18) {
+           return 'Debes ser mayor de 18 años';
+         }
+         
+         return null;
+       }
+     }
+     ```
+
+9.2) Manejo de errores en Provider:
+     - Usar try-catch en todas las operaciones async
+     - Guardar mensaje de error en _errorMessage
+     - Mostrar SnackBar al usuario:
+       ```dart
+       if (!result) {
+         ScaffoldMessenger.of(context).showSnackBar(
+           SnackBar(
+             content: Text(profileProvider.errorMessage ?? 'Error'),
+             backgroundColor: AppColors.red,
+           ),
+         );
+       }
+       ```
+
+9.3) Loading states:
+     - Mostrar CircularProgressIndicator durante operaciones
+     - Deshabilitar botones mientras isLoading
+     - Usar Stack con Positioned para overlay de loading si es necesario
+
+════════════════════════════════════════════════════════════════════════════════
+🔧 PASO 10: CONFIGURACIÓN Y DETALLES FINALES
+════════════════════════════════════════════════════════════════════════════════
+
+10.1) Dependencias necesarias en pubspec.yaml:
+      ```yaml
+      dependencies:
+        flutter:
+          sdk: flutter
+        provider: ^6.1.1
+        dio: ^5.4.0
+        shared_preferences: ^2.2.2
+        image_picker: ^1.0.7
+        intl: ^0.19.0
+        flutter_secure_storage: ^9.0.0
+      ```
+
+10.2) Permisos necesarios:
+      
+      Android (android/app/src/main/AndroidManifest.xml):
+      ```xml
+      <uses-permission android:name="android.permission.CAMERA" />
+      <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+      <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+      ```
+      
+      iOS (ios/Runner/Info.plist):
+      ```xml
+      <key>NSCameraUsageDescription</key>
+      <string>Necesitamos acceso a la cámara para subir documentos</string>
+      <key>NSPhotoLibraryUsageDescription</key>
+      <string>Necesitamos acceso a la galería para subir imágenes</string>
+      ```
+
+10.3) Rutas de navegación en app_routes.dart:
+      ```dart
+      '/profile': (context) => const ProfileScreen(),
+      '/orders': (context) => const OrdersPage(),
+      '/order-detail': (context) => const OrderDetailPage(),
+      ```
+
+10.4) Testing básico:
+      - Crear test/unit/profile_provider_test.dart
+      - Mockear ProfileService
+      - Testear cada función del provider
+      - Verificar estados y notifyListeners
+
+════════════════════════════════════════════════════════════════════════════════
+📌 NOTAS IMPORTANTES
+════════════════════════════════════════════════════════════════════════════════
+
+1. RESPONSIVE:
+   - Usar MediaQuery para ajustar tamaños según pantalla
+   - GridView con crossAxisCount dinámico (1 en móvil, 2 en tablet)
+   - Botones siempre deben mantenerse alineados a la derecha (flex + mainAxisAlignment)
+
+2. ACCESIBILIDAD:
+   - Todos los campos de formulario con labels descriptivos
+   - Colores con suficiente contraste
+   - Botones con tamaño mínimo de 44x44px (recomendación iOS/Android)
+
+3. PERFORMANCE:
+   - Usar const constructors donde sea posible
+   - ListView.builder para listas largas
+   - CachedNetworkImage para imágenes de red
+   - Debounce en búsquedas si se agregan
+
+4. SEGURIDAD:
+   - Tokens en flutter_secure_storage
+   - NO loggear información sensible (tokens, documentos, etc.)
+   - Validar en frontend Y backend
+   - Enmascarar datos sensibles (cuentas bancarias, etc.)
+
+5. UX:
+   - Confirmación antes de eliminar items
+   - Loading states en todas las operaciones
+   - Pull to refresh en la pantalla principal
+   - Mensajes de éxito/error claros
+   - Transiciones suaves entre pantallas
+
+6. ORDEN DE IMPLEMENTACIÓN RECOMENDADO:
+   1. Tema y colores
+   2. Modelos de datos
+   3. Servicio API
+   4. Provider
+   5. Pantalla principal con estructura básica
+   6. ProfileHeader
+   7. ProfileInfoCard y su modal
+   8. PhonesCard y su modal
+   9. AddressesCard y su modal
+   10. DocumentsCard y su modal
+   11. CommerceCard y su modal
+   12. OrdersCard (solo lectura)
+   13. Botón de cerrar sesión
+   14. Testing y ajustes finales
+
+════════════════════════════════════════════════════════════════════════════════
+🎯 RESULTADO FINAL ESPERADO
+════════════════════════════════════════════════════════════════════════════════
+
+Una aplicación Flutter con:
+✅ Módulo de perfil completamente funcional
+✅ Modo claro/oscuro que persiste entre sesiones
+✅ Adaptación dinámica según rol del usuario (buyer/seller/admin)
+✅ CRUD completo para teléfonos, direcciones y documentos
+✅ Upload de imágenes (avatar, documentos, logo comercio)
+✅ Diseño moderno, minimalista y responsive
+✅ Manejo robusto de errores y loading states
+✅ Código limpio siguiendo Clean Architecture
+✅ Listo para integrar con backend Laravel existente
+
+════════════════════════════════════════════════════════════════════════════════
+
+-->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil - Zonix Imports</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Colores de AppColors - Light Mode */
+            --blue-dark: #0A2239;
+            --blue: #1CA9E5;
+            --yellow: #FFC72C;
+            --orange: #FF9800;
+            --orange-coral: #FF5722;
+            --red: #FF4B3E;
+            --green: #43D675;
+            --white: #FFFFFF;
+            --black: #000000;
+            --gray-light: #F5F5F5;
+            --gray: #4A4A4A;
+            --gray-dark: #23262B;
+            --background-dark: #181A20;
+            --purple: #8A56AC;
+            --teal: #009688;
+
+            /* Variables dinámicas para tema */
+            --bg-primary: #FFFFFF;
+            --bg-secondary: #F5F5F5;
+            --text-primary: #0A2239;
+            --text-secondary: #4A4A4A;
+            --card-bg: #FFFFFF;
+            --header-bg: #1CA9E5;
+            --border-color: #F5F5F5;
+        }
+
+        /* Dark Mode Variables */
+        body.dark-mode {
+            --bg-primary: #181A20;
+            --bg-secondary: #23262B;
+            --text-primary: #FFFFFF;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --card-bg: #23262B;
+            --header-bg: #0A2239;
+            --border-color: #23262B;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* === HEADER === */
+        .header {
+            background: var(--header-bg);
+            color: var(--white);
+            padding: 60px 20px 40px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 30px;
+            background: var(--bg-secondary);
+            border-radius: 30px 30px 0 0;
+        }
+
+        /* Theme Toggle Button */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: var(--white);
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 4px solid var(--white);
+            margin: 0 auto 15px;
+            object-fit: cover;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .profile-name {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .profile-role {
+            display: inline-block;
+            padding: 6px 16px;
+            background: var(--orange);
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-top: 8px;
+        }
+
+        .profile-email {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        /* === CONTAINER === */
+        .container {
+            max-width: 800px;
+            margin: -20px auto 0;
+            padding: 0 16px 30px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* === CARDS === */
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: background-color 0.3s;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            flex: 1;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+            margin-left: auto;
+        }
+
+        /* === BUTTONS === */
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        /* Botón de agregar circular con + */
+        .btn-add {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--orange);
+            color: var(--white);
+            border: none;
+            font-size: 24px;
+            font-weight: 300;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            padding: 0;
+        }
+
+        .btn-add:hover {
+            background: var(--orange-coral);
+            transform: scale(1.1);
+        }
+
+        .btn-primary {
+            background: var(--orange);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--orange-coral);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--blue);
+            color: var(--white);
+        }
+
+        .btn-secondary:hover {
+            background: #1890c5;
+        }
+
+        .btn-danger {
+            background: var(--red);
+            color: var(--white);
+        }
+
+        .btn-danger:hover {
+            background: #d43e32;
+        }
+
+        .btn-success {
+            background: var(--green);
+            color: var(--white);
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        /* === INFO GRID === */
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .info-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-value {
+            font-size: 15px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* === LIST ITEMS === */
+        .list-item {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            position: relative;
+            transition: background-color 0.3s, transform 0.2s;
+            cursor: pointer;
+        }
+
+        .list-item:hover {
+            transform: translateX(4px);
+        }
+
+        .list-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .list-item-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 15px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .list-item-subtitle {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-primary {
+            background: var(--blue);
+            color: var(--white);
+        }
+
+        .badge-success {
+            background: var(--green);
+            color: var(--white);
+        }
+
+        .badge-warning {
+            background: var(--orange);
+            color: var(--white);
+        }
+
+        .badge-danger {
+            background: var(--red);
+            color: var(--white);
+        }
+
+        /* === EMPTY STATE === */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray);
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        .empty-state-text {
+            font-size: 15px;
+            margin-bottom: 20px;
+        }
+
+        /* === MODAL === */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.3s;
+        }
+
+        .modal-header {
+            padding: 24px 24px 16px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-footer {
+            padding: 16px 24px 24px;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        /* === FORM === */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 15px;
+            font-family: inherit;
+            color: var(--text-primary);
+            background: var(--bg-secondary);
+            transition: border-color 0.2s, background-color 0.3s;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--blue);
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        /* === DOCUMENT PREVIEW === */
+        .document-preview {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .document-image {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid var(--gray-light);
+        }
+
+        /* === RESPONSIVE === */
+        @media (min-width: 768px) {
+            .container {
+                padding: 0 24px 40px;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .card {
+                padding: 24px;
+            }
+
+            .header {
+                padding: 80px 20px 50px;
+            }
+
+            .profile-avatar {
+                width: 120px;
+                height: 120px;
+            }
+
+            .profile-name {
+                font-size: 28px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .card-title {
+                font-size: 16px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .document-preview {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-name {
+                font-size: 20px;
+            }
+
+            .profile-email {
+                font-size: 13px;
+            }
+        }
+
+        /* === ROLE VISIBILITY === */
+        .seller-only {
+            display: none;
+        }
+
+        body[data-role="seller"] .seller-only,
+        body[data-role="admin"] .seller-only {
+            display: block;
+        }
+
+        /* === STATUS INDICATORS === */
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        .status-complete {
+            background: var(--green);
+        }
+
+        .status-incomplete {
+            background: var(--orange);
+        }
+
+        .status-notverified {
+            background: var(--gray);
+        }
+
+        /* === IMAGE UPLOAD === */
+        .image-upload-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            padding: 20px;
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: border-color 0.2s;
+            background: var(--bg-secondary);
+        }
+
+        .image-upload-container:hover {
+            border-color: var(--blue);
+        }
+
+        .image-preview {
+            width: 100%;
+            max-width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 12px;
+            display: none;
+        }
+
+        .image-preview.show {
+            display: block;
+        }
+
+        .upload-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+    </style>
+</head>
+<body data-role="buyer">
+    
+    <!-- === HEADER === -->
+    <div class="header">
+        <button class="theme-toggle" onclick="toggleTheme()" id="themeToggleBtn">
+            ☀️
+        </button>
+        <img src="assets/default_avatar.png" alt="Avatar" class="profile-avatar" id="headerAvatar" onerror="this.src='https://ui-avatars.com/api/?name=Juan+Perez&size=120&background=FF9800&color=fff&bold=true'">
+        <h1 class="profile-name" id="headerName">Juan Pérez González</h1>
+        <p class="profile-email" id="headerEmail">juan.perez@example.com</p>
+        <span class="profile-role" id="headerRole">Comprador</span>
+    </div>
+
+    <!-- === CONTAINER === -->
+    <div class="container">
+
+        <!-- === INFORMACIÓN PERSONAL === -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Información Personal</h2>
+                <div class="card-actions">
+                    <button class="btn btn-primary btn-small" onclick="editProfile()">Editar</button>
+                </div>
+            </div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label">Primer Nombre</span>
+                    <span class="info-value" id="firstName">Juan</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Segundo Nombre</span>
+                    <span class="info-value" id="middleName">Carlos</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Primer Apellido</span>
+                    <span class="info-value" id="lastName">Pérez</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Segundo Apellido</span>
+                    <span class="info-value" id="secondLastName">González</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Fecha de Nacimiento</span>
+                    <span class="info-value" id="dateOfBirth">15/08/1990</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Estado del Perfil</span>
+                    <span class="info-value">
+                        <span class="status-indicator status-complete"></span>
+                        <span id="profileStatus">Completo</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- === TELÉFONOS === -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Teléfonos</h2>
+                <div class="card-actions">
+                    <button class="btn-add" onclick="addPhone()">+</button>
+                </div>
+            </div>
+            <div id="phonesList">
+                <!-- Lista de teléfonos - Click para editar -->
+                <div class="list-item" onclick="editPhone(1)">
+                    <div class="list-item-title">
+                        +58 412-1234567
+                        <span class="badge badge-primary">Principal</span>
+                    </div>
+                    <div class="list-item-subtitle">Movilnet</div>
+                </div>
+
+                <div class="list-item" onclick="editPhone(2)">
+                    <div class="list-item-title">+58 424-9876543</div>
+                    <div class="list-item-subtitle">Movistar</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- === DIRECCIONES === -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Direcciones</h2>
+                <div class="card-actions">
+                    <button class="btn-add" onclick="addAddress()">+</button>
+                </div>
+            </div>
+            <div id="addressesList">
+                <!-- Click para editar -->
+                <div class="list-item" onclick="editAddress(1)">
+                    <div class="list-item-title">
+                        Casa - Av. Principal, Edif. Torre A, Piso 5
+                        <span class="badge badge-success">Por Defecto</span>
+                    </div>
+                    <div class="list-item-subtitle">Caracas, Distrito Capital</div>
+                    <div class="list-item-subtitle">Ref: Frente al centro comercial</div>
+                </div>
+
+                <div class="list-item" onclick="editAddress(2)">
+                    <div class="list-item-title">Trabajo - Calle Comercio #123</div>
+                    <div class="list-item-subtitle">Valencia, Carabobo</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- === DOCUMENTOS === -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Documentos de Identidad</h2>
+                <div class="card-actions">
+                    <button class="btn-add" onclick="addDocument()">+</button>
+                </div>
+            </div>
+            <div id="documentsList">
+                <!-- Click para ver detalle -->
+                <div class="list-item" onclick="viewDocument(1)">
+                    <div class="list-item-title">
+                        Cédula de Identidad - V-12345678
+                        <span class="badge badge-success">Verificado</span>
+                    </div>
+                    <div class="list-item-subtitle">Emitida: 15/01/2020 | Vence: 15/01/2030</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- === DATOS DE COMERCIO (Solo para Vendedores) === -->
+        <div class="card seller-only">
+            <div class="card-header">
+                <h2 class="card-title">Datos del Comercio</h2>
+                <div class="card-actions">
+                    <button class="btn btn-primary btn-small" onclick="editCommerce()">Editar</button>
+                </div>
+            </div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label">Nombre del Negocio</span>
+                    <span class="info-value" id="businessName">Tienda El Ejemplo</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Tipo de Negocio</span>
+                    <span class="info-value" id="businessType">Electrónica</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">RIF</span>
+                    <span class="info-value" id="commerceRif">J-123456789</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Cuenta Bancaria</span>
+                    <span class="info-value" id="bankAccount">0134-****-****-****-1234</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Estado</span>
+                    <span class="info-value">
+                        <span class="status-indicator status-complete"></span>
+                        <span id="commerceStatus">Verificado</span>
+                    </span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Métodos de Pago</span>
+                    <span class="info-value">
+                        <span class="badge badge-primary">Stripe</span>
+                        <span class="badge badge-primary">PayPal</span>
+                        <span class="badge badge-primary">Pago Móvil</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- === HISTORIAL DE ÓRDENES === -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Mis Órdenes</h2>
+                <div class="card-actions">
+                    <button class="btn btn-secondary btn-small" onclick="viewAllOrders()">Ver Todo</button>
+                </div>
+            </div>
+            <div id="ordersList">
+                <!-- Click para ver detalle -->
+                <div class="list-item" onclick="viewOrder(1001)">
+                    <div class="list-item-title">
+                        Orden #1001
+                        <span class="badge badge-success">Entregado</span>
+                    </div>
+                    <div class="list-item-subtitle">3 productos • $150.00 • 15/10/2025</div>
+                </div>
+
+                <div class="list-item" onclick="viewOrder(1002)">
+                    <div class="list-item-title">
+                        Orden #1002
+                        <span class="badge badge-warning">En Camino</span>
+                    </div>
+                    <div class="list-item-subtitle">1 producto • $75.00 • 20/10/2025</div>
+                </div>
+
+                <div class="list-item" onclick="viewOrder(1003)">
+                    <div class="list-item-title">
+                        Orden #1003
+                        <span class="badge badge-primary">Pendiente Pago</span>
+                    </div>
+                    <div class="list-item-subtitle">2 productos • $200.00 • 22/10/2025</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- === CERRAR SESIÓN === -->
+        <div style="margin-top: 30px; margin-bottom: 30px; text-align: center;">
+            <button class="btn btn-danger" style="padding: 12px 40px; font-size: 16px;" onclick="logout()">Cerrar Sesión</button>
+        </div>
+
+    </div>
+
+    <!-- === MODALES === -->
+
+    <!-- Modal: Editar Perfil -->
+    <div class="modal" id="modalEditProfile">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Editar Información Personal</h3>
+            </div>
+            <div class="modal-body">
+                <form id="formEditProfile">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Primer Nombre *</label>
+                            <input type="text" class="form-input" value="Juan" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Segundo Nombre</label>
+                            <input type="text" class="form-input" value="Carlos">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Primer Apellido *</label>
+                            <input type="text" class="form-input" value="Pérez" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Segundo Apellido</label>
+                            <input type="text" class="form-input" value="González">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Fecha de Nacimiento *</label>
+                        <input type="date" class="form-input" value="1990-08-15" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Foto de Perfil</label>
+                        <div class="image-upload-container" onclick="document.getElementById('profileImageInput').click()">
+                            <img id="profileImagePreview" class="image-preview" src="" alt="Preview">
+                            <div class="upload-text">
+                                <p><strong>Toca para subir una imagen</strong></p>
+                                <p style="font-size: 12px;">JPG, PNG (Max 5MB)</p>
+                            </div>
+                        </div>
+                        <input type="file" id="profileImageInput" style="display: none;" accept="image/*" onchange="previewImage(this, 'profileImagePreview')">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('modalEditProfile')">Cancelar</button>
+                <button class="btn btn-primary" onclick="saveProfile()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Agregar/Editar Teléfono -->
+    <div class="modal" id="modalPhone">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="phoneModalTitle">Agregar Teléfono</h3>
+            </div>
+            <div class="modal-body">
+                <form id="formPhone">
+                    <div class="form-group">
+                        <label class="form-label">Código de Operador *</label>
+                        <select class="form-select" required>
+                            <option value="">Seleccionar...</option>
+                            <option value="0412">0412 - Movilnet</option>
+                            <option value="0414">0414 - Movistar</option>
+                            <option value="0424">0424 - Movistar</option>
+                            <option value="0416">0416 - Movistar</option>
+                            <option value="0426">0426 - Movistar</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Número *</label>
+                        <input type="text" class="form-input" placeholder="1234567" maxlength="7" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-group">
+                            <input type="checkbox" class="form-checkbox">
+                            <span class="form-label" style="margin: 0;">Teléfono Principal</span>
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-group">
+                            <input type="checkbox" class="form-checkbox" checked>
+                            <span class="form-label" style="margin: 0;">Activo</span>
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('modalPhone')">Cancelar</button>
+                <button class="btn btn-primary" onclick="savePhone()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Agregar/Editar Dirección -->
+    <div class="modal" id="modalAddress">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="addressModalTitle">Agregar Dirección</h3>
+            </div>
+            <div class="modal-body">
+                <form id="formAddress">
+                    <div class="form-group">
+                        <label class="form-label">Estado *</label>
+                        <select class="form-select" required>
+                            <option value="">Seleccionar...</option>
+                            <option value="1">Distrito Capital</option>
+                            <option value="2">Miranda</option>
+                            <option value="3">Carabobo</option>
+                            <option value="4">Zulia</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Ciudad *</label>
+                        <select class="form-select" required>
+                            <option value="">Seleccionar...</option>
+                            <option value="1">Caracas</option>
+                            <option value="2">Valencia</option>
+                            <option value="3">Maracaibo</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Calle/Avenida *</label>
+                        <input type="text" class="form-input" placeholder="Ej: Av. Principal" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Número de Casa/Edif. *</label>
+                            <input type="text" class="form-input" placeholder="Ej: Edif. A-5" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Código Postal</label>
+                            <input type="text" class="form-input" placeholder="1010">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Línea 2 (Apartamento, Piso, etc.)</label>
+                        <input type="text" class="form-input" placeholder="Ej: Piso 5, Apto 501">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Referencia</label>
+                        <textarea class="form-textarea" placeholder="Puntos de referencia cercanos..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-group">
+                            <input type="checkbox" class="form-checkbox">
+                            <span class="form-label" style="margin: 0;">Dirección por Defecto</span>
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('modalAddress')">Cancelar</button>
+                <button class="btn btn-primary" onclick="saveAddress()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Agregar/Ver Documento -->
+    <div class="modal" id="modalDocument">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="documentModalTitle">Agregar Documento</h3>
+            </div>
+            <div class="modal-body">
+                <form id="formDocument">
+                    <div class="form-group">
+                        <label class="form-label">Tipo de Documento *</label>
+                        <select class="form-select" required>
+                            <option value="">Seleccionar...</option>
+                            <option value="ci">Cédula de Identidad</option>
+                            <option value="passport">Pasaporte</option>
+                            <option value="rif">RIF</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Número de Documento *</label>
+                        <input type="text" class="form-input" placeholder="Ej: V-12345678" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Fecha de Emisión</label>
+                            <input type="date" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Fecha de Vencimiento</label>
+                            <input type="date" class="form-input">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Imagen Frontal *</label>
+                        <div class="image-upload-container" onclick="document.getElementById('frontImageInput').click()">
+                            <img id="frontImagePreview" class="image-preview" src="" alt="Preview">
+                            <div class="upload-text">
+                                <p><strong>Toca para subir imagen del frente</strong></p>
+                                <p style="font-size: 12px;">JPG, PNG (Max 5MB)</p>
+                            </div>
+                        </div>
+                        <input type="file" id="frontImageInput" style="display: none;" accept="image/*" onchange="previewImage(this, 'frontImagePreview')">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Imagen Posterior</label>
+                        <div class="image-upload-container" onclick="document.getElementById('backImageInput').click()">
+                            <img id="backImagePreview" class="image-preview" src="" alt="Preview">
+                            <div class="upload-text">
+                                <p><strong>Toca para subir imagen del reverso</strong></p>
+                                <p style="font-size: 12px;">JPG, PNG (Max 5MB)</p>
+                            </div>
+                        </div>
+                        <input type="file" id="backImageInput" style="display: none;" accept="image/*" onchange="previewImage(this, 'backImagePreview')">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('modalDocument')">Cancelar</button>
+                <button class="btn btn-primary" onclick="saveDocument()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Editar Comercio -->
+    <div class="modal" id="modalCommerce">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Editar Datos del Comercio</h3>
+            </div>
+            <div class="modal-body">
+                <form id="formCommerce">
+                    <div class="form-group">
+                        <label class="form-label">Nombre del Negocio *</label>
+                        <input type="text" class="form-input" value="Tienda El Ejemplo" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Tipo de Negocio *</label>
+                        <input type="text" class="form-input" value="Electrónica" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">RIF *</label>
+                        <input type="text" class="form-input" value="J-123456789" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Cuenta Bancaria</label>
+                        <input type="text" class="form-input" placeholder="0134-0000-0000-0000-0000">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Teléfono del Negocio</label>
+                        <input type="text" class="form-input" placeholder="+58 412-1234567">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Métodos de Pago Aceptados</label>
+                        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
+                            <label class="checkbox-group">
+                                <input type="checkbox" class="form-checkbox" checked>
+                                <span>Stripe</span>
+                            </label>
+                            <label class="checkbox-group">
+                                <input type="checkbox" class="form-checkbox" checked>
+                                <span>PayPal</span>
+                            </label>
+                            <label class="checkbox-group">
+                                <input type="checkbox" class="form-checkbox">
+                                <span>Binance</span>
+                            </label>
+                            <label class="checkbox-group">
+                                <input type="checkbox" class="form-checkbox" checked>
+                                <span>Pago Móvil</span>
+                            </label>
+                            <label class="checkbox-group">
+                                <input type="checkbox" class="form-checkbox">
+                                <span>Zelle</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Logo del Negocio</label>
+                        <div class="image-upload-container" onclick="document.getElementById('commerceImageInput').click()">
+                            <img id="commerceImagePreview" class="image-preview" src="" alt="Preview">
+                            <div class="upload-text">
+                                <p><strong>Toca para subir logo</strong></p>
+                                <p style="font-size: 12px;">JPG, PNG (Max 5MB)</p>
+                            </div>
+                        </div>
+                        <input type="file" id="commerceImageInput" style="display: none;" accept="image/*" onchange="previewImage(this, 'commerceImagePreview')">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('modalCommerce')">Cancelar</button>
+                <button class="btn btn-primary" onclick="saveCommerce()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Confirmar Eliminación -->
+    <div class="modal" id="modalConfirmDelete">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Confirmar Eliminación</h3>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 15px; color: var(--gray);">¿Estás seguro que deseas eliminar este elemento? Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('modalConfirmDelete')">Cancelar</button>
+                <button class="btn btn-danger" onclick="confirmDelete()">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- === JAVASCRIPT === -->
+    <script>
+        // Simular datos del usuario (en producción vendría del backend)
+        let currentUserRole = 'buyer'; // buyer, seller, admin
+        let isDarkMode = false;
+
+        // Inicializar tema desde localStorage
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                isDarkMode = true;
+                document.getElementById('themeToggleBtn').textContent = '🌙';
+            }
+        }
+
+        // Cambiar tema
+        function toggleTheme() {
+            isDarkMode = !isDarkMode;
+            document.body.classList.toggle('dark-mode');
+            
+            // Actualizar ícono
+            const btn = document.getElementById('themeToggleBtn');
+            btn.textContent = isDarkMode ? '🌙' : '☀️';
+            
+            // Guardar preferencia
+            localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+        }
+
+        // Cambiar rol para probar (eliminar en producción)
+        function changeRole(role) {
+            currentUserRole = role;
+            document.body.setAttribute('data-role', role);
+            
+            // Actualizar header
+            const roleNames = {
+                buyer: 'Comprador',
+                seller: 'Vendedor',
+                admin: 'Administrador'
+            };
+            document.getElementById('headerRole').textContent = roleNames[role];
+        }
+
+        // Inicializar al cargar la página
+        window.addEventListener('DOMContentLoaded', function() {
+            initTheme();
+        });
+
+        // Modal functions
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // Cerrar modal al hacer clic fuera
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('active');
+            }
+        }
+
+        // Profile functions
+        function editProfile() {
+            openModal('modalEditProfile');
+        }
+
+        function saveProfile() {
+            // Aquí iría la lógica para guardar en el backend
+            alert('Perfil actualizado correctamente');
+            closeModal('modalEditProfile');
+        }
+
+        // Phone functions
+        function addPhone() {
+            document.getElementById('phoneModalTitle').textContent = 'Agregar Teléfono';
+            openModal('modalPhone');
+        }
+
+        function editPhone(id) {
+            document.getElementById('phoneModalTitle').textContent = 'Editar Teléfono';
+            // Cargar datos del teléfono
+            openModal('modalPhone');
+        }
+
+        function deletePhone(id) {
+            openModal('modalConfirmDelete');
+            // Guardar referencia para la eliminación
+            window.pendingDeleteAction = () => {
+                alert('Teléfono eliminado');
+                closeModal('modalConfirmDelete');
+            };
+        }
+
+        function savePhone() {
+            alert('Teléfono guardado correctamente');
+            closeModal('modalPhone');
+        }
+
+        // Address functions
+        function addAddress() {
+            document.getElementById('addressModalTitle').textContent = 'Agregar Dirección';
+            openModal('modalAddress');
+        }
+
+        function editAddress(id) {
+            document.getElementById('addressModalTitle').textContent = 'Editar Dirección';
+            openModal('modalAddress');
+        }
+
+        function deleteAddress(id) {
+            openModal('modalConfirmDelete');
+            window.pendingDeleteAction = () => {
+                alert('Dirección eliminada');
+                closeModal('modalConfirmDelete');
+            };
+        }
+
+        function saveAddress() {
+            alert('Dirección guardada correctamente');
+            closeModal('modalAddress');
+        }
+
+        // Document functions
+        function addDocument() {
+            document.getElementById('documentModalTitle').textContent = 'Agregar Documento';
+            openModal('modalDocument');
+        }
+
+        function viewDocument(id) {
+            document.getElementById('documentModalTitle').textContent = 'Ver Documento';
+            // Cargar y mostrar documento en modo solo lectura
+            openModal('modalDocument');
+        }
+
+        function deleteDocument(id) {
+            openModal('modalConfirmDelete');
+            window.pendingDeleteAction = () => {
+                alert('Documento eliminado');
+                closeModal('modalConfirmDelete');
+            };
+        }
+
+        function saveDocument() {
+            alert('Documento guardado correctamente');
+            closeModal('modalDocument');
+        }
+
+        // Commerce functions
+        function editCommerce() {
+            openModal('modalCommerce');
+        }
+
+        function saveCommerce() {
+            alert('Datos del comercio actualizados');
+            closeModal('modalCommerce');
+        }
+
+        // Order functions
+        function viewAllOrders() {
+            alert('Redirigiendo a página de órdenes...');
+        }
+
+        function viewOrder(id) {
+            alert('Ver detalle de orden #' + id);
+        }
+
+        function payOrder(id) {
+            alert('Proceder a pagar orden #' + id);
+        }
+
+        function cancelOrder(id) {
+            if (confirm('¿Deseas cancelar esta orden?')) {
+                alert('Orden #' + id + ' cancelada');
+            }
+        }
+
+        // General functions
+        function confirmDelete() {
+            if (window.pendingDeleteAction) {
+                window.pendingDeleteAction();
+                window.pendingDeleteAction = null;
+            }
+        }
+
+        // Logout
+        function logout() {
+            if (confirm('¿Estás seguro que deseas cerrar sesión?')) {
+                // Limpiar datos locales
+                localStorage.removeItem('theme');
+                localStorage.removeItem('userToken');
+                
+                // En producción: redirigir al login
+                alert('Sesión cerrada. Redirigiendo al inicio...');
+                // window.location.href = '/login';
+            }
+        }
+
+        // Image preview
+        function previewImage(input, previewId) {
+            const file = input.files[0];
+            const preview = document.getElementById(previewId);
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.classList.add('show');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Demo: Funciones disponibles en consola
+        console.log('🎭 TEMPLATE ZONIX IMPORTS - PERFIL');
+        console.log('═══════════════════════════════════════');
+        console.log('📱 Funciones de Demo:');
+        console.log('  changeRole("buyer")   - Ver como comprador');
+        console.log('  changeRole("seller")  - Ver como vendedor');
+        console.log('  changeRole("admin")   - Ver como administrador');
+        console.log('  toggleTheme()         - Cambiar modo claro/oscuro');
+        console.log('═══════════════════════════════════════');
+        console.log('💡 El tema se guarda en localStorage');
+        console.log('✨ Template listo para integrar con Flutter');
+    </script>
+
+</body>
+</html>
+

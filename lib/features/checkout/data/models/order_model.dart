@@ -1,5 +1,4 @@
 import 'package:zonix/features/checkout/data/models/address_model.dart';
-import 'package:zonix/features/products/data/models/product_model.dart';
 
 class OrderModel {
   final int id;
@@ -51,10 +50,12 @@ class OrderModel {
       total: (json['total'] as num).toDouble(),
       estimatedDelivery: json['estimated_delivery'] as String?,
       shippingAddress: json['shipping_address'] != null
-          ? AddressModel.fromJson(json['shipping_address'] as Map<String, dynamic>)
+          ? AddressModel.fromJson(
+              json['shipping_address'] as Map<String, dynamic>)
           : null,
       billingAddress: json['billing_address'] != null
-          ? AddressModel.fromJson(json['billing_address'] as Map<String, dynamic>)
+          ? AddressModel.fromJson(
+              json['billing_address'] as Map<String, dynamic>)
           : null,
       commerce: json['commerce'] != null
           ? CommerceMinimal.fromJson(json['commerce'] as Map<String, dynamic>)
@@ -79,7 +80,8 @@ class OrderModel {
       'shipping_total': shippingTotal,
       'total': total,
       'estimated_delivery': estimatedDelivery,
-      if (shippingAddress != null) 'shipping_address': shippingAddress!.toJson(),
+      if (shippingAddress != null)
+        'shipping_address': shippingAddress!.toJson(),
       if (billingAddress != null) 'billing_address': billingAddress!.toJson(),
       if (commerce != null) 'commerce': commerce!.toJson(),
       'items': items.map((item) => item.toJson()).toList(),
@@ -217,4 +219,3 @@ class CommerceMinimal {
     };
   }
 }
-

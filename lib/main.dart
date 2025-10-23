@@ -30,16 +30,17 @@ import 'package:zonix/features/orders/presentation/screens/orders_page.dart';
 
 // Imports del módulo Profile
 import 'package:zonix/features/profile/presentation/providers/profile_provider.dart';
+import 'package:zonix/features/profile/presentation/screens/profile_screen.dart';
+import 'package:zonix/features/profile/data/datasources/unified_profile_service.dart';
+
+// Imports del módulo Theme
+import 'package:zonix/shared/providers/theme_provider.dart';
 
 // import 'dart:io';
 // import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-// import 'package:zonix/features/screens/profile/profile_page.dart';
-import 'package:zonix/shared/widgets/settings_page_2.dart';
 import 'package:zonix/features/auth/presentation/screens/sign_in_screen.dart';
-
-import 'package:zonix/features/profile/data/datasources/profile_service.dart';
 
 /*
  * ZONIX IMPORTS - Aplicación E-commerce MVP
@@ -92,12 +93,14 @@ Future<void> main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => ProductProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => CheckoutProvider()),
         ChangeNotifierProvider(create: (_) => PaymentProvider()),
         ChangeNotifierProvider(create: (_) => OrderProvider()),
-        ChangeNotifierProvider(create: (_) => ProfileProvider()),
+        ChangeNotifierProvider(
+            create: (_) => ProfileProvider(UnifiedProfileService())),
       ],
       child: MyApp(isIntegrationTest: isIntegrationTest),
     ),
@@ -117,9 +120,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
 
-    // Usar WidgetsBinding para ejecutar después del build
+    // Inicializar tema automáticamente
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      themeProvider.initializeTheme(context);
+
       if (isIntegrationTest) {
         // Forzar autenticación como comercio
         userProvider.setAuthenticatedForTest(role: 'commerce');
@@ -291,7 +297,7 @@ class MainRouterState extends State<MainRouter> {
         throw Exception('El ID del usuario es inválido: $id');
       }
       // Obtén el perfil usando el ID del usuario
-      _profile = await ProfileService().getProfileById(id);
+      _profile = await UnifiedProfileService().getProfile();
 
       setState(() {});
     } catch (e) {
@@ -416,7 +422,7 @@ class MainRouterState extends State<MainRouter> {
     if (index == itemCount - 1) {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const SettingsPage2()),
+        MaterialPageRoute(builder: (context) => const ProfileScreen()),
       );
     } else {
       setState(() {
@@ -520,15 +526,20 @@ class MainRouterState extends State<MainRouter> {
                     position: const RelativeRect.fromLTRB(200, 80, 0, 0),
                     items: [
                       PopupMenuItem(
-                        child: const Text('Mi Perfil (próximamente)'),
-                        onTap: () {},
+                        child: const Text('Mi Perfil'),
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ProfileScreen(),
+                          ),
+                        ),
                       ),
                       PopupMenuItem(
                         child: const Text('Configuración'),
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const SettingsPage2(),
+                            builder: (context) => const ProfileScreen(),
                           ),
                         ),
                       ),
@@ -582,11 +593,11 @@ class MainRouterState extends State<MainRouter> {
                           radius: 20,
                           backgroundImage: _getProfileImage(
                             _profile
-                                ?.photo, // Foto del perfil del usuario (desde el backend)
+                                ?.photoUsers, // Foto del perfil del usuario (desde el backend)
                             snapshot
                                 .data!, // Foto de Google (si está disponible)
                           ),
-                          child: (_profile?.photo == null &&
+                          child: (_profile?.photoUsers == null &&
                                   snapshot.data == null)
                               ? const Icon(Icons.person,
                                   color: Colors
